@@ -152,8 +152,8 @@ Hallway:
  control: hidden
  entities:
  - group.Hallway_Light
- - light.gateway_light_7811dcb215d2
- - sensor.illumination_7811dcb215d2
+ - !secret xg_light
+ - !secret xg_sensor
  - binary_sensor.motion_sensor_158d0002236930
  - sensor.illumination_158d0002236930
  - binary_sensor.door_window_sensor_158d0001fa8dce

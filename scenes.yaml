@@ -50,7 +50,7 @@
 
 - name: Gateway
   entities:
-    light.gateway_light_7811dcb215d2:
+    !secret xg_light:
       state: on
       brightness_pct: 10
       color_name: darkred

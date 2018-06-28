@@ -105,8 +105,12 @@ binary_sensor.motion_sensor_158d0001b1cd72:
 sensor.illumination_158d0001b1cd72:
   friendly_name: "Light"
 
-sensor.illumination_7811dcb215d2:
+!secret xg_sensor:
   friendly_name: "Light"
+
+!secret xg_light:
+  friendly_name: "Gateway"
+  icon: mdi:ladybug
 
 binary_sensor.door_window_sensor_158d0002011816:
   friendly_name: "Couch"
@@ -120,10 +124,6 @@ sensor.couch:
 binary_sensor.door_window_sensor_158d0001fa8dce:
   friendly_name: "Door"
   icon: mdi:door
-
-light.gateway_light_7811dcb215d2:
-  friendly_name: "Gateway"
-  icon: mdi:ladybug
 
 sensor.bob:
   friendly_name: "Movement"

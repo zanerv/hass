@@ -92,7 +92,7 @@
         option: Home
     - service: xiaomi_aqara.play_ringtone
       data:
-        gw_mac: 7811dcb215d2
+        gw_mac: !secre xg_mac
         ringtone_id: 10002
         ringtone_vol: 50
         
@@ -108,7 +108,7 @@
   action:
     - service: xiaomi_aqara.play_ringtone
       data_template:
-        gw_mac: 7811dcb215d2
+        gw_mac: !secre xg_mac
         ringtone_vol: 50
         ringtone_id: '{{ (range(10000, 10003)|random) }}'
         
@@ -129,7 +129,7 @@
   action:
     - service: xiaomi_aqara.play_ringtone
       data:
-        gw_mac: 7811dcb215d2
+        gw_mac: !secret xg_mac
         ringtone_id: 10001
         ringtone_vol: 3
     - service: notify.hass
@@ -415,7 +415,7 @@
     to: 'Motion'
   condition:
     condition: numeric_state
-    entity_id: sensor.illumination_7811dcb215d2
+    entity_id: !secret xg_sensor
     below: 300
   action:
     - service: scene.turn_on
@@ -431,7 +431,7 @@
       minutes: 5
   action:
     - service: light.turn_off
-      entity_id: light.gateway_light_7811dcb215d2
+      entity_id: !secret xg_light
 
 - alias: 'Kitchen ON'
   initial_state: True
