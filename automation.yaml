@@ -92,7 +92,7 @@
         option: Home
     - service: xiaomi_aqara.play_ringtone
       data:
-        gw_mac: !secre xg_mac
+        gw_mac: !secret xg_mac
         ringtone_id: 10002
         ringtone_vol: 50
         
@@ -108,7 +108,7 @@
   action:
     - service: xiaomi_aqara.play_ringtone
       data_template:
-        gw_mac: !secre xg_mac
+        gw_mac: !secret xg_mac
         ringtone_vol: 50
         ringtone_id: '{{ (range(10000, 10003)|random) }}'
         
