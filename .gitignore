@@ -1,9 +1,10 @@
 home-assistant.log
+.cloud/
+deps/
 www/
 tts/
 ssl/
-deps/
-custom_components/device_tracker
+custom_components/
 secrets.yaml
 known_devices.yaml
 entity_registry.yaml
