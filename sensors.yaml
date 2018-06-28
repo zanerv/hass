@@ -13,7 +13,7 @@
       friendly_name: 'Z'
     ro_status:
       value_template: '{{ states.input_select.ro_status_dropdown.state }}'
-      friendly_name: 'Rodica'
+      friendly_name: !secret she
     cube_last:
       friendly_name: "Cube"
       value_template: '{{ states.binary_sensor.cube_158d0001035b08.attributes.last_action }}'

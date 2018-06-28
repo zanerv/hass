@@ -260,4 +260,4 @@ switch.holiday:
 sensor.z_status:
   entity_picture: /local/haiti.jpg
 sensor.ro_status:
-  entity_picture: /local/rodica.jpg
+  entity_picture: /local/she.jpg

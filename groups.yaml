@@ -216,7 +216,7 @@ us:
  - device_tracker.rmi
 
 ro:
- name: "Rodica"
+ name: !secret she
  entities:
  - device_tracker.r
  - device_tracker.rdell
