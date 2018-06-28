@@ -1,0 +1,165 @@
+homeassistant:
+  # Name of the location where Home Assistant is running
+  name: Home
+  # Location required to calculate the time the sun rises and sets
+  latitude: !secret latitude
+  longitude: !secret longitude
+  # Impacts weather/sunrise data (altitude above sea level in meters)
+  elevation: 185
+  # metric for Metric, imperial for Imperial
+  unit_system: metric
+  # Pick yours from here: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+  time_zone: !secret time_zone
+  # Customization file
+  customize: !include customizes.yaml
+  packages: !include_dir_named packages/
+  
+input_boolean:
+  mmode:
+    initial: off
+
+#logger:
+#  default: debug
+influxdb:
+recorder:
+  db_url: !secret db_url
+
+panel_iframe:
+  editor:
+    title: Editor
+    icon: mdi:creation
+    url: !secret url
+
+vacuum:
+  - platform: xiaomi_miio
+    host: !secret vaccum
+    name: 'Harry Potter'
+    token: !secret vaccum_token
+
+xiaomi_aqara:
+  gateways:
+  - mac: !secret xg_mac
+    key: !secret xg_key
+    host: !secret xg_host
+
+mqtt:
+  broker: !secret mqtt_broker
+  port: !secret mqtt_port
+  client_id: home-assistant-1
+#  keepalive: 60
+  username: !secret mqtt_user
+  password: !secret mqtt_password
+
+# Enables configuration UI
+config:
+
+http:
+  #ssl_certificate: !secret ssl_certificate
+  #ssl_key: !secret ssl_key
+  # Secrets are defined in the file secrets.yaml
+  # api_password: !secret http_password
+  # Uncomment this if you are using SSL/TLS, running in Docker container, etc.
+  # base_url: !secret base_url
+
+# Checks for available updates
+# Note: This component will send some information about your system to
+# the developers to assist with development of Home Assistant.
+# For more information, please see:
+# https://home-assistant.io/blog/2016/10/25/explaining-the-updater/
+updater:
+  # Optional, allows Home Assistant developers to focus on popular components.
+  # include_used_components: true
+
+# Discover some devices automatically
+#discovery:
+
+# Allows you to issue voice commands from the frontend in enabled browsers
+conversation:
+
+# Enables support for tracking state changes over time
+history:
+
+# View all events in a logbook
+logbook:
+
+# Enables a map showing the location of tracked devices
+#map:
+
+# Track the sun
+sun:
+
+# Text to speech
+tts:
+  - platform: google
+
+shopping_list:
+
+# Plex
+media_player:
+  - platform: plex
+    entity_namespace: 'plex'
+    include_non_clients: true
+    scan_interval: 5
+    show_all_controls: false
+    use_custom_entity_ids: true
+    use_episode_art: true
+
+  - platform: firetv
+    device: sleepingroom
+    name: FireTV
+    host: !secret firetv_host
+    port: !secret firetv_port
+    
+
+device_tracker:
+  - platform: snmp
+    host: !secret snmp_host
+    community: !secret snmp_community
+    baseoid: !secret snmp_baseoid
+    interval_seconds: 30
+    consider_home: 60
+  - platform: nmap_tracker
+    hosts: !secret nmap_hosts
+    home_interval: 10
+    exclude:
+     - !secret mqtt_broker
+  - platform: ping
+    hosts:
+      WC: !secret WC
+      masa: !secret masa
+      Hallway1: !secret Hallway1
+      Kitchen: !secret Kitchen
+    count: 2
+
+notify:
+  - name: hass
+    platform: pushbullet
+    api_key: !secret pushbullet_api
+
+# Enables the frontend
+frontend:
+#  extra_html_url:
+#    - /local/custom_ui/state-card-custom_light.html
+
+  javascript_version: latest
+  themes: !include themes.yaml
+
+scene: !include scenes.yaml
+
+automation: !include automation.yaml
+
+light: !include lights.yaml
+
+switch: !include switches.yaml
+
+sensor: !include sensors.yaml
+
+binary_sensor: !include binary_sensor.yaml
+
+group: !include groups.yaml
+
+script: !include scripts.yaml
+
+input_select: !include input_select.yaml
+
+shell_command: !include shell_command.yaml  

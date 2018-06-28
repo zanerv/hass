@@ -1,0 +1,140 @@
+default_view:
+  name: Home
+  view: yes
+  icon: mdi:home
+  entities:
+  - group.za
+  - group.riki
+  - group.light
+  - group.tweek
+  - group.Monitoring
+  - media_player.plex_web_firefox
+  - media_player.plex_web_chrome
+
+Automation:
+  name: Automation
+  view: yes
+  icon: mdi:robot
+  entities:
+  - group.all_automations
+  - scene.hallway_morning
+  - scene.hallway_night
+  - scene.hallway_off
+
+Weather:
+  name: Weather 
+  view: yes
+  icon: mdi:weather-cloudy
+  entities:
+  - group.Environment
+
+devices:
+  name: Devices
+  view: yes
+  icon: mdi:home-map-marker
+  entities:
+  - group.all_devices
+  - group.us
+
+dev:
+  view: yes
+  icon: mdi:test-tube
+  entities:
+  - group.Food
+  - group.entrance
+systemmonitor  - group.all_switches
+  - group.all_lights
+  - switch.projector
+  - group.Cafea
+  - sensor.tweek
+  - sensor.bob
+  - binary_sensor.overcast
+  - light.hallway_1
+  - light.hallway_2
+  - light.hallway_3
+  - light.kitchen
+
+Za:
+ name: 'Guster switch'
+ entities:
+ - switch.bob
+ - automation.bob_night
+
+Riki:
+ name: "Riki"
+ control: hidden
+ entities:
+ - switch.rikis_food
+# - automation.815__1800_feed_za_animal
+
+Hallway:
+ name: Hallway
+ entities:
+ - light.hallway_1
+ - light.hallway_2
+ - light.hallway_3
+
+Light:
+ name: Lights
+ entities:
+ - light.kitchen
+ - group.hallway
+
+Cafea:
+ control: hidden
+ name: Coffee
+ icon: mdi:home
+ entities:
+ - switch.wakeup
+ - switch.cafea
+ - sensor.cup_template
+
+Tweek:
+ control: hidden
+ name: Tweek
+ entities:
+ - switch.wake_up
+ - switch.espresso
+ - switch.coffee
+
+Environment:
+ name: Afara 3D
+ entities:
+ - sun.sun 
+ - sensor.dark_sky_template
+ - sensor.yr_symbol
+ - sensor.dark_sky_apparent_temperature
+ - sensor.yr_temperature
+ - sensor.yr_wind_speed
+ - sensor.yr_precipitation
+ - sensor.dark_sky_cloud_coverage
+ - sensor.yr_cloudiness
+us:
+ name: "Tracked"
+ entities:
+ - device_tracker.z
+ - device_tracker.r
+ - device_tracker.rdell
+
+Food:
+ control: hidden
+ name: Food</dev>
+ entities:
+ - switch.caruso
+ - switch.fortys
+ - switch.holiday
+
+Monitoring:
+ name: niggers
+ icon: mdi:account-multiple
+ entities:
+ - sensor.stats_count
+ - sensor.peter
+ - sensor.dave
+ - sensor.cup
+
+Entrance:
+ name: Entrance
+ entities:
+ - switch.entrance
+ - sensor.entrance

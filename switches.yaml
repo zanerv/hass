@@ -1,0 +1,111 @@
+- platform: mqtt
+  name: "Socket"
+  state_topic: "stat/socket/POWER"
+  command_topic: "cmnd/socket/POWER"
+  availability_topic: "tele/socket/LWT"
+  qos: 1
+  payload_on: "ON"
+  payload_off: "OFF"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+  retain: true
+
+- platform: mqtt
+  name: "Trantor power"
+  state_topic: "stat/trantor/POWER"
+  command_topic: "cmnd/trantor/POWER"
+  availability_topic: "tele/trantor/LWT"
+  qos: 1
+  payload_on: "ON"
+  payload_off: "OFF"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+  retain: true
+  # The following switch orders food
+# - platform: command_line
+  # switches:
+    # fortys:
+      # command_on: " "
+      # command_off: " "
+      # command_state: " "
+      # #value_template: '{{ value == "1" }}'
+      # friendly_name: "Forty Cowboy Pizza"
+
+# - platform: command_line
+  # switches:
+    # caruso:
+      # command_on: " "
+      # command_off: " "
+      # command_state: " "
+      # #value_template: '{{ value == "1" }}'
+      # friendly_name: "Caruso Contadina Pizza"
+
+# - platform: command_line
+  # switches:
+    # holiday:
+      # command_on: " "
+      # command_off: " "
+      # command_state: " "
+      # #value_template: '{{ value == "1" }}'
+      # friendly_name: "Holiday Zebra"
+
+- platform: mqtt
+  name: "Riki's food"
+  state_topic: "home/riki/stat"
+  command_topic: "home/riki"
+  qos: 0
+  payload_on: "push"
+  payload_off: "off"
+  retain: true
+
+# The following switch wakes up the coffee machine
+- platform: mqtt
+  name: "Wake Up"
+  state_topic: "home/tweek/status"
+  command_topic: "home/tweek/cmd"
+  qos: 0
+  payload_on: "0"
+  payload_off: "9"
+  retain: true
+  value_template: >
+        {% if value == 'on' %}
+        0
+        {% elif value == 'standby' %}
+        9
+        {% endif %}
+
+# The following switches makes coffee      
+- platform: mqtt
+  name: "Espresso"
+  state_topic: "home/tweek/status"
+  command_topic: "home/tweek/cmd"
+  qos: 0
+  payload_on: "1"
+  payload_off: "9"
+  retain: true
+  value_template: >
+        {% if value == 'esspresso' %}
+        1
+        {% elif value == 'standby' %}
+        9
+        {% endif %}
+
+- platform: mqtt
+  name: "Coffee"
+  state_topic: "home/tweek/status"
+  command_topic: "home/tweek/cmd"
+  qos: 0
+  payload_on: "2"
+  payload_off: ""
+  retain: true
+  value_template: '{{ value == "coffee" }}'
+
+- platform: mqtt
+  name: "Projector"
+  state_topic: "home/lupa/cmd"
+#  state_topic: "home/lupa/status"
+  command_topic: "home/lupa/cmd"
+  qos: 0
+  payload_on: "on"
+  payload_off: "off"
+  retain: true

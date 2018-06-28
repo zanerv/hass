@@ -1,0 +1,35 @@
+  guest:
+    name: Guest
+    options:
+      - Home
+      - Away
+
+  location:
+    name: Location
+    options:
+      - Couch
+      - Kitchen
+      - Bob
+      - Entrance
+      - WC
+      - Living
+      - Hallway
+      - Masa
+
+  z_status_dropdown:
+    name: Z
+    options:
+      - Home
+      - Just Arrived
+      - Just Left
+      - Away
+      - Extended Away
+
+  ro_status_dropdown:
+    name: Rodica
+    options:
+      - Home
+      - Just Arrived
+      - Just Left
+      - Away
+      - Extended Away

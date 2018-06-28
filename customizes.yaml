@@ -1,0 +1,263 @@
+device_tracker.hallway1:
+  hidden: true
+
+device_tracker.kitchen:
+  hidden: true
+
+device_tracker.masa:
+  hidden: true
+
+device_tracker.wc:
+  hidden: true
+
+binary_sensor.switch_158d00021323b6:
+  friendly_name: "Button"
+  hidden: true
+
+sensor.firetv:
+  hidden: true
+
+binary_sensor.switch_158d0001f4b243:
+  hidden: true
+
+sensor.Temperature_158d0002271513:
+  friendly_name: "Temperature"
+
+sensor.Humidity_158d0002271513:
+  friendly_name: "Humidity"
+
+sensor.Pressure_158d0002271513:
+  friendly_name: "Pressure"
+
+sensor.Temperature_158d000227b7d2:
+  friendly_name: "Temperature"
+
+sensor.Humidity_158d000227b7d2:
+  friendly_name: "Humidity"
+
+sensor.Pressure_158d000227b7d2:
+  friendly_name: "Pressure"
+
+light.masa:
+  icon: mdi:ceiling-light
+  friendly_name: "Dota Table"
+
+light.spot:
+  icon: mdi:spotlight-beam
+  friendly_name: "Spot"
+
+sensor.entrance:
+  friendly_name: "Movement"
+  icon: mdi:walk
+  # value_template: '{{ states.sensor.entrance }}'
+  # icon_template: >
+          # {%- if sensor.entrance, Clear -%}
+            # mdi:walk
+          # {%- else -%}
+            # mdi:help-circle
+          # {%- endif -%}
+  # icon_template: >
+    # {% if is_state('sensor.entrance', 'Clear') %}
+      # mdi:walk
+    # {% elif is_state('sensor.entrance', 'Detected') %}
+      # mdi:transit-transfer
+    # {% else %}
+      # mdi:help-circle
+    # {% endif %}
+
+sensor.masa_pir:
+  icon: mdi:walk
+  friendly_name: "Movement"
+
+light.kitchen:
+  icon: mdi:ceiling-light
+  friendly_name: "Light"
+
+binary_sensor.cube_158d0001035b08:
+  icon: mdi:cube-outline
+  friendly_name: "Cube"
+  hidden: true
+
+sensor.cube_last:
+  icon: mdi:cube
+
+binary_sensor.motion_sensor_158d000222cd2b:
+  friendly_name: "Movement"
+
+sensor.illumination_158d000222cd2b:
+  friendly_name: "Light"
+
+binary_sensor.motion_sensor_158d0002236930:
+  friendly_name: "Movement"
+
+sensor.illumination_158d0002236930:
+  friendly_name: "Light"
+
+binary_sensor.motion_sensor_158d0001e53c55:
+  friendly_name: "Movement"
+
+sensor.illumination_158d0001e53c55:
+  friendly_name: "Light"
+
+binary_sensor.motion_sensor_158d0001b1cd72:
+  friendly_name: "Movement"
+
+sensor.illumination_158d0001b1cd72:
+  friendly_name: "Light"
+
+sensor.illumination_7811dcb215d2:
+  friendly_name: "Light"
+
+binary_sensor.door_window_sensor_158d0002011816:
+  friendly_name: "Couch"
+  icon: mdi:sofa
+  hidden: true
+
+sensor.couch:
+  friendly_name: "Couch"
+  icon: mdi:sofa
+
+binary_sensor.door_window_sensor_158d0001fa8dce:
+  friendly_name: "Door"
+  icon: mdi:door
+
+light.gateway_light_7811dcb215d2:
+  friendly_name: "Gateway"
+  icon: mdi:ladybug
+
+sensor.bob:
+  friendly_name: "Movement"
+  icon: mdi:walk
+
+switch.socket:
+  friendly_name: "Socket"
+  icon: mdi:power-socket-eu
+
+sensor.uptime:
+  icon: mdi:calendar-today
+sensor.voltage:
+  icon: mdi:power-socket-eu
+sensor.power:
+  icon: mdi:speedometer
+sensor.today:
+  icon: mdi:gauge-empty
+sensor.yesterday:
+  icon: mdi:gauge
+sensor.total_since_04feb:
+  icon: mdi:gauge-full
+sensor.t_voltage:
+  friendly_name: "Voltage"
+  icon: mdi:power-socket-eu
+sensor.t_power:
+  friendly_name: "Power"
+  icon: mdi:speedometer
+sensor.t_today:
+  friendly_name: "Today"
+  icon: mdi:gauge-empty
+sensor.t_yesterday:
+  friendly_name: "Yesterday"
+  icon: mdi:gauge
+sensor.t_total_since_17mar:
+  friendly_name: "Total sience 17/Mar"
+  icon: mdi:gauge-full
+
+sensor.plex:
+  icon: mdi:plex
+
+sensor.cpu_temperature:
+  icon: mdi:temperature-celsius
+
+sensor.yr_cloudiness:
+  friendly_name: Cloud Level
+  icon: mdi:cloud
+
+group.all_sensors:
+  control: hidden
+  hidden: false
+  friendly_name: "Sensors"
+
+group.all_switches:
+  control: hidden
+  hidden: false
+  friendly_name: "Switches"
+
+group.all_lightss:
+  hidden: false
+  friendly_name: "Lights"
+
+automation.815__1800_feed_za_animal:
+  icon: mdi:timetable
+
+group.all_automations:
+  hidden: false
+  friendly_name: "Automation"
+
+group.all_devices:
+  hidden: false
+  friendly_name: "Devices"
+
+switch.rikis_food:
+  icon: mdi:cat
+
+switch.bob:
+  icon: mdi:sofa
+
+#automation.bob_night:
+input_boolean.meh:
+  friendly_name: "Manual Mode"
+  icon: mdi:human-greeting
+#brightness-auto
+
+cover.bob:
+  friendly_name: "Bob"
+  assumed_state: true
+  icon: mdi:sofa
+  
+sensor.dark_sky_apparent_temperature:
+  friendly_name: "Feels like"
+sensor.yr_precipitation:
+  friendly_name: "Precipitation"
+  icon: mdi:weather-rainy
+sensor.yr_symbol:
+  friendly_name: "Sky"
+  hidden: true
+sensor.yr_temperature:
+  friendly_name: "Temperature"
+sensor.yr_wind_speed:
+  friendly_name: "Wind"
+  icon: mdi:weather-windy-variant
+sensor.standby:
+  icon: mdi:power-settings
+
+switch.wakeup:
+  icon: mdi:power-settings
+switch.wake_up:
+  icon: mdi:power-settings
+switch.cafea:
+  icon: mdi:coffee-to-go
+switch.espresso:
+  icon: mdi:coffee
+switch.coffee:
+  icon: mdi:coffee-outline
+
+sensor.dark_sky_template:
+  friendly_name: "Sky"
+sensor.dark_sky_icon:
+  hidden: true
+sensor.cup:
+  hidden: true
+sensor.dark_sky_summary:
+  hidden: true
+sensor.cup_template:
+  friendly_name: "Cup"
+switch.fortys:
+  icon: mdi:pizza
+switch.caruso:
+  icon: mdi:pizza
+switch.holiday:
+  icon: mdi:food
+
+sensor.z_status:
+  entity_picture: /local/haiti.jpg
+sensor.ro_status:
+  entity_picture: /local/rodica.jpg

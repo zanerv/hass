@@ -1,0 +1,1034 @@
+
+- id: restart_firetv
+  alias: 'Restart FireTv'
+  initial_state: True
+  trigger:
+     - platform: state
+       entity_id: 'sensor.firetv'
+  action:
+      - service: shell_command.restart_firetv
+
+- id: theme
+  alias: 'Theme'
+  initial_state: True
+  trigger:
+     - platform: homeassistant
+       event: start
+     - platform: time
+       at: '21:00'
+  action:
+      - service: frontend.set_theme
+        data_template:
+          name: >
+            {% if now().strftime('%H')|int >= 0 and now().strftime('%H')|int <= 9 %}
+              default
+            {% else %}
+              Night
+            {% endif %}
+
+- id: kitchen_to_couch
+  alias: from kitchen to couch
+  initial_state: True
+  trigger:
+     - platform: state
+       entity_id: 'sensor.couch'
+       to: 'Detected'
+  condition:
+     condition: and
+     conditions:
+      - condition: state
+        entity_id: light.kitchen
+        state: 'on'
+      - condition: template
+        value_template: '{{(as_timestamp(now()) - as_timestamp(states.light.kitchen.last_changed) < 30)}}'
+  action:
+     - service: light.turn_off
+       entity_id: light.kitchen
+
+- id: couch_to_kitchen
+  alias: from couch to kitchen
+  initial_state: True
+  trigger:
+     - platform: state
+       entity_id: 'binary_sensor.motion_sensor_158d000222cd2b'
+       to: 'on'
+  condition:
+     condition: and
+     conditions:
+      - condition: state
+        entity_id: sensor.z_status
+        state: 'Home'
+      - condition: numeric_state
+        entity_id: sensor.illumination_158d0001e53c55
+        below: 30
+      - condition: state
+        entity_id: 'sensor.couch'
+        state: 'Clear'
+      - condition: state
+        entity_id: 'light.kitchen'
+        state: 'off'
+      - condition: state
+        entity_id: 'sensor.bob'
+        state: 'ON'
+  action:
+    # # - wait_template: "{{ states.binary_sensor.motion_sensor_158d000222cd2b.state == 'on' }}"
+      # # timeout: '00:00:20'
+     - service: light.turn_on
+       entity_id: light.kitchen
+
+- id: Monkey
+  alias: 'Monkey'
+  initial_state: True
+  trigger:
+    platform: event
+    event_type: click
+    event_data:
+      entity_id: binary_sensor.switch_158d0001f4b243
+      click_type: long_click_press
+  action:
+    - service: input_select.select_option
+      data:
+        entity_id: 'input_select.ro_status_dropdown'
+        option: Home
+    - service: xiaomi_aqara.play_ringtone
+      data:
+        gw_mac: 7811dcb215d2
+        ringtone_id: 10002
+        ringtone_vol: 50
+        
+- id: button
+  alias: Button
+  initial_state: True
+  trigger:
+   - platform: event
+     event_type: click
+     event_data:
+       entity_id: binary_sensor.switch_158d00021323b6
+       event_type: click
+  action:
+    - service: xiaomi_aqara.play_ringtone
+      data_template:
+        gw_mac: 7811dcb215d2
+        ringtone_vol: 50
+        ringtone_id: '{{ (range(10000, 10003)|random) }}'
+        
+- id: unavailable
+  alias: 'unavailable'
+  initial_state: True
+  trigger:
+    - platform: state
+      entity_id: light.bob, light.wc, light.kitchen, light.hallway_1, light.masa
+      to: 'unavailable'
+      for:
+        seconds: 10
+    # - platform: state
+      # entity_id: device_tracker.wc, device_tracker.kitchen, device_tracker.hallway_1, device_tracker.masa
+      # to: 'not_home'
+      # for:
+        # seconds: 1
+  action:
+    - service: xiaomi_aqara.play_ringtone
+      data:
+        gw_mac: 7811dcb215d2
+        ringtone_id: 10001
+        ringtone_vol: 3
+    - service: notify.hass
+      data_template:
+       title: Unavailable
+       message: '{{ states[trigger.entity_id.split(".")[0]][ trigger.entity_id.split(".")[1]].name }}'
+
+- id: we away
+  alias: 'we are away'
+  initial_state: True
+  trigger:
+    - platform: state
+      entity_id: group.us
+      to: 'not_home'
+      for:
+        minutes: 10
+  condition:
+      - condition: state
+        entity_id: input_select.guest
+        state: 'Away'
+  action:
+    - service: switch.turn_off
+      entity_id: switch.socket
+    - service: light.turn_off
+      entity_id: light.wc,light.kitchen,light.masa,light.hallway_1,light.hallway_2,light.hallway_3,light.bob, light.spot
+
+- id: location
+  alias: 'Last Movement'
+  initial_state: True
+  trigger:
+    #bob
+    - platform: state
+      entity_id: sensor.bob
+      to: 'ON'
+    #masa
+    - platform: state
+      entity_id: sensor.masa_pir
+      to: 'ON'
+    #couch
+    - platform: state
+      entity_id: sensor.couch
+      to: 'Detected'
+    #entrance
+    - platform: state
+      entity_id: sensor.entrance
+      to: 'Motion'
+    #kitchen, WC, Living, Hallway, 
+    - platform: state
+      entity_id: binary_sensor.motion_sensor_158d0001e53c55, binary_sensor.motion_sensor_158d0001b1cd72, binary_sensor.motion_sensor_158d000222cd2b, binary_sensor.motion_sensor_158d0002236930
+      to: 'on'
+      for:
+        seconds: 0.1
+  action:
+      - service: input_select.select_option
+        data_template:
+         entity_id: 'input_select.location'
+         option: >
+           {% if trigger.entity_id == "sensor.bob" %} Bob
+           {% elif trigger.entity_id == "sensor.masa_pir" %} Masa
+           {% elif trigger.entity_id == "sensor.couch" %} Couch
+           {% elif trigger.entity_id == "sensor.entrance" %} Entrance
+           {% elif trigger.entity_id == "binary_sensor.motion_sensor_158d0001e53c55" %} Kitchen
+           {% elif trigger.entity_id == "binary_sensor.motion_sensor_158d0001b1cd72" %} WC
+           {% elif trigger.entity_id == "binary_sensor.motion_sensor_158d000222cd2b" %} Living
+           {% elif trigger.entity_id == "binary_sensor.motion_sensor_158d0002236930" %} Hallway
+           {% endif %}
+
+- alias: Lazy ON
+  initial_state: True
+  trigger:
+    - platform: state
+      entity_id: sensor.couch
+      to: 'Detected'
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: 'input_select.guest'
+        state: 'Away'
+      - condition: template
+        value_template: '{{ not is_state("sensor.ro_status", "Home") or is_state("media_player.firetv", "playing") }}'
+  action:
+    - service: automation.turn_off
+      entity_id: automation.dota_table_on, automation.kitchen_on, automation.hallway_on
+    - service: light.turn_off
+      entity_id: light.wc,light.kitchen,light.masa,light.hallway_1,light.hallway_2,light.hallway_3
+    - service: input_select.select_option
+      data:
+        entity_id: 'input_select.location'
+        option: Couch
+
+- alias: Lazy OFF
+  initial_state: True
+  trigger:
+    - platform: state
+      entity_id: sensor.couch
+      to: 'Clear'
+  action:
+    - service: automation.turn_on
+      entity_id: automation.dota_table_on, automation.kitchen_on, automation.hallway_on
+
+- alias: 'WC Auto OFF'
+  initial_state: True
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.motion_sensor_158d0001e53c55
+    to: 'on'
+    for:
+      seconds: 0.1
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: sensor.ro_status
+        state: 'Away'
+      - condition: state
+        entity_id: input_select.guest
+        state: 'Away'
+      - condition: state
+        entity_id: light.WC
+        state: 'on'
+  action:
+      service: light.turn_off
+      entity_id: light.WC
+
+- id: got_home
+  alias: 'Arrived Home'
+  initial_state: True
+  trigger:
+    platform: state
+    entity_id: binary_sensor.door_window_sensor_158d0001fa8dce
+    to: 'on'
+    for:
+      seconds: 0.1
+  action:
+    - service: automation.trigger
+      entity_id: automation.hallway_on
+
+- id: door
+  alias: 'Door opened'
+  initial_state: True
+  trigger:
+    platform: state
+    entity_id: binary_sensor.door_window_sensor_158d0001fa8dce
+    to: 'on'
+    for:
+      seconds: 0.1
+  condition:
+    - condition: state
+      entity_id: device_tracker.z
+      state: 'not_home'
+  action:
+    - service: notify.hass
+      data:
+        title: Door
+        message: Open
+
+- alias: 'Home Alone'
+  initial_state: True
+  trigger:
+  - platform: state
+    entity_id: group.lights
+    to: 'on'
+    for:
+      seconds: 10
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: 'input_select.guest'
+        state: 'Away'
+      - condition: state
+        entity_id: sensor.ro_status
+        state: 'Away'
+      - condition: state
+        entity_id: sensor.z_status
+        state: 'Home'
+      - condition: state
+        entity_id: sun.sun
+        state: 'below_horizon'
+      - condition: state
+        entity_id: sensor.couch
+        state: 'Detected'
+  action:
+    - service: light.turn_off
+      entity_id: light.kitchen, light.masa, light.wc, light.bob, light.hallway_1, light.hallway_2, light.hallway_3
+
+- alias: 'Sunset'
+  initial_state: True
+  trigger:
+    platform: sun
+    event: sunset
+    offset: '-00:35:00'
+  action:
+    - service: input_boolean.turn_on
+      entity_id: input_boolean.mmode
+
+- alias: Home
+  initial_state: True
+  trigger:
+    - platform: state
+      entity_id: device_tracker.z, group.ro
+      from: 'not_home'
+      to: 'home'
+  action:
+    - service: input_select.select_option
+      data_template:
+        entity_id: >
+          {% if trigger.entity_id == 'device_tracker.z' %}
+            input_select.z_status_dropdown
+          {% else %}
+            input_select.ro_status_dropdown
+          {% endif %}
+        option: Home
+ 
+- alias: Just left
+  initial_state: True
+  trigger:
+    - platform: state
+      entity_id: device_tracker.z, group.ro
+      from: 'home'
+      to: 'not_home'
+  action:
+    - service: input_select.select_option
+      data_template:
+        entity_id: >
+          {% if trigger.entity_id == 'device_tracker.z' %}
+            input_select.z_status_dropdown
+          {% else %}
+            input_select.ro_status_dropdown
+          {% endif %}
+        option: Just Left
+ 
+- alias: Away
+  initial_state: True
+  trigger:
+    - platform: state
+      entity_id: input_select.z_status_dropdown, input_select.ro_status_dropdown
+      to: 'Just Left'
+      for:
+        minutes: 5
+  action:
+    - service: input_select.select_option
+      data_template:
+        entity_id: >
+          {% if trigger.entity_id == 'input_select.z_status_dropdown' %}
+            input_select.z_status_dropdown
+          {% else %}
+            input_select.ro_status_dropdown
+          {% endif %}
+        option: Away
+      
+- alias: Extended away
+  initial_state: True
+  trigger:
+    - platform: state
+      entity_id: input_select.z_status_dropdown, input_select.ro_status_dropdown
+      to: 'Away'
+      for:
+        hours: 24
+  action:
+    - service: input_select.select_option
+      data_template:
+        entity_id: >
+          {% if trigger.entity_id == 'input_select.z_status_dropdown' %}
+            input_select.z_status_dropdown
+          {% else %}
+            input_select.ro_status_dropdown
+          {% endif %}
+        option: Extended Away
+
+- alias: Gateway light ON
+  initial_state: True
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.motion_sensor_158d0002236930
+    from: 'off'
+    to: 'on'
+    for:
+      seconds: 0.1
+  - platform: state
+    entity_id: sensor.entrance
+    to: 'Motion'
+  condition:
+    condition: numeric_state
+    entity_id: sensor.illumination_7811dcb215d2
+    below: 300
+  action:
+    - service: scene.turn_on
+      entity_id: scene.gateway
+
+- alias: Gateway light OFF
+  initial_state: True
+  trigger:
+    platform: state
+    entity_id: binary_sensor.motion_sensor_158d0002236930
+    to: 'off'
+    for:
+      minutes: 5
+  action:
+    - service: light.turn_off
+      entity_id: light.gateway_light_7811dcb215d2
+
+- alias: 'Kitchen ON'
+  initial_state: True
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.motion_sensor_158d0001e53c55
+    to: 'on'
+    for:
+      seconds: 0.1
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: group.us
+        state: home
+      - condition: numeric_state
+        entity_id: sensor.illumination_158d0001e53c55
+        below: 30
+  action:
+      - service: scene.turn_on
+        data_template:
+          entity_id: >
+            {% if now().strftime('%H')|int >= 4 and now().strftime('%H')|int <= 9 %}
+              scene.kitchen_morning
+            {% else %}
+              scene.kitchen_night
+            {% endif %}
+
+- alias: 'Kitchen OFF'
+  initial_state: True
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.motion_sensor_158d0001e53c55
+    to: 'off'
+    for:
+       seconds: 30
+  condition:
+    condition:  state
+    entity_id: light.kitchen
+    state: 'on'
+  action:
+      service: light.turn_off
+      entity_id: light.kitchen
+
+- alias: 'Dota Table ON'
+  initial_state: True
+  trigger:
+  - platform: state
+    entity_id: sensor.masa_pir
+    to: 'ON'
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: group.us
+        state: home
+      - condition: state
+        entity_id: light.masa
+        state: 'off'
+      - condition: numeric_state
+        entity_id: sensor.illumination_158d0001e53c55
+        below: 30
+  action:
+      service: light.turn_on
+      entity_id: light.masa
+
+- alias: 'Dota Table OFF'
+  initial_state: True
+  trigger:
+  - platform: state
+    entity_id: sensor.masa_pir
+    to: 'OFF'
+    for:
+      minutes: 3
+  action:
+      service: light.turn_off
+      entity_id: light.masa
+
+- alias: 'Bob ON'
+  initial_state: True
+  trigger:
+  - platform: state
+    entity_id: sensor.bob
+    to: 'ON'
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: input_boolean.mmode
+        state: 'on'
+      - condition: state
+        entity_id: group.us
+        state: home
+      - condition: state
+        entity_id: sun.sun
+        state: 'below_horizon'
+  action:
+      service: light.turn_on
+      entity_id: light.bob
+
+- alias: 'Bob OFF'
+  initial_state: True
+  trigger:
+    platform: state
+    entity_id: sensor.bob
+    to: 'OFF'
+    for:
+      minutes: 15
+  action:
+      service: light.turn_off
+      entity_id: light.bob, light.spot
+#, switch.projector
+
+- alias: 'Hallway ON'
+  initial_state: True
+  trigger:
+  - platform: state     
+    entity_id: sensor.entrance
+    to: 'Motion'
+  - platform: state     
+    entity_id: binary_sensor.motion_sensor_158d0002236930
+    to: 'on'
+    for:
+      seconds: 0.1
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: group.us
+        state: home
+      - condition: numeric_state
+        entity_id: sensor.illumination_158d0002236930
+        below: 30
+  action:
+    - service: scene.turn_on
+      data_template:
+        entity_id: >
+          {% if now().strftime('%H')|int >= 2 and now().strftime('%H')|int <= 9 %}
+            scene.hallway_morning
+          {% else %}
+            scene.hallway_night
+          {% endif %}
+
+- alias: 'Hallway OFF'
+  initial_state: True
+  trigger:
+  - platform: state
+    entity_id: sensor.entrance
+    to: 'Still'
+    for:
+      seconds: 30
+  - platform: state
+    entity_id: binary_sensor.motion_sensor_158d0002236930
+    to: 'off'
+    for:
+      seconds: 10
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: 'light.hallway_1'
+        state: 'on'
+      - condition: state
+        entity_id: sensor.entrance
+        state: 'Still'
+        for:
+          seconds: 30
+  action:
+      service: light.turn_off
+      entity_id: light.hallway_1,light.hallway_2,light.hallway_3
+
+- alias: 'WC ON'
+  initial_state: True
+  trigger:
+  - platform: state     
+    entity_id: binary_sensor.motion_sensor_158d0001b1cd72
+    to: 'on'
+    for:
+      seconds: 0.1
+  condition:
+    condition: and
+    conditions:
+      - condition: numeric_state
+        entity_id: sensor.illumination_158d0001b1cd72
+        below: 10
+  action:
+    - service: scene.turn_on
+      data_template:
+        entity_id: >
+          {% if now().strftime('%H')|int >= 2 and now().strftime('%H')|int <= 9 %}
+            scene.wc_morning
+          {% else %}
+            scene.wc_night
+          {% endif %}
+
+- alias: 'WC OFF'
+  initial_state: True
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.motion_sensor_158d0001b1cd72
+    to: 'off'
+    for:
+      seconds: 60
+  action:
+      service: light.turn_off
+      entity_id: light.WC
+
+- alias: 'Feed ze animal 8:15 & 17:40'
+  initial_state: True
+  trigger: 
+  #- platform: time
+    #hours: /8
+    #minutes: 00
+    #seconds: 00
+  - platform: time
+    hours: 08
+    minutes: 15
+    seconds: 0
+  - platform: time
+    hours: 17
+    minutes: 40
+    seconds: 0
+  action:
+      service: switch.turn_on
+      entity_id: switch.rikis_food
+
+####Cube####
+- id: cube_rotate
+  alias: Cube rotate
+  initial_state: True
+  trigger:
+    platform: event
+    event_type: cube_action
+    event_data:
+      entity_id: binary_sensor.cube_158d0001035b08
+      action_type: rotate
+  action:
+    - service: homeassistant.toggle
+      entity_id: group.za
+
+- id: tap_twice
+  alias: Cube tap
+  initial_state: True
+  trigger:
+    platform: event
+    event_type: cube_action
+    event_data:
+      entity_id: binary_sensor.cube_158d0001035b08
+      action_type: tap_twice
+  action:
+    - service: input_boolean.turn_off
+      entity_id: input_boolean.mmode
+    - service: light.turn_off
+      entity_id: light.kitchen,light.masa,light.bob
+
+- id: flip90
+  alias: Cube flip90
+  initial_state: True
+  trigger:
+    platform: event
+    event_type: cube_action
+    event_data:
+      entity_id: binary_sensor.cube_158d0001035b08
+      action_type: flip90
+  action:
+    - service: light.toggle
+      entity_id: light.kitchen
+
+- id: flip180
+  alias: Cube flip180
+  initial_state: True
+  trigger:
+    platform: event
+    event_type: cube_action
+    event_data:
+      entity_id: binary_sensor.cube_158d0001035b08
+      action_type: flip180
+  action:
+    - service: light.toggle
+      entity_id: light.masa 
+
+- id: free_fall
+  alias: Cube toggle
+  initial_state: True
+  trigger:
+    platform: event
+    event_type: cube_action
+    event_data:
+      entity_id: binary_sensor.cube_158d0001035b08
+      action_type: free_fall
+  action:
+    - service: automation.toggle
+      entity_id: automation.cube_rotate, automation.cube_flip90, automation.cube_flip180, automation.cube_tap, automation.cube_shake
+    - service: light.toggle
+      entity_id: light.bob
+    - delay: '00:00:01'
+    - service: light.toggle
+      entity_id: light.bob
+
+- id: shake_air
+  alias: Cube shake
+  initial_state: True
+  trigger:
+    platform: event
+    event_type: cube_action
+    event_data:
+      entity_id: binary_sensor.cube_158d0001035b08
+      action_type: shake_air
+  action:
+    - service: light.toggle  
+      entity_id: light.spot
+
+- id: shake_air_bob
+  alias: Cube shake bob 
+  initial_state: True
+  trigger:
+    platform: event
+    event_type: cube_action
+    event_data:
+      entity_id: binary_sensor.cube_158d0001035b08
+      action_type: shake_air
+  action:
+    - service: light.turn_off  
+      entity_id: light.bob
+    - service: input_boolean.turn_off
+      entity_id: input_boolean.mmode
+
+- id: move
+  alias: Cube move
+  initial_state: False
+  trigger:
+    platform: event
+    event_type: cube_action
+    event_data:
+      entity_id: binary_sensor.cube_158d0001035b08
+      action_type: move
+  action:
+    - service: mqtt.publish
+      data:
+        topic: say/Z
+        payload: "Garage door triggered"
+        qos: 0
+    - service: notify.hass
+      data:
+        title: " "
+        message: "Hauarde"
+
+- id: alert
+  alias: 'Cube Alert'
+  initial_state: False
+  trigger:
+    platform: event
+    event_type: cube_action
+    event_data:
+      entity_id: binary_sensor.cube_158d0001035b08
+      action_type: alert
+  action:
+    - service: notify.hass        
+      data_template:
+        title: test
+        message: >
+          {% if now().strftime('%H')|int >= 2 and now().strftime('%H')|int <= 9 %}
+            'alert 2 - 9'
+          {% else %}
+            'alert 9 - 2'
+          {% endif %}
+
+- id: swing
+  alias: 'Cube Swing'
+  initial_state: True
+  trigger:
+    platform: event
+    event_type: cube_action
+    event_data:
+      entity_id: binary_sensor.cube_158d0001035b08
+      action_type: swing
+  action:
+    - service: notify.hass
+      data:
+        title: Swing
+        message: Cube swing
+
+####Monitor devices####
+- id: new_device
+  alias: 'Notify for new devices'
+  initial_state: True
+  trigger:
+    platform: event
+    event_type: device_tracker_new_device
+  action:
+    - service: notify.hass
+      data_template:
+        message: >
+          New device:
+          {{trigger.event.data.host_name}}
+          ({{trigger.event.data.entity_id}})
+        title: new device connected
+    - service: input_select.select_option
+      data:
+        entity_id: 'input_select.guest'
+        option: Home
+
+- id: 2c0e3de5e904
+  hide_entity: True
+  alias: 'Unknown MACs'
+  initial_state: True
+  trigger:
+    - platform: state
+      entity_id: device_tracker.2c0e3de5e904, device_tracker.7c7a912feeb9, device_tracker.74e2f598da40, device_tracker.d013fd42a5f6, device_tracker.001fa7256c4c, device_tracker.00904cc51238
+  action:
+    - service: notify.hass
+      data:
+        message: "One of the tracked devices is connected"
+        title: "Tracking alert"
+
+# - alias: 'Sunrise'
+  # trigger:
+    # platform: sun
+    # event: sunrise
+    # offset: '+00:45:00'
+  # action:
+    # service: input_boolean.turn_off
+    # entity_id: input_boolean.sunset_offset
+
+# - id: Cube
+  # alias: 'Cube'
+  # trigger:
+    # - platform: event
+      # event_type: cube_action
+      # event_data:
+        # entity_id: binary_sensor.cube_158d0001035b08
+        # action_type: rotate
+    # - platform: event
+      # event_type: cube_action
+      # event_data:
+        # entity_id: binary_sensor.cube_158d0001035b08
+        # action_type: tap_twice
+    # - platform: event
+      # event_type: cube_action
+      # event_data:
+        # entity_id: binary_sensor.cube_158d0001035b08
+        # action_type: flip90
+    # - platform: event
+      # event_type: cube_action
+      # event_data:
+        # entity_id: binary_sensor.cube_158d0001035b08
+        # action_type: flip180
+    # - platform: event
+      # event_type: cube_action
+      # event_data:
+        # entity_id: binary_sensor.cube_158d0001035b08
+        # action_type: free_fall
+    # - platform: event
+      # event_type: cube_action
+      # event_data:
+        # entity_id: binary_sensor.cube_158d0001035b08
+        # action_type: shake_air
+    # - platform: event
+      # event_type: cube_action
+      # event_data:
+        # entity_id: binary_sensor.cube_158d0001035b08
+        # action_type: move
+    # - platform: event
+      # event_type: cube_action
+      # event_data:
+        # entity_id: binary_sensor.cube_158d0001035b08
+        # action_type: alert
+    # - platform: event
+      # event_type: cube_action
+      # event_data:
+        # entity_id: binary_sensor.cube_158d0001035b08
+        # action_type: swing
+  # action:
+      # service_template: >
+           # {% if trigger.entity_id.attributes.last_action == "rotate" %} 
+             # homeassistant.toggle
+           # {% elif trigger.entity_id.attributes.last_action == "tap_twice" %} Couch
+           # {% elif trigger.entity_id.attributes.last_action == "flip90" %} Entrance
+           # {% elif trigger.entity_id.attributes.last_action == "flip180" %} Kitchen
+           # {% elif trigger.entity_id.attributes.last_action == "free_fall" %} WC
+           # {% elif trigger.entity_id.attributes.last_action == "shake_air" %} Living
+           # {% elif trigger.entity_id.attributes.last_action == "move" %} Hallway
+           # {% elif trigger.entity_id.attributes.last_action == "alert" %} Hallway
+           # {% elif trigger.entity_id.attributes.last_action == "swing" %} Hallway
+           # {% endif %}
+      # data_template: >
+           # {% if trigger.entity_id.attributes.last_action == "rotate" %}
+             # group.za
+           # {% elif trigger.entity_id.attributes.last_action == "tap_twice" %} Couch
+           # {% elif trigger.entity_id.attributes.last_action == "flip90" %} Entrance
+           # {% elif trigger.entity_id.attributes.last_action == "flip180" %} Kitchen
+           # {% elif trigger.entity_id.attributes.last_action == "free_fall" %} WC
+           # {% elif trigger.entity_id.attributes.last_action == "shake_air" %} Living
+           # {% elif trigger.entity_id.attributes.last_action == "move" %} Hallway
+           # {% elif trigger.entity_id.attributes.last_action == "alert" %} Hallway
+           # {% elif trigger.entity_id.attributes.last_action == "swing" %} Hallway
+           # {% endif %}
+# - alias: from hallway to kitchen
+  # trigger:
+    # - platform: state
+      # entity_id: binary_sensor.motion_sensor_158d0001e53c55
+      # to: 'on'
+      # for:
+        # seconds: 0.1
+  # condition:
+    # condition: and
+    # conditions:
+      # - condition: state
+        # entity_id: 'input_select.location'
+        # state: 'WC to Hallway'
+      # - condition: state
+        # entity_id: sensor.ro_status
+        # state: 'Away'
+      # - condition: state
+        # entity_id: 'input_select.guest'
+        # state: 'Away'
+  # action:
+    # - service: light.turn_off
+      # entity_id: light.hallway_1,light.hallway_2,light.hallway_3
+    # - service: input_select.select_option
+      # data:
+        # entity_id: 'input_select.location'
+        # option: Hallway to Kitchen
+
+# - alias: from hallway to WC 
+  # trigger:
+    # - platform: state
+      # entity_id: binary_sensor.motion_sensor_158d0001b1cd72
+      # to: 'on'
+  # condition:
+    # condition: and
+    # conditions:
+      # - condition: state
+        # entity_id: sensor.ro_status
+        # state: 'Away'
+      # - condition: state
+        # entity_id: 'input_select.guest'
+        # state: 'Away'
+  # action:
+    # - service: light.turn_off
+      # entity_id: light.hallway_1,light.hallway_2,light.hallway_3,light.masa
+    # - service: input_select.select_option
+      # data:
+        # entity_id: 'input_select.location'
+        # option: Hallway to WC
+    # # - delay: 00:00:20
+    
+# - alias: from kitchen to hallway
+  # trigger:
+    # - platform: state
+      # entity_id: binary_sensor.motion_sensor_158d0001e53c55
+      # to: 'on'
+  # condition:
+    # condition: and
+    # conditions:
+      # - condition: state
+        # entity_id: 'input_select.location'
+        # state: 'Couch to Kitchen'
+      # - condition: state
+        # entity_id: sensor.ro_status
+        # state: 'Away'
+      # - condition: state
+        # entity_id: 'input_select.guest'
+        # state: 'Away'
+  # action:
+    # - service: light.turn_off
+      # entity_id: light.bob
+    # - service: input_select.select_option
+      # data:
+        # entity_id: 'input_select.location'
+        # option: Kitchen to Hallway
+
+# - alias: from kitchen to couch
+  # trigger:
+    # - platform: state
+      # entity_id: 'binary_sensor.motion_sensor_158d000222cd2b'
+      # to: 'on'
+      # for:
+        # seconds: 0.1
+  # condition:
+    # condition: and
+    # conditions:
+      # - condition: state
+        # entity_id: sensor.couch
+        # state: 'Detected'
+      # - condition: state
+        # entity_id: sensor.ro_status
+        # state: 'Away'
+      # - condition: state
+        # entity_id: 'input_select.guest'
+        # state: 'Away'
+  # action:
+    # - service: light.turn_off
+      # entity_id: light.kitchen, light.masa
+    # - service: automation.turn_off
+      # entity_id: automation.dota_table_on
+    # - service: input_select.select_option
+      # data:
+        # entity_id: 'input_select.location'
+        # option: Kitchen to Couch

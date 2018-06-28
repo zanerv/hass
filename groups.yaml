@@ -1,0 +1,264 @@
+#default_view:
+default:
+  name: Home
+  view: yes
+  icon: mdi:home
+  entities:
+  - group.za
+  # - script.restart_ha
+  - group.lights
+  - group.prezenta
+
+
+Automation:
+  name: Automation
+  view: yes
+  icon: mdi:robot
+  entities:
+  - group.all_automations
+  - scene.hallway_morning
+  - scene.hallway_night
+  - scene.hallway_off
+  - scene.wc_morning
+  - scene.wc_night
+  - scene.wc_off
+
+Weather:
+  name: Weather 
+  view: yes
+  icon: mdi:weather-cloudy
+  entities:
+  - group.Environment
+
+devices:
+  name: Devices
+  view: yes
+  icon: mdi:home-map-marker
+  entities:
+  - group.all_devices
+  - group.us
+  - group.media_players
+
+dev:
+  view: yes
+  icon: mdi:test-tube
+  entities:
+  # - input_select.current_theme
+  # - group.Food
+  # - group.entrance
+  - group.all_automations
+  # - group.all_locks
+  # - group.all_remotes
+  - group.all_scripts
+  - group.all_switches
+  - group.all_lights
+  - group.all_devices
+  - group.all_vacuum_cleaners
+  # - binary_sensor.door_window_sensor_158d0002011816
+  # - switch.projector
+  # - group.Cafea
+  # - sensor.tweek
+  # - sensor.bob
+  # - binary_sensor.overcast
+  # - light.hallway_1
+  # - light.hallway_2
+  # - light.hallway_3
+  # - light.kitchen
+  # - light.bob
+  # - light.wc
+  # - sensor.dark_outside
+
+Shiny:
+  name: Shiny
+  view: yes
+  icon: mdi:server
+  entities:
+  - group.monitoring
+  - group.all_devices
+  - group.canapea
+  - switch.trantor_power
+
+prezenta:
+ name: 'Prezenta'
+ entities:  
+  - sensor.ro_status
+  - sensor.ro_travel_time
+  - sensor.z_status
+  - sensor.travel_time
+  - sensor.location
+
+Za:
+ name: 'Guster switch'
+ entities:
+ - light.bob
+# - switch.bob
+# - automation.bob_night
+ - input_boolean.mmode
+
+Masa:
+ name: 'Masa'
+ control: hidden
+ entities:
+ - light.masa
+ - sensor.masa_pir
+ - vacuum.harry_potter
+
+Bedroom:
+ name: 'Bedroom'
+ control: hidden
+ entities:
+ - sensor.Temperature_158d0002271513
+ - sensor.Humidity_158d0002271513
+ - sensor.Pressure_158d0002271513
+
+Living:
+ name: 'Living'
+ entities:
+ - sensor.Temperature_158d000227b7d2
+ - sensor.Humidity_158d000227b7d2
+ - sensor.Pressure_158d000227b7d2
+ - light.bob
+ - light.spot
+ - switch.socket
+ - sensor.bob
+ - binary_sensor.cube_158d0001035b08
+ - sensor.Cube_last
+ - binary_sensor.motion_sensor_158d000222cd2b
+ - sensor.illumination_158d000222cd2b
+ - sensor.couch
+ - binary_sensor.switch_158d00021323b6
+
+Kitchen:
+ name: 'Kitchen'
+ control: hidden
+ entities:
+ - light.kitchen
+ - switch.wake_up
+ - switch.espresso
+ - switch.coffee
+ - binary_sensor.motion_sensor_158d0001e53c55
+ - sensor.illumination_158d0001e53c55
+ - switch.rikis_food
+
+WC:
+ name: 'WC'
+ entities:
+ - binary_sensor.motion_sensor_158d0001b1cd72
+ - sensor.illumination_158d0001b1cd72
+ - light.WC
+
+Hallway:
+ name: Hallway
+ control: hidden
+ entities:
+ - group.Hallway_Light
+ - light.gateway_light_7811dcb215d2
+ - sensor.illumination_7811dcb215d2
+ - binary_sensor.motion_sensor_158d0002236930
+ - sensor.illumination_158d0002236930
+ - binary_sensor.door_window_sensor_158d0001fa8dce
+ - light.entrance
+ - sensor.entrance
+ - binary_sensor.switch_158d0001f4b243
+ 
+Hallway_Light:
+ name: Hallway Lights
+ entities:
+ - light.hallway_1
+ - light.hallway_2
+ - light.hallway_3
+
+Lights:
+ name: Lights
+ entities:
+ - group.hallway_light
+ - light.bob
+ - light.spot
+ - light.masa
+ - light.kitchen
+ - light.wc
+ - switch.socket
+
+Environment:
+ name: Afara 3D
+ entities:
+ - sun.sun 
+ - sensor.dark_sky_template
+ - sensor.yr_symbol
+ - sensor.dark_sky_apparent_temperature
+ - sensor.yr_temperature
+ - sensor.yr_wind_speed
+ - sensor.yr_precipitation
+ - sensor.dark_sky_cloud_coverage
+ - sensor.yr_cloudiness
+ # - sensor.dark_outside
+
+Canapea:
+ name: "Canapea"
+ entities:
+ - sensor.t_voltage
+ - sensor.t_power
+ - sensor.t_today
+ - sensor.t_yesterday
+ - sensor.t_total_since_17mar
+
+# guest:
+ # name: "Guest"
+ # entities:
+ # - device_tracker.guest
+ 
+us:
+ name: "Tracked"
+ entities:
+ - device_tracker.z
+ - device_tracker.r
+ - device_tracker.rdell
+ - device_tracker.rmi
+
+ro:
+ name: "Rodica"
+ entities:
+ - device_tracker.r
+ - device_tracker.rdell
+ - device_tracker.aristica
+ - device_tracker.rmi
+ 
+me:
+ name: "Z"
+ entities:
+ - device_tracker.z
+ - device_tracker.lenovopc
+
+Food:
+ control: hidden
+ name: Food</dev>
+ entities:
+ - switch.caruso
+ - switch.fortys
+ - switch.holiday
+
+Monitoring:
+ name: Shiny
+ entities:
+ - sensor.stats_count
+ - sensor.disk_use_percent_
+ - sensor.memory_use_percent
+ - sensor.cpu_speed
+ - sensor.cpu_temp
+ - sensor.processor_use
+ - sensor.load_1m
+ - sensor.load_5m
+ - sensor.load_15m
+ - sensor.last_boot
+ - sensor.uptime
+ - sensor.voltage
+ - sensor.power
+ - sensor.today
+ - sensor.yesterday
+ - sensor.total_since_04feb
+
+media_players:
+ name: Media Players
+ entities:
+ - media_player.firetv
+ - sensor.plex

@@ -1,0 +1,9 @@
+home-assistant.log
+tts/
+ssl/
+deps/
+custom_components/device_tracker
+secrets.yaml
+known_devices.yaml
+entity_registry.yaml
+.shopping_list.json

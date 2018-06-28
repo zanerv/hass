@@ -1,0 +1,1 @@
+restart_firetv: curl --unix-socket /var/run/docker.sock -X POST http:/v1.24/containers/firetv/restart

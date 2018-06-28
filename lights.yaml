@@ -1,0 +1,61 @@
+- platform: yeelight
+  devices:
+    !secret Kitchen:
+      name: Kitchen
+      transition: 1000
+      save_on_change: False
+    !secret Hallway_1:
+      name: Hallway 1
+      transition: 1000
+      save_on_change: False
+    !secret Hallway_2:
+      name: Hallway 2
+      transition: 1000
+      save_on_change: False
+    !secret Hallway_3:
+      name: Hallway 3
+      transition: 1000
+      save_on_change: False
+    !secret Bob:
+      name: Bob
+      transition: 1000
+      save_on_change: False
+    !secret WC:
+      name: WC
+      transition: 1000
+      save_on_change: False
+      
+- platform: mqtt
+  name: "Masa"
+#  state_topic: "stat/masa/POWER"
+#  state_topic: "home/masa/tele/STATE"
+#  state_value_template: "{{ value_json.POWER }}"
+  state_topic: "masa/cmnd/POWER"
+  command_topic: "masa/cmnd/POWER"
+  availability_topic: "masa/tele/LWT"
+  qos: 1
+  payload_on: "ON"
+  payload_off: "OFF"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+
+- platform: mqtt
+  name: "spot"
+  state_topic: "bob/cmnd/POWER"
+  command_topic: "bob/cmnd/POWER"
+  availability_topic: "bob/tele/LWT"
+  qos: 0
+  payload_on: "ON"
+  payload_off: "OFF"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+
+- platform: mqtt
+  name: "Entrance"
+  state_topic: "home/niggers/hallway1/set"
+  command_topic: "home/niggers/hallway1/set"
+  payload_on: 1
+  payload_off: 0
+  optimistic: false
+  qos: 0
+  retain: true

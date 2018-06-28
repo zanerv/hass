@@ -1,0 +1,57 @@
+- name: Hallway Morning
+  entities:
+    light.hallway_1:
+      state: on
+      brightness: 10
+    light.hallway_2:
+      state: on
+      brightness: 10
+    light.hallway_3:
+      state: on
+      brightness: 10
+  
+- name: Hallway Night
+  entities:
+    light.hallway_1:
+      state: on
+      brightness: 250
+    light.hallway_2:
+      state: on
+      brightness: 250
+    light.hallway_3:
+      state: on
+      brightness: 250
+  
+- name: Kitchen Morning
+  entities:
+    light.kitchen:
+      state: on
+      brightness_pct: 5
+
+- name: Kitchen Night
+  entities:
+    light.kitchen:
+      state: on
+      brightness_pct: 100
+
+- name: WC Morning
+  entities:
+    light.wc:
+      state: on
+      brightness_pct: 17
+      color_name: darkred
+
+- name: WC Night
+  entities:
+    light.wc:
+      state: on
+      brightness_pct: 100
+      rgb_color: [255,200,155]
+
+- name: Gateway
+  entities:
+    light.gateway_light_7811dcb215d2:
+      state: on
+      brightness_pct: 10
+      color_name: darkred
+

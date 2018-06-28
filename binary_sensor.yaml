@@ -1,0 +1,5 @@
+# - platform: threshold
+  # name: Overcast
+  # threshold: 80
+  # type: upper
+  # entity_id: sensor.dark_sky_cloud_coverage

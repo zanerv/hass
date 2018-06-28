@@ -1,0 +1,173 @@
+- platform: command_line
+  hidden: true
+  name: firetv
+  command: "grep -o 'rror while setting up platform firetv' /config/home-assistant.log | wc -l"
+
+- platform: template
+  sensors:
+    location:
+      value_template: '{{ states.input_select.location.state }}'
+      friendly_name: 'Location'
+    z_status:
+      value_template: '{{ states.input_select.z_status_dropdown.state }}'
+      friendly_name: 'Z'
+    ro_status:
+      value_template: '{{ states.input_select.ro_status_dropdown.state }}'
+      friendly_name: 'Rodica'
+    cube_last:
+      friendly_name: "Cube"
+      value_template: '{{ states.binary_sensor.cube_158d0001035b08.attributes.last_action }}'
+    dark_sky_template:
+      value_template: "{{ states('sensor.dark_sky_summary') }}"
+      icon_template: >
+        {% if is_state('sensor.dark_sky_icon', 'clear-day') %}
+          mdi:weather-sunny
+        {% elif is_state('sensor.dark_sky_icon', 'clear-night') %}
+          mdi:weather-night
+        {% elif is_state('sensor.dark_sky_icon', 'rain') %}
+          mdi:weather-rainy
+        {% elif is_state('sensor.dark_sky_icon', 'snow') %}
+          mdi:weather-snowy
+        {% elif is_state('sensor.dark_sky_icon', 'sleet') %}
+          mdi:weather-snowy-rainy
+        {% elif is_state('sensor.dark_sky_icon', 'wind') %}
+          mdi:weather-windy-variant
+        {% elif is_state('sensor.dark_sky_icon', 'fog') %}
+          mdi:weather-fog
+        {% elif is_state('sensor.dark_sky_icon', 'cloudy') %}
+          mdi:weather-cloudy
+        {% elif is_state('sensor.dark_sky_icon', 'partly-cloudy-day') or is_state('sensor.dark_sky_icon', 'partly-cloudy-night') %}
+          mdi:weather-partlycloudy
+        {% elif is_state('sensor.dark_sky_icon', 'hail') %}
+          mdi:weather-hail
+        {% elif is_state('sensor.dark_sky_icon', 'thunderstorm') %}
+          mdi:weather-lightning
+        {% else %}
+          mdi:help-circle
+        {% endif %}
+    couch:
+      value_template: "{% if is_state('binary_sensor.door_window_sensor_158d0002011816', 'off') %}Detected{% else %}Clear{% endif %}"
+
+#- platform: waze_travel_time
+#  name: "Travel Time"
+#  origin: !secret waze_origin
+#  destination: !secret waze_destination
+#  origin: !secret waze_origin_gps
+#  destination: !secret waze_destination_gps
+#  region: 'EU'
+
+- platform: mqtt
+  name: "masa pir"
+  state_topic: "masa/PIR/cmnd/POWER1"
+
+- platform: mqtt
+  name: "bob"
+  state_topic: "bob/PIR/cmnd/POWER1"
+
+- platform: mqtt
+  name: "Today"
+  state_topic: "martor/tele/SENSOR"
+  value_template: "{{ value_json.ENERGY.Today }}"
+  unit_of_measurement: "kWh"
+
+- platform: mqtt
+  name: "Power"
+  state_topic: "martor/tele/SENSOR"
+  value_template: "{{ value_json.ENERGY.Power }}"
+  unit_of_measurement: "W"
+
+- platform: mqtt
+  name: "Voltage"
+  state_topic: "martor/tele/SENSOR"
+  value_template: "{{ value_json.ENERGY.Voltage }}"
+  unit_of_measurement: "V"
+
+- platform: mqtt  
+  name: "Yesterday"  
+  state_topic: "martor/tele/SENSOR"
+  value_template: "{{ value_json.ENERGY.Yesterday }}"  
+  unit_of_measurement: "kWh"  
+
+- platform: mqtt
+  name: "Total since 04/Feb"
+  state_topic: "martor/tele/SENSOR"
+  value_template: "{{ value_json.ENERGY.Total }}"
+  unit_of_measurement: "kWh"
+
+- platform: mqtt
+  name: "Uptime"
+  state_topic: "martor/tele/STATE"
+  value_template: "{{ value_json.Uptime }}"
+  unit_of_measurement: "Hours"
+
+- platform: mqtt
+  name: "T_Today"
+  state_topic: "tele/trantor/SENSOR"
+  value_template: "{{ value_json.ENERGY.Today }}"
+  unit_of_measurement: "kWh"
+
+- platform: mqtt
+  name: "T_Power"
+  state_topic: "tele/trantor/SENSOR"
+  value_template: "{{ value_json.ENERGY.Power }}"
+  unit_of_measurement: "W"
+
+- platform: mqtt
+  name: "T_Voltage"
+  state_topic: "tele/trantor/SENSOR"
+  value_template: "{{ value_json.ENERGY.Voltage }}"
+  unit_of_measurement: "V"
+
+- platform: mqtt  
+  name: "T_Yesterday"  
+  state_topic: "tele/trantor/SENSOR"
+  value_template: "{{ value_json.ENERGY.Yesterday }}"  
+  unit_of_measurement: "kWh"  
+
+- platform: mqtt
+  name: "T_Total since 17/Mar"
+  state_topic: "tele/trantor/SENSOR"
+  value_template: "{{ value_json.ENERGY.Total }}"
+  unit_of_measurement: "kWh"
+
+- platform: mqtt
+  name: entrance
+  state_topic: "home/niggers/hallway1"
+
+- platform: plex
+  host: !secret plex_host
+  token: !secret plex_token
+
+- platform: systemmonitor
+  resources:
+     - type: disk_use_percent
+       arg: /
+     - type: memory_use_percent
+     - type: processor_use
+     - type: load_1m
+     - type: load_5m
+     - type: load_15m
+     - type: last_boot
+
+- platform: command_line
+  name: CPU temp
+  command: "cat /sys/class/thermal/thermal_zone0/temp"
+  unit_of_measurement: "°C"
+  value_template: '{{ (value | multiply(0.001)) | round(1) }}'
+
+- platform: yr
+  monitored_conditions:
+     - temperature
+     - symbol
+     - precipitation
+     - windSpeed
+     - cloudiness
+
+- platform: darksky
+  api_key: !secret darksky_api
+  monitored_conditions:
+      - summary
+      - icon
+      - apparent_temperature
+      - cloud_cover
+
