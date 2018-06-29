@@ -13,3 +13,4 @@ entity_registry.yaml
 plex.conf
 device.py
 configurator.py
+*.cal

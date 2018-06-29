@@ -175,3 +175,7 @@
       - apparent_temperature_high
       - apparent_temperature_low
       - precip_probability
+
+- platform: command_line
+  name: Zalendar
+  command: python3 -c "print(open('z.cal').readlines())"
