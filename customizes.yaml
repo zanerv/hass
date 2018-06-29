@@ -1,3 +1,6 @@
+sensor.zalendar:
+  hidden: true
+
 device_tracker.hallway1:
   hidden: true
 

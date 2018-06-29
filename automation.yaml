@@ -15,7 +15,8 @@
                   Today is {{ now().strftime( '%a %B %d') }}{{ "\n" }}
                   {{ "\n" }}
                   Outside feels like {{states('sensor.dark_sky_apparent_temperature') | round}}°, high is {{states('sensor.dark_sky_daytime_high_apparent_temperature')| round}}° with a low of {{states('sensor.dark_sky_overnight_low_apparent_temperature') | round}}°, {{states('sensor.dark_sky_template')|lower}} skies.{{ "\n" }}
-                  Tonight's forecast is {{states('sensor.dark_sky_hourly_summary')[:-1]|lower}}{{ "\n" }}
+                  Forecast is {{states('sensor.dark_sky_hourly_summary')[:-1]|lower}}{{ "\n" }}
+                  {{states('sensor.zalendar')}}
 
 - id: restart_firetv
   alias: 'Restart FireTv'

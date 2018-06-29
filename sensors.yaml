@@ -178,4 +178,4 @@
 
 - platform: command_line
   name: Zalendar
-  command: python3 -c "print(open('z.cal').readlines())"
+  command: cat /config/Z.cal
