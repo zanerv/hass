@@ -60,9 +60,9 @@ dev:
   # - sensor.tweek
   # - sensor.bob
   # - binary_sensor.overcast
-  # - light.hallway_1
-  # - light.hallway_2
-  # - light.hallway_3
+  # - light.Hallway1
+  # - light.Hallway2
+  # - light.Hallway3
   # - light.kitchen
   # - light.bob
   # - light.wc
@@ -164,9 +164,9 @@ Hallway:
 Hallway_Light:
  name: Hallway Lights
  entities:
- - light.hallway_1
- - light.hallway_2
- - light.hallway_3
+ - light.Hallway1
+ - light.Hallway2
+ - light.Hallway3
 
 Lights:
  name: Lights
@@ -191,7 +191,12 @@ Environment:
  - sensor.yr_precipitation
  - sensor.dark_sky_cloud_coverage
  - sensor.yr_cloudiness
- # - sensor.dark_outside
+ - sensor.dark_sky_daytime_high_apparent_temperature
+ - sensor.dark_sky_overnight_low_apparent_temperature
+ - sensor.dark_sky_precip_probability
+ - sensor.dark_sky_hourly_summary
+ - sensor.dark_sky_minutely_summary
+ - sensor.dark_sky_precip
 
 Canapea:
  name: "Canapea"

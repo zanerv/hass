@@ -1,24 +1,24 @@
 - name: Hallway Morning
   entities:
-    light.hallway_1:
+    light.Hallway1:
       state: on
       brightness: 10
-    light.hallway_2:
+    light.Hallway2:
       state: on
       brightness: 10
-    light.hallway_3:
+    light.Hallway3:
       state: on
       brightness: 10
   
 - name: Hallway Night
   entities:
-    light.hallway_1:
+    light.Hallway1:
       state: on
       brightness: 250
-    light.hallway_2:
+    light.Hallway2:
       state: on
       brightness: 250
-    light.hallway_3:
+    light.Hallway3:
       state: on
       brightness: 250
   

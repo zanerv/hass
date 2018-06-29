@@ -1,3 +1,21 @@
+- id: briefing
+  alias: "Morning Briefing"
+  trigger:
+    platform: time
+    at: '07:00'
+  condition:
+    condition: state
+    entity_id: device_tracker.z
+    state: 'home'
+  action:
+    - service: notify.hass
+      data_template:
+        title: "Moring Briefing"
+        message: >
+                  Today is {{ now().strftime( '%a %B %d') }}{{ "\n" }}
+                  {{ "\n" }}
+                  Outside feels like {{states('sensor.dark_sky_apparent_temperature') | round}}°, high is {{states('sensor.dark_sky_daytime_high_apparent_temperature')| round}}° with a low of {{states('sensor.dark_sky_overnight_low_apparent_temperature') | round}}°, {{states('sensor.dark_sky_template')|lower}} skies.{{ "\n" }}
+                  Tonight's forecast is {{states('sensor.dark_sky_hourly_summary')[:-1]|lower}}{{ "\n" }}
 
 - id: restart_firetv
   alias: 'Restart FireTv'
@@ -117,12 +135,12 @@
   initial_state: True
   trigger:
     - platform: state
-      entity_id: light.bob, light.wc, light.kitchen, light.hallway_1, light.masa
+      entity_id: light.bob, light.wc, light.kitchen, light.Hallway1, light.masa
       to: 'unavailable'
       for:
         seconds: 10
     # - platform: state
-      # entity_id: device_tracker.wc, device_tracker.kitchen, device_tracker.hallway_1, device_tracker.masa
+      # entity_id: device_tracker.wc, device_tracker.kitchen, device_tracker.Hallway1, device_tracker.masa
       # to: 'not_home'
       # for:
         # seconds: 1
@@ -154,7 +172,7 @@
     - service: switch.turn_off
       entity_id: switch.socket
     - service: light.turn_off
-      entity_id: light.wc,light.kitchen,light.masa,light.hallway_1,light.hallway_2,light.hallway_3,light.bob, light.spot
+      entity_id: light.wc,light.kitchen,light.masa,light.Hallway1,light.Hallway2,light.Hallway3,light.bob, light.spot
 
 - id: location
   alias: 'Last Movement'
@@ -215,7 +233,7 @@
     - service: automation.turn_off
       entity_id: automation.dota_table_on, automation.kitchen_on, automation.hallway_on
     - service: light.turn_off
-      entity_id: light.wc,light.kitchen,light.masa,light.hallway_1,light.hallway_2,light.hallway_3
+      entity_id: light.wc,light.kitchen,light.masa,light.Hallway1,light.Hallway2,light.Hallway3
     - service: input_select.select_option
       data:
         entity_id: 'input_select.location'
@@ -315,7 +333,7 @@
         state: 'Detected'
   action:
     - service: light.turn_off
-      entity_id: light.kitchen, light.masa, light.wc, light.bob, light.hallway_1, light.hallway_2, light.hallway_3
+      entity_id: light.kitchen, light.masa, light.wc, light.bob, light.Hallway1, light.Hallway2, light.Hallway3
 
 - alias: 'Sunset'
   initial_state: True
@@ -569,7 +587,7 @@
     - service: scene.turn_on
       data_template:
         entity_id: >
-          {% if now().strftime('%H')|int >= 2 and now().strftime('%H')|int <= 9 %}
+          {% if now().strftime('%H')|int >= 0 and now().strftime('%H')|int <= 9 %}
             scene.hallway_morning
           {% else %}
             scene.hallway_night
@@ -592,7 +610,7 @@
     condition: and
     conditions:
       - condition: state
-        entity_id: 'light.hallway_1'
+        entity_id: 'light.Hallway1'
         state: 'on'
       - condition: state
         entity_id: sensor.entrance
@@ -601,7 +619,7 @@
           seconds: 30
   action:
       service: light.turn_off
-      entity_id: light.hallway_1,light.hallway_2,light.hallway_3
+      entity_id: light.Hallway1,light.Hallway2,light.Hallway3
 
 - alias: 'WC ON'
   initial_state: True
@@ -793,11 +811,10 @@
       data_template:
         title: test
         message: >
-          {% if now().strftime('%H')|int >= 2 and now().strftime('%H')|int <= 9 %}
-            'alert 2 - 9'
-          {% else %}
-            'alert 9 - 2'
-          {% endif %}
+                  Today is {{ now().strftime( '%a %d-%B') }}{{ "\n" }}
+                  {{ "\n" }}
+                  Outside feels like {{states('sensor.dark_sky_apparent_temperature') | round}}°, high is {{states('sensor.dark_sky_daytime_high_apparent_temperature')| round}}° with a low of {{states('sensor.dark_sky_overnight_low_apparent_temperature') | round}}°, {{states('sensor.dark_sky_template')|lower}} skies.{{ "\n" }}
+                  Tonight's forecast is  {{states('sensor.dark_sky_hourly_summary')[:-1]|lower}}{{ "\n" }}
 
 - id: swing
   alias: 'Cube Swing'
@@ -950,7 +967,7 @@
         # state: 'Away'
   # action:
     # - service: light.turn_off
-      # entity_id: light.hallway_1,light.hallway_2,light.hallway_3
+      # entity_id: light.Hallway1,light.Hallway2,light.Hallway3
     # - service: input_select.select_option
       # data:
         # entity_id: 'input_select.location'
@@ -972,7 +989,7 @@
         # state: 'Away'
   # action:
     # - service: light.turn_off
-      # entity_id: light.hallway_1,light.hallway_2,light.hallway_3,light.masa
+      # entity_id: light.Hallway1,light.Hallway2,light.Hallway3,light.masa
     # - service: input_select.select_option
       # data:
         # entity_id: 'input_select.location'

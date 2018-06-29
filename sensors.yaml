@@ -156,6 +156,7 @@
   value_template: '{{ (value | multiply(0.001)) | round(1) }}'
 
 - platform: yr
+  forecast: 24
   monitored_conditions:
      - temperature
      - symbol
@@ -170,4 +171,7 @@
       - icon
       - apparent_temperature
       - cloud_cover
-
+      - hourly_summary
+      - apparent_temperature_high
+      - apparent_temperature_low
+      - precip_probability

@@ -213,8 +213,6 @@ cover.bob:
   assumed_state: true
   icon: mdi:sofa
   
-sensor.dark_sky_apparent_temperature:
-  friendly_name: "Feels like"
 sensor.yr_precipitation:
   friendly_name: "Precipitation"
   icon: mdi:weather-rainy
@@ -228,6 +226,31 @@ sensor.yr_wind_speed:
   icon: mdi:weather-windy-variant
 sensor.standby:
   icon: mdi:power-settings
+
+sensor.dark_sky_apparent_temperature:
+  friendly_name: "Feels like"
+sensor.dark_sky_daytime_high_apparent_temperature:
+  friendly_name: 'Daily High'
+  icon: mdi:thermometer
+sensor.dark_sky_overnight_low_temperature:
+  friendly_name: 'Daily Low'
+  icon: mdi:thermometer
+sensor.dark_sky_humidity:
+  friendly_name: 'Current Humidity'
+sensor.dark_sky_temperature:
+  friendly_name: 'Current Temperature'
+sensor.dark_sky_daily_summary:
+  friendly_name: 'Daily Summary'
+sensor.dark_sky_cloud_coverage:
+  friendly_name: 'Cloud Coverage'
+sensor.dark_sky_overnight_low_apparent_temperature:
+  friendly_name: 'Overnight Low'
+sensor.dark_sky_precip_probability:
+  friendly_name: 'Precip Probability'
+sensor.dark_sky_hourly_summary:
+  friendly_name: 'Hourly Summary'
+sensor.dark_sky_minutely_summary:
+  friendly_name: 'Summary'
 
 switch.wakeup:
   icon: mdi:power-settings
@@ -261,3 +284,6 @@ sensor.z_status:
   entity_picture: /local/haiti.jpg
 sensor.ro_status:
   entity_picture: /local/she.jpg
+
+sensor.location:
+  icon: mdi:map-marker-radius

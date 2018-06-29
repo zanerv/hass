@@ -4,16 +4,16 @@
       name: Kitchen
       transition: 1000
       save_on_change: False
-    !secret Hallway_1:
-      name: Hallway 1
+    !secret Hallway1:
+      name: Hallway1
       transition: 1000
       save_on_change: False
-    !secret Hallway_2:
-      name: Hallway 2
+    !secret Hallway2:
+      name: Hallway2
       transition: 1000
       save_on_change: False
-    !secret Hallway_3:
-      name: Hallway 3
+    !secret Hallway3:
+      name: Hallway3
       transition: 1000
       save_on_change: False
     !secret Bob:

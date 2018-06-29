@@ -127,7 +127,7 @@ device_tracker:
     hosts:
       WC: !secret WC
       masa: !secret masa
-      Hallway_1: !secret Hallway_1
+      Hallway1: !secret Hallway1
       Kitchen: !secret Kitchen
     count: 2
 
