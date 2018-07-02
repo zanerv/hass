@@ -9,7 +9,6 @@ default:
   - group.lights
   - group.prezenta
 
-
 Automation:
   name: Automation
   view: yes

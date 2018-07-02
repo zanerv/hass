@@ -47,7 +47,19 @@
         {% endif %}
     couch:
       value_template: "{% if is_state('binary_sensor.door_window_sensor_158d0002011816', 'off') %}Detected{% else %}Clear{% endif %}"
-
+    
+    # location:
+      # friendly_name: 'Location'
+      # value_template: >
+        # {%- set sensors = [states.binary_sensor.motion_sensor_158d0001b1cd72, states.binary_sensor.motion_sensor_158d0001e53c55, states.binary_sensor.motion_sensor_158d000222cd2b, states.binary_sensor.motion_sensor_158d0002236930, states.sensor.bob, states.sensor.masa_pir, states.sensor.entrance, states.binary_sensor.door_window_sensor_158d0002011816] %}
+        # {% for sensor in sensors %}
+            # {% if as_timestamp(sensor.last_changed) == as_timestamp(sensors | map(attribute='last_changed') | max) %}
+              # {% if sensor.state == 'ON' %}
+                 # {{ sensor.name }}
+              # {% endif %}
+            # {% endif %}
+        # {% endfor %}
+    
 #- platform: waze_travel_time
 #  name: "Travel Time"
 #  origin: !secret waze_origin
@@ -179,3 +191,11 @@
 - platform: command_line
   name: Zalendar
   command: cat /config/Z.cal
+
+- platform: command_line
+  name: Ralendar
+  command: cat /config/R.cal
+
+
+
+

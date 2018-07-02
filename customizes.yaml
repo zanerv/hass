@@ -1,4 +1,16 @@
+light.Hallway1:
+  hidden: true
+
+light.Hallway2:
+  hidden: true
+
+light.Hallway3:
+  hidden: true
+
 sensor.zalendar:
+  hidden: true
+
+sensor.ralendar:
   hidden: true
 
 device_tracker.hallway1:
@@ -50,7 +62,7 @@ light.spot:
   friendly_name: "Spot"
 
 sensor.entrance:
-  friendly_name: "Movement"
+  friendly_name: "Entrance"
   icon: mdi:walk
   # value_template: '{{ states.sensor.entrance }}'
   # icon_template: >
@@ -70,7 +82,7 @@ sensor.entrance:
 
 sensor.masa_pir:
   icon: mdi:walk
-  friendly_name: "Movement"
+  friendly_name: "Masa"
 
 light.kitchen:
   icon: mdi:ceiling-light
@@ -85,25 +97,25 @@ sensor.cube_last:
   icon: mdi:cube
 
 binary_sensor.motion_sensor_158d000222cd2b:
-  friendly_name: "Movement"
+  friendly_name: "Living"
+
+binary_sensor.motion_sensor_158d0002236930:
+  friendly_name: "Hallway"
+
+binary_sensor.motion_sensor_158d0001e53c55:
+  friendly_name: "Kitchen"
+
+binary_sensor.motion_sensor_158d0001b1cd72:
+  friendly_name: "WC"
 
 sensor.illumination_158d000222cd2b:
   friendly_name: "Light"
 
-binary_sensor.motion_sensor_158d0002236930:
-  friendly_name: "Movement"
-
 sensor.illumination_158d0002236930:
   friendly_name: "Light"
 
-binary_sensor.motion_sensor_158d0001e53c55:
-  friendly_name: "Movement"
-
 sensor.illumination_158d0001e53c55:
   friendly_name: "Light"
-
-binary_sensor.motion_sensor_158d0001b1cd72:
-  friendly_name: "Movement"
 
 sensor.illumination_158d0001b1cd72:
   friendly_name: "Light"
@@ -129,7 +141,7 @@ binary_sensor.door_window_sensor_158d0001fa8dce:
   icon: mdi:door
 
 sensor.bob:
-  friendly_name: "Movement"
+  friendly_name: "Couch"
   icon: mdi:walk
 
 switch.socket:

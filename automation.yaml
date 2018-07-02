@@ -1,12 +1,11 @@
-- id: briefing
-  alias: "Morning Briefing"
+- id: zriefing
+  alias: "Morning Briefing Z"
   trigger:
     platform: time
     at: '07:00'
   condition:
-    condition: state
-    entity_id: device_tracker.z
-    state: 'home'
+    condition: template
+    value_template: "{% if not is_state('sensor.z_status', 'Extended Away') %}true{% endif %}"
   action:
     - service: notify.hass
       data_template:
@@ -17,6 +16,27 @@
                   Outside feels like {{states('sensor.dark_sky_apparent_temperature') | round}}°, high is {{states('sensor.dark_sky_daytime_high_apparent_temperature')| round}}° with a low of {{states('sensor.dark_sky_overnight_low_apparent_temperature') | round}}°, {{states('sensor.dark_sky_template')|lower}} skies.{{ "\n" }}
                   Forecast is {{states('sensor.dark_sky_hourly_summary')[:-1]|lower}}{{ "\n" }}
                   {{states('sensor.zalendar')}}
+- id: rriefing
+  alias: "Morning Briefing R"
+  trigger:
+    platform: time
+    at: '07:00'
+  condition:
+    condition: template
+    value_template: "{% if not is_state('sensor.ro_status', 'Extended Away') %}true{% endif %}"
+  action:
+    - service: notify.hass
+      data_template:
+        target:
+          - !secret she_mail     
+        title: "Moring Briefing"
+        message: >
+                  Today is {{ now().strftime( '%a %B %d') }}{{ "\n" }}
+                  {{ "\n" }}
+                  Outside feels like {{states('sensor.dark_sky_apparent_temperature') | round}}°, high is {{states('sensor.dark_sky_daytime_high_apparent_temperature')| round}}° with a low of {{states('sensor.dark_sky_overnight_low_apparent_temperature') | round}}°, {{states('sensor.dark_sky_template')|lower}} skies.{{ "\n" }}
+                  Forecast is {{states('sensor.dark_sky_hourly_summary')[:-1]|lower}}{{ "\n" }}
+                  {{states('sensor.ralendar')}}
+
 
 - id: restart_firetv
   alias: 'Restart FireTv'
@@ -39,7 +59,7 @@
       - service: frontend.set_theme
         data_template:
           name: >
-            {% if now().strftime('%H')|int >= 0 and now().strftime('%H')|int <= 9 %}
+            {% if now().strftime('%H')|int >= 0 and now().strftime('%H')|int <= 21 %}
               default
             {% else %}
               Night
@@ -139,12 +159,7 @@
       entity_id: light.bob, light.wc, light.kitchen, light.Hallway1, light.masa
       to: 'unavailable'
       for:
-        seconds: 10
-    # - platform: state
-      # entity_id: device_tracker.wc, device_tracker.kitchen, device_tracker.Hallway1, device_tracker.masa
-      # to: 'not_home'
-      # for:
-        # seconds: 1
+        seconds: 5
   action:
     - service: xiaomi_aqara.play_ringtone
       data:
@@ -473,7 +488,7 @@
       - service: scene.turn_on
         data_template:
           entity_id: >
-            {% if now().strftime('%H')|int >= 4 and now().strftime('%H')|int <= 9 %}
+            {% if now().strftime('%H')|int >= 0 and now().strftime('%H')|int <= 9 %}
               scene.kitchen_morning
             {% else %}
               scene.kitchen_night
@@ -483,14 +498,19 @@
   initial_state: True
   trigger:
   - platform: state
+    entity_id: light.kitchen
+    to: 'on'
+    for:
+       seconds: 30
+  - platform: state
     entity_id: binary_sensor.motion_sensor_158d0001e53c55
     to: 'off'
     for:
        seconds: 30
   condition:
     condition:  state
-    entity_id: light.kitchen
-    state: 'on'
+    entity_id: binary_sensor.motion_sensor_158d0001e53c55
+    state: 'off'
   action:
       service: light.turn_off
       entity_id: light.kitchen
