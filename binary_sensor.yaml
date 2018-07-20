@@ -1,5 +1,64 @@
-# - platform: threshold
-  # name: Overcast
-  # threshold: 80
-  # type: upper
-  # entity_id: sensor.dark_sky_cloud_coverage
+- platform: workday
+  country: CZ
+
+- platform: bayesian
+  prior: 0.05
+  name: 'Sleep'
+  probability_threshold: 0.95
+  observations:
+    - entity_id: 'device_tracker.rdell'
+      prob_given_true: 0.3
+      prob_given_false: 0.2
+      platform: 'state'
+      to_state: 'not_home'
+    - entity_id: 'device_tracker.aristica'
+      prob_given_true: 0.3
+      prob_given_false: 0.2
+      platform: 'state'
+      to_state: 'not_home'
+    - entity_id: 'input_boolean.r'
+      prob_given_true: 0.3
+      prob_given_false: 0.7
+      platform: 'state'
+      to_state: 'on'
+    - entity_id: 'binary_sensor.motion_bedroom'
+      prob_given_true: 0.2
+      prob_given_false: 0.5
+      platform: 'state'
+      to_state: 'off'
+    - entity_id: 'media_player.firetv'
+      prob_given_true: 0.7
+      prob_given_false: 0.5
+      platform: 'state'
+      to_state: 'playing'
+
+- platform: bayesian
+  prior: 0.25
+  name: 'Z Presence'
+  probability_threshold: 0.9
+  observations:
+    - entity_id: 'device_tracker.z'
+      prob_given_true: 0.9
+      prob_given_false: 0.3
+      platform: 'state'
+      to_state: 'home'
+    - entity_id: 'device_tracker.zpc'
+      prob_given_true: 0.3
+      prob_given_false: 0.5
+      platform: 'state'
+      to_state: 'home'
+    - entity_id: 'sensor.projector_status'
+      prob_given_true: 0.6
+      prob_given_false: 0.4
+      platform: 'state'
+      to_state: 'on'
+    - entity_id: 'device_tracker.brad_nodered'
+      prob_given_true: 0.8
+      prob_given_false: 0.2
+      platform: 'state'
+      to_state: 'home'
+    - entity_id: 'device_tracker.tile_keys'
+      prob_given_true: 0.8
+      prob_given_false: 0.4
+      platform: 'state'
+      to_state: 'home'

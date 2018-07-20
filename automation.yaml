@@ -1,3 +1,237 @@
+- id: test1
+  alias: test1
+  trigger:
+    - platform: state
+      entity_id: sensor.masa_pir
+  action:
+     - service: input_text.set_value
+       data_template:
+         entity_id: input_text.guest
+         value: "{{trigger.entity_id}}"
+
+
+- id: bedroom_doors
+  alias: 'Bedroom doors'
+  initial_state: True
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.door_lightroom, binary_sensor.door_darkroom
+      to: 'on'
+      for:
+        seconds: 300
+  action:
+    - service: media_player.volume_set
+      data_template:
+        entity_id: media_player.living_room_speaker
+        volume_level: 0.8
+    - service: media_player.play_media
+      data:
+        entity_id: media_player.living_room_speaker
+        media_content_id: https://hass.kpu.ro/local/door.wav
+        media_content_type: music
+
+- id: bedroom_doors_thanks
+  alias: 'Bedroom doors closed'
+  hide_entity: True
+  initial_state: True
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.door_lightroom, binary_sensor.door_darkroom
+      to: 'off'
+      for:
+        seconds: 1
+  condition:
+    condition: template
+    value_template: "{% if (as_timestamp(now()) - as_timestamp(states.automation.bedroom_doors.attributes.last_triggered)) < 100 %}true{% endif %}"
+  action:
+    - service: media_player.volume_set
+      data_template:
+        entity_id: media_player.living_room_speaker
+        volume_level: 0.8
+    - service: media_player.play_media
+      data:
+        entity_id: media_player.living_room_speaker
+        media_content_id: https://hass.kpu.ro/local/thanks.wav
+        media_content_type: music
+
+- id: Unknown
+  alias: "Home Unknown state"
+  initial_state: 'on'
+  trigger:
+      - platform: state
+        entity_id: sensor.house
+        to: 'Unknown'
+        for:
+          seconds: 10
+  action:
+    - service: notify.hass
+      data_template:
+        message:  "vacation: {{states.input_boolean.vacation.state}}, away: {{states.input_boolean.away.state}}, guest: {{states.input_boolean.guest.state}}, z: {{states.input_boolean.z.state}}, r: {{states.input_boolean.r.state}}"
+
+- id: welcome_home
+  alias: "Welcome Home"
+  initial_state: 'on'
+  trigger:
+      - platform: state
+        entity_id: sensor.house
+  action:
+    - service_template: >
+        {% if states.sensor.house.state == 'Away' or states.sensor.house.state == 'Vacation' %} switch.turn_off
+        {% else %}switch.turn_on
+        {% endif %}
+      entity_id: switch.trantor_power
+
+- id: movie_time
+  alias: "Movie"
+  initial_state: 'on'
+  trigger:
+    platform: state
+    entity_id: sensor.tautulli
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: input_boolean.guest
+        state: 'off'
+      - condition: state
+        entity_id: input_boolean.z
+        state: 'on'
+      - condition: state
+        entity_id: sun.sun
+        state: 'below_horizon'
+      - condition: state
+        entity_id: sensor.couch
+        state: 'Detected'
+      - condition: template
+        value_template: "{% if states.sensor.tautulli.state == 'play' or states.sensor.tautulli.state == 'stop' %}true{% endif %}"
+  action:
+    - service_template: >
+        {% if states.sensor.tautulli.state == 'play' %} homeassistant.turn_off
+        {% elif states.sensor.tautulli.state == 'stop' %} homeassistant.turn_on
+        {% endif %}
+      entity_id: group.guster
+    - service_template: >
+        {% if states.sensor.tautulli.state == 'play' %} light.turn_on
+        {% elif states.sensor.tautulli.state == 'stop' %} light.turn_off
+        {% endif %}
+      entity_id: light.spot
+    - service: automation.trigger
+      data_template:
+          entity_id: >
+            {% if states.sensor.tautulli.state == 'play' %} automation.lazy_on
+            {% elif states.sensor.tautulli.state == 'stop' %} automation.lazy_off
+            {% endif %}
+
+- id: house_mode_user_z
+  alias: "House mode user Z"
+  initial_state: 'on'
+  trigger:
+      - platform: state
+        entity_id: device_tracker.z
+  condition:
+    condition: template
+    value_template: "{% if (as_timestamp(now()) - as_timestamp(states.binary_sensor.door_entrance.last_changed)) < 1000 %}true{% endif %}"
+  action:
+    - service_template: >
+        {% if states.device_tracker.z.state == 'home' %} homeassistant.turn_on
+        {% elif states.device_tracker.z.state != 'home'%} homeassistant.turn_off
+        {% endif %}
+      entity_id: input_boolean.z
+
+- id: house_mode_user_r
+  alias: "House mode user R"
+  initial_state: 'on'
+  trigger:
+      - platform: state
+        entity_id: device_tracker.r
+        # to: 'not_home'
+        # for:
+          # minutes: 5
+      # - platform: state
+        # entity_id: device_tracker.rdell, device_tracker.r, binary_sensor.door_entrance
+  condition:
+    condition: template
+    value_template: "{% if (as_timestamp(now()) - as_timestamp(states.binary_sensor.door_entrance.last_changed)) < 1000 %}true{% endif %}"
+  action:
+        # {% if states.device_tracker.rdell.state == 'home' or states.device_tracker.r.state == 'home' and states.input_boolean.r.state == 'off' %} homeassistant.turn_on
+        # {% elif states.device_tracker.rdell.state != 'home' or states.device_tracker.r.state != 'home' and states.input_boolean.r.state == 'off'%} homeassistant.turn_off
+    - service_template: >
+        {% if states.device_tracker.rdell.state == 'home' or states.device_tracker.r.state == 'home' %} homeassistant.turn_on
+        {% elif states.device_tracker.rdell.state != 'home' or states.device_tracker.r.state != 'home'%} homeassistant.turn_off
+        {% endif %}
+      entity_id: input_boolean.r
+
+- id: house_mode_away
+  alias: "House mode Away"
+  initial_state: 'on'
+  trigger:
+    - platform: state
+      entity_id: input_boolean.z, input_boolean.r, input_boolean.guest
+  action:
+    - service_template: >
+        {% if states.input_boolean.z.state == 'off' and states.input_boolean.r.state == 'off' and states.input_boolean.guest.state == 'off' and states.input_boolean.away.state == 'off' %} input_boolean.turn_on
+        {% elif states.input_boolean.z.state == 'on' or states.input_boolean.r.state == 'on' or states.input_boolean.guest.state == 'on' and states.input_boolean.away.state == 'on' %} input_boolean.turn_off
+        {% endif %}
+      entity_id: input_boolean.away
+    - service_template: >
+        {% if states.input_boolean.away.state == 'on' %} script.house_mode_away
+        {% endif %}
+    - service_template: >
+          {% if (as_timestamp(now()) - as_timestamp(states.input_boolean.away.last_changed)) < 60 %} notify.hass
+          {% endif %}
+      data_template:
+        message: >
+         {% if states.input_boolean.away.state == 'off' and states.input_boolean.guest.state == 'off' %} Alarm is disarmed, Welcome Home
+         {% elif states.input_boolean.away.state == 'on' and states.input_boolean.guest.state == 'off' %} Alarm is armed, House set to Away Mode
+         {% endif %}
+
+- id: house_mode_vacation
+  alias: "House mode Vacation"
+  initial_state: 'on'
+  trigger:
+    - platform: state
+      entity_id: input_boolean.away
+      to: 'on'
+      for:
+        hours: 17
+    - platform: state
+      entity_id: input_boolean.away
+      to: 'off'
+  action:
+    - service_template: >
+        {% if states.input_boolean.vacation.state == 'off' and states.input_boolean.away.state == 'on' %} homeassistant.turn_on
+        {% elif states.input_boolean.vacation.state == 'on' and states.input_boolean.away.state == 'off' %} homeassistant.turn_off
+        {% endif %}
+      entity_id: input_boolean.vacation
+    - service: notify.hass
+      data_template:
+        message: >
+         {% if states.input_boolean.vacation.state == 'off' %} Welcome Home I trust your time away was nice.
+         {% elif states.input_boolean.vacation.state == 'on'%} Vacation Mode is now activated. Have a nice time away.
+         {% endif %}
+         
+- id: Notify_Vacation_Mode
+  alias: "Notify Vacation Mode"
+  initial_state: 'on'
+  trigger:
+    - platform: state
+      entity_id: input_boolean.vacation
+  action:
+    - service: notify.hass
+      data:
+        message: 'Vacation Mode is now {{states.input_boolean.vacation.state}}'
+
+- id: Notify_Guest_Mode
+  alias: "Notify Guest Mode"
+  initial_state: 'on'
+  trigger:
+    - platform: state
+      entity_id: input_boolean.guest
+  action:
+    - service: notify.hass
+      data:
+        message: 'Guest Mode is now {{states.input_boolean.guest.state}}'
+
 - id: zriefing
   alias: "Morning Briefing Z"
   trigger:
@@ -5,17 +239,24 @@
     at: '07:00'
   condition:
     condition: template
-    value_template: "{% if not is_state('sensor.z_status', 'Extended Away') %}true{% endif %}"
+    value_template: "{% if states.input_boolean.z.state == 'on' %}true{% endif %}"
   action:
     - service: notify.hass
       data_template:
-        title: "Moring Briefing"
         message: >
                   Today is {{ now().strftime( '%a %B %d') }}{{ "\n" }}
                   {{ "\n" }}
                   Outside feels like {{states('sensor.dark_sky_apparent_temperature') | round}}°, high is {{states('sensor.dark_sky_daytime_high_apparent_temperature')| round}}° with a low of {{states('sensor.dark_sky_overnight_low_apparent_temperature') | round}}°, {{states('sensor.dark_sky_template')|lower}} skies.{{ "\n" }}
                   Forecast is {{states('sensor.dark_sky_hourly_summary')[:-1]|lower}}{{ "\n" }}
-                  {{states('sensor.zalendar')}}
+                  {{ "\n" }}
+                  {{states('sensor.zalendar')}}{{ "\n" }}
+                  {{ "\n" }}
+                  {%- if is_state("sensor.quote_of_the_day", "unknown") -%}
+                  Do or do not. There is no Try.
+                  {%- else -%}
+                  {{states.sensor.quote_of_the_day.state}}
+                  {%- endif %}
+
 - id: rriefing
   alias: "Morning Briefing R"
   trigger:
@@ -23,19 +264,25 @@
     at: '07:00'
   condition:
     condition: template
-    value_template: "{% if not is_state('sensor.ro_status', 'Extended Away') %}true{% endif %}"
+    value_template: "{% if states.input_boolean.r.state == 'on' %}true{% endif %}"
   action:
     - service: notify.hass
       data_template:
         target:
           - !secret she_mail     
-        title: "Moring Briefing"
         message: >
                   Today is {{ now().strftime( '%a %B %d') }}{{ "\n" }}
                   {{ "\n" }}
                   Outside feels like {{states('sensor.dark_sky_apparent_temperature') | round}}°, high is {{states('sensor.dark_sky_daytime_high_apparent_temperature')| round}}° with a low of {{states('sensor.dark_sky_overnight_low_apparent_temperature') | round}}°, {{states('sensor.dark_sky_template')|lower}} skies.{{ "\n" }}
                   Forecast is {{states('sensor.dark_sky_hourly_summary')[:-1]|lower}}{{ "\n" }}
-                  {{states('sensor.ralendar')}}
+                  {{ "\n" }}
+                  {{states('sensor.ralendar')}}{{ "\n" }}
+                  {{ "\n" }}
+                  {%- if is_state("sensor.quote_of_the_day", "unknown") -%}
+                  Do or do not. There is no Try. 
+                  {%- else -%} 
+                  {{states.sensor.quote_of_the_day.state}}
+                  {%- endif %}
 
 
 - id: restart_firetv
@@ -43,7 +290,7 @@
   initial_state: True
   trigger:
      - platform: state
-       entity_id: 'sensor.firetv'
+       entity_id: sensor.firetv
   action:
       - service: shell_command.restart_firetv
 
@@ -70,7 +317,7 @@
   initial_state: True
   trigger:
      - platform: state
-       entity_id: 'sensor.couch'
+       entity_id: sensor.couch
        to: 'Detected'
   condition:
      condition: and
@@ -89,28 +336,28 @@
   initial_state: True
   trigger:
      - platform: state
-       entity_id: 'binary_sensor.motion_sensor_158d000222cd2b'
+       entity_id: binary_sensor.motion_sensor_living
        to: 'on'
   condition:
      condition: and
      conditions:
       - condition: state
-        entity_id: sensor.z_status
-        state: 'Home'
+        entity_id: input_boolean.z
+        state: 'on'
       - condition: numeric_state
-        entity_id: sensor.illumination_158d0001e53c55
+        entity_id: sensor.illumination_kitchen
         below: 30
       - condition: state
-        entity_id: 'sensor.couch'
+        entity_id: sensor.couch
         state: 'Clear'
       - condition: state
-        entity_id: 'light.kitchen'
+        entity_id: light.kitchen
         state: 'off'
       - condition: state
-        entity_id: 'sensor.bob'
+        entity_id: sensor.bob
         state: 'ON'
   action:
-    # # - wait_template: "{{ states.binary_sensor.motion_sensor_158d000222cd2b.state == 'on' }}"
+    # # - wait_template: "{{ states.binary_sensor.motion_sensor_living.state == 'on' }}"
       # # timeout: '00:00:20'
      - service: light.turn_on
        entity_id: light.kitchen
@@ -122,13 +369,12 @@
     platform: event
     event_type: click
     event_data:
-      entity_id: binary_sensor.switch_158d0001f4b243
+      entity_id: binary_sensor.switch_monkey
       click_type: long_click_press
   action:
-    - service: input_select.select_option
+    - service: input_boolean.turn_on
       data:
-        entity_id: 'input_select.ro_status_dropdown'
-        option: Home
+        entity_id: input_boolean.r
     - service: xiaomi_aqara.play_ringtone
       data:
         gw_mac: !secret xg_mac
@@ -142,13 +388,18 @@
    - platform: event
      event_type: click
      event_data:
-       entity_id: binary_sensor.switch_158d00021323b6
+       entity_id: binary_sensor.switch_living
        event_type: click
   action:
+    # - service:  media_player.play_media
+      # data:
+        # entity_id: media_player.living_room_speaker
+        # media_content_id: !secret wav1_url
+        # media_content_type: music
     - service: xiaomi_aqara.play_ringtone
       data_template:
         gw_mac: !secret xg_mac
-        ringtone_vol: 50
+        ringtone_vol: 10
         ringtone_id: '{{ (range(10000, 10003)|random) }}'
         
 - id: unavailable
@@ -168,27 +419,7 @@
         ringtone_vol: 3
     - service: notify.hass
       data_template:
-       title: Unavailable
        message: '{{ states[trigger.entity_id.split(".")[0]][ trigger.entity_id.split(".")[1]].name }}'
-
-- id: we away
-  alias: 'we are away'
-  initial_state: True
-  trigger:
-    - platform: state
-      entity_id: group.us
-      to: 'not_home'
-      for:
-        minutes: 10
-  condition:
-      - condition: state
-        entity_id: input_select.guest
-        state: 'Away'
-  action:
-    - service: switch.turn_off
-      entity_id: switch.socket
-    - service: light.turn_off
-      entity_id: light.wc,light.kitchen,light.masa,light.Hallway1,light.Hallway2,light.Hallway3,light.bob, light.spot
 
 - id: location
   alias: 'Last Movement'
@@ -202,33 +433,29 @@
     - platform: state
       entity_id: sensor.masa_pir
       to: 'ON'
-    #couch
-    - platform: state
-      entity_id: sensor.couch
-      to: 'Detected'
     #entrance
     - platform: state
       entity_id: sensor.entrance
       to: 'Motion'
-    #kitchen, WC, Living, Hallway, 
+    #kitchen, WC, Living, Hallway, couch
     - platform: state
-      entity_id: binary_sensor.motion_sensor_158d0001e53c55, binary_sensor.motion_sensor_158d0001b1cd72, binary_sensor.motion_sensor_158d000222cd2b, binary_sensor.motion_sensor_158d0002236930
+      entity_id: binary_sensor.motion_sensor_kitchen, binary_sensor.motion_sensor_wc, binary_sensor.motion_sensor_living, binary_sensor.motion_sensor_hallway, binary_sensor.couch
       to: 'on'
       for:
         seconds: 0.1
   action:
       - service: input_select.select_option
         data_template:
-         entity_id: 'input_select.location'
+         entity_id: input_select.location
          option: >
            {% if trigger.entity_id == "sensor.bob" %} Bob
            {% elif trigger.entity_id == "sensor.masa_pir" %} Masa
-           {% elif trigger.entity_id == "sensor.couch" %} Couch
+           {% elif trigger.entity_id == "binary_sensor.couch" %} Couch
            {% elif trigger.entity_id == "sensor.entrance" %} Entrance
-           {% elif trigger.entity_id == "binary_sensor.motion_sensor_158d0001e53c55" %} Kitchen
-           {% elif trigger.entity_id == "binary_sensor.motion_sensor_158d0001b1cd72" %} WC
-           {% elif trigger.entity_id == "binary_sensor.motion_sensor_158d000222cd2b" %} Living
-           {% elif trigger.entity_id == "binary_sensor.motion_sensor_158d0002236930" %} Hallway
+           {% elif trigger.entity_id == "binary_sensor.motion_sensor_kitchen" %} Kitchen
+           {% elif trigger.entity_id == "binary_sensor.motion_sensor_wc" %} WC
+           {% elif trigger.entity_id == "binary_sensor.motion_sensor_living" %} Living
+           {% elif trigger.entity_id == "binary_sensor.motion_sensor_hallway" %} Hallway
            {% endif %}
 
 - alias: Lazy ON
@@ -241,10 +468,10 @@
     condition: and
     conditions:
       - condition: state
-        entity_id: 'input_select.guest'
-        state: 'Away'
+        entity_id: input_boolean.guest
+        state: 'off'
       - condition: template
-        value_template: '{{ not is_state("sensor.ro_status", "Home") or is_state("media_player.firetv", "playing") }}'
+        value_template: "{% if states.input_boolean.r.state == 'off' or states.media_player.firetv.state == 'playing' %}true{% endif %}"
   action:
     - service: automation.turn_off
       entity_id: automation.dota_table_on, automation.kitchen_on, automation.hallway_on
@@ -252,7 +479,7 @@
       entity_id: light.wc,light.kitchen,light.masa,light.Hallway1,light.Hallway2,light.Hallway3
     - service: input_select.select_option
       data:
-        entity_id: 'input_select.location'
+        entity_id: input_select.location
         option: Couch
 
 - alias: Lazy OFF
@@ -269,7 +496,7 @@
   initial_state: True
   trigger:
   - platform: state
-    entity_id: binary_sensor.motion_sensor_158d0001e53c55
+    entity_id: binary_sensor.motion_sensor_kitchen
     to: 'on'
     for:
       seconds: 0.1
@@ -277,11 +504,11 @@
     condition: and
     conditions:
       - condition: state
-        entity_id: sensor.ro_status
-        state: 'Away'
+        entity_id: input_boolean.r
+        state: 'off'
       - condition: state
-        entity_id: input_select.guest
-        state: 'Away'
+        entity_id: input_boolean.guest
+        state: 'off'
       - condition: state
         entity_id: light.WC
         state: 'on'
@@ -294,7 +521,7 @@
   initial_state: True
   trigger:
     platform: state
-    entity_id: binary_sensor.door_window_sensor_158d0001fa8dce
+    entity_id: binary_sensor.door_entrance
     to: 'on'
     for:
       seconds: 0.1
@@ -302,12 +529,41 @@
     - service: automation.trigger
       entity_id: automation.hallway_on
 
+- id: snoop
+  alias: 'snooping'
+  initial_state: True
+  trigger:
+    platform: state
+    entity_id: binary_sensor.motion_bedroom
+    to: 'on'
+    for:
+      seconds: 0.1
+  condition:
+    condition: or
+    conditions:
+      - condition: state
+        entity_id: input_boolean.guest
+        state: 'on'
+      - condition: state
+        entity_id: input_boolean.away
+        state: 'on'
+      - condition: state
+        entity_id: input_boolean.vacation
+        state: 'on'
+  action:
+    - service: notify.hass
+      data:
+        target:
+          - !secret she_mail
+          - !secret he_mail        
+        message: "Someone is snooping around the bedroom"
+
 - id: door
   alias: 'Door opened'
   initial_state: True
   trigger:
     platform: state
-    entity_id: binary_sensor.door_window_sensor_158d0001fa8dce
+    entity_id: binary_sensor.door_entrance
     to: 'on'
     for:
       seconds: 0.1
@@ -318,8 +574,10 @@
   action:
     - service: notify.hass
       data:
-        title: Door
-        message: Open
+        target:
+          - !secret she_mail
+          - !secret he_mail        
+        message: "Door opened"
 
 - alias: 'Home Alone'
   initial_state: True
@@ -333,14 +591,14 @@
     condition: and
     conditions:
       - condition: state
-        entity_id: 'input_select.guest'
-        state: 'Away'
+        entity_id: input_boolean.guest
+        state: 'off'
       - condition: state
-        entity_id: sensor.ro_status
-        state: 'Away'
+        entity_id: input_boolean.r
+        state: 'off'
       - condition: state
-        entity_id: sensor.z_status
-        state: 'Home'
+        entity_id: input_boolean.z
+        state: 'on'
       - condition: state
         entity_id: sun.sun
         state: 'below_horizon'
@@ -351,95 +609,11 @@
     - service: light.turn_off
       entity_id: light.kitchen, light.masa, light.wc, light.bob, light.Hallway1, light.Hallway2, light.Hallway3
 
-- alias: 'Sunset'
-  initial_state: True
-  trigger:
-    platform: sun
-    event: sunset
-    offset: '-00:35:00'
-  action:
-    - service: input_boolean.turn_on
-      entity_id: input_boolean.mmode
-
-- alias: Home
-  initial_state: True
-  trigger:
-    - platform: state
-      entity_id: device_tracker.z, group.ro
-      from: 'not_home'
-      to: 'home'
-  action:
-    - service: input_select.select_option
-      data_template:
-        entity_id: >
-          {% if trigger.entity_id == 'device_tracker.z' %}
-            input_select.z_status_dropdown
-          {% else %}
-            input_select.ro_status_dropdown
-          {% endif %}
-        option: Home
- 
-- alias: Just left
-  initial_state: True
-  trigger:
-    - platform: state
-      entity_id: device_tracker.z, group.ro
-      from: 'home'
-      to: 'not_home'
-  action:
-    - service: input_select.select_option
-      data_template:
-        entity_id: >
-          {% if trigger.entity_id == 'device_tracker.z' %}
-            input_select.z_status_dropdown
-          {% else %}
-            input_select.ro_status_dropdown
-          {% endif %}
-        option: Just Left
- 
-- alias: Away
-  initial_state: True
-  trigger:
-    - platform: state
-      entity_id: input_select.z_status_dropdown, input_select.ro_status_dropdown
-      to: 'Just Left'
-      for:
-        minutes: 5
-  action:
-    - service: input_select.select_option
-      data_template:
-        entity_id: >
-          {% if trigger.entity_id == 'input_select.z_status_dropdown' %}
-            input_select.z_status_dropdown
-          {% else %}
-            input_select.ro_status_dropdown
-          {% endif %}
-        option: Away
-      
-- alias: Extended away
-  initial_state: True
-  trigger:
-    - platform: state
-      entity_id: input_select.z_status_dropdown, input_select.ro_status_dropdown
-      to: 'Away'
-      for:
-        hours: 24
-  action:
-    - service: input_select.select_option
-      data_template:
-        entity_id: >
-          {% if trigger.entity_id == 'input_select.z_status_dropdown' %}
-            input_select.z_status_dropdown
-          {% else %}
-            input_select.ro_status_dropdown
-          {% endif %}
-        option: Extended Away
-
 - alias: Gateway light ON
   initial_state: True
   trigger:
   - platform: state
-    entity_id: binary_sensor.motion_sensor_158d0002236930
+    entity_id: binary_sensor.motion_sensor_hallway
     from: 'off'
     to: 'on'
     for:
@@ -449,7 +623,7 @@
     to: 'Motion'
   condition:
     condition: numeric_state
-    entity_id: !secret xg_sensor
+    entity_id: sensor.illumination_gateway
     below: 300
   action:
     - service: scene.turn_on
@@ -459,30 +633,29 @@
   initial_state: True
   trigger:
     platform: state
-    entity_id: binary_sensor.motion_sensor_158d0002236930
+    entity_id: binary_sensor.motion_sensor_hallway
     to: 'off'
     for:
       minutes: 5
   action:
     - service: light.turn_off
-      entity_id: !secret xg_light
+      entity_id: light.gateway
 
 - alias: 'Kitchen ON'
   initial_state: True
   trigger:
   - platform: state
-    entity_id: binary_sensor.motion_sensor_158d0001e53c55
+    entity_id: binary_sensor.motion_sensor_kitchen
     to: 'on'
     for:
       seconds: 0.1
   condition:
     condition: and
     conditions:
-      - condition: state
-        entity_id: group.us
-        state: home
+      - condition: template
+        value_template: "{% if states.sensor.house.state != 'Away' or states.sensor.house.state != 'Vacation' %}true{% endif %}"
       - condition: numeric_state
-        entity_id: sensor.illumination_158d0001e53c55
+        entity_id: sensor.illumination_kitchen
         below: 30
   action:
       - service: scene.turn_on
@@ -503,13 +676,13 @@
     for:
        seconds: 30
   - platform: state
-    entity_id: binary_sensor.motion_sensor_158d0001e53c55
+    entity_id: binary_sensor.motion_sensor_kitchen
     to: 'off'
     for:
        seconds: 30
   condition:
     condition:  state
-    entity_id: binary_sensor.motion_sensor_158d0001e53c55
+    entity_id: binary_sensor.motion_sensor_kitchen
     state: 'off'
   action:
       service: light.turn_off
@@ -524,14 +697,13 @@
   condition:
     condition: and
     conditions:
-      - condition: state
-        entity_id: group.us
-        state: home
+      - condition: template
+        value_template: "{% if states.sensor.house.state != 'Away' or states.sensor.house.state != 'Vacation' %}true{% endif %}"
       - condition: state
         entity_id: light.masa
         state: 'off'
       - condition: numeric_state
-        entity_id: sensor.illumination_158d0001e53c55
+        entity_id: sensor.illumination_kitchen
         below: 30
   action:
       service: light.turn_on
@@ -561,9 +733,8 @@
       - condition: state
         entity_id: input_boolean.mmode
         state: 'on'
-      - condition: state
-        entity_id: group.us
-        state: home
+      - condition: template
+        value_template: "{% if states.sensor.house.state != 'Away' or states.sensor.house.state != 'Vacation' %}true{% endif %}"
       - condition: state
         entity_id: sun.sun
         state: 'below_horizon'
@@ -591,19 +762,18 @@
     entity_id: sensor.entrance
     to: 'Motion'
   - platform: state     
-    entity_id: binary_sensor.motion_sensor_158d0002236930
+    entity_id: binary_sensor.motion_sensor_hallway
     to: 'on'
     for:
       seconds: 0.1
   condition:
     condition: and
     conditions:
-      - condition: state
-        entity_id: group.us
-        state: home
+      - condition: template
+        value_template: "{% if states.sensor.house.state != 'Away' or states.sensor.house.state != 'Vacation' %}true{% endif %}"
       - condition: numeric_state
-        entity_id: sensor.illumination_158d0002236930
-        below: 30
+        entity_id: sensor.illumination_hallway
+        below: 45
   action:
     - service: scene.turn_on
       data_template:
@@ -623,7 +793,7 @@
     for:
       seconds: 30
   - platform: state
-    entity_id: binary_sensor.motion_sensor_158d0002236930
+    entity_id: binary_sensor.motion_sensor_hallway
     to: 'off'
     for:
       seconds: 10
@@ -631,7 +801,7 @@
     condition: and
     conditions:
       - condition: state
-        entity_id: 'light.Hallway1'
+        entity_id: light.Hallway1
         state: 'on'
       - condition: state
         entity_id: sensor.entrance
@@ -646,7 +816,7 @@
   initial_state: True
   trigger:
   - platform: state     
-    entity_id: binary_sensor.motion_sensor_158d0001b1cd72
+    entity_id: binary_sensor.motion_sensor_wc
     to: 'on'
     for:
       seconds: 0.1
@@ -654,7 +824,7 @@
     condition: and
     conditions:
       - condition: numeric_state
-        entity_id: sensor.illumination_158d0001b1cd72
+        entity_id: sensor.illumination_wc
         below: 10
   action:
     - service: scene.turn_on
@@ -670,7 +840,7 @@
   initial_state: True
   trigger:
   - platform: state
-    entity_id: binary_sensor.motion_sensor_158d0001b1cd72
+    entity_id: binary_sensor.motion_sensor_wc
     to: 'off'
     for:
       seconds: 10
@@ -678,20 +848,20 @@
       service: light.turn_off
       entity_id: light.WC
 
-- alias: 'Feed ze animal 8:15 & 17:40'
+- alias: 'Feed ze animal 8&14&18'
   initial_state: True
   trigger: 
-  #- platform: time
-    #hours: /8
-    #minutes: 00
-    #seconds: 00
   - platform: time
     hours: 08
-    minutes: 15
+    minutes: 0
     seconds: 0
   - platform: time
-    hours: 17
-    minutes: 40
+    hours: 14
+    minutes: 0
+    seconds: 0
+  - platform: time
+    hours: 18
+    minutes: 0
     seconds: 0
   action:
       service: switch.turn_on
@@ -705,11 +875,11 @@
     platform: event
     event_type: cube_action
     event_data:
-      entity_id: binary_sensor.cube_158d0001035b08
+      entity_id: binary_sensor.cube
       action_type: rotate
   action:
     - service: homeassistant.toggle
-      entity_id: group.za
+      entity_id: group.guster
 
 - id: tap_twice
   alias: Cube tap
@@ -718,7 +888,7 @@
     platform: event
     event_type: cube_action
     event_data:
-      entity_id: binary_sensor.cube_158d0001035b08
+      entity_id: binary_sensor.cube
       action_type: tap_twice
   action:
     - service: input_boolean.turn_off
@@ -733,7 +903,7 @@
     platform: event
     event_type: cube_action
     event_data:
-      entity_id: binary_sensor.cube_158d0001035b08
+      entity_id: binary_sensor.cube
       action_type: flip90
   action:
     - service: light.toggle
@@ -746,7 +916,7 @@
     platform: event
     event_type: cube_action
     event_data:
-      entity_id: binary_sensor.cube_158d0001035b08
+      entity_id: binary_sensor.cube
       action_type: flip180
   action:
     - service: light.toggle
@@ -759,7 +929,7 @@
     platform: event
     event_type: cube_action
     event_data:
-      entity_id: binary_sensor.cube_158d0001035b08
+      entity_id: binary_sensor.cube
       action_type: free_fall
   action:
     - service: automation.toggle
@@ -777,7 +947,7 @@
     platform: event
     event_type: cube_action
     event_data:
-      entity_id: binary_sensor.cube_158d0001035b08
+      entity_id: binary_sensor.cube
       action_type: shake_air
   action:
     - service: light.toggle  
@@ -790,7 +960,7 @@
     platform: event
     event_type: cube_action
     event_data:
-      entity_id: binary_sensor.cube_158d0001035b08
+      entity_id: binary_sensor.cube
       action_type: shake_air
   action:
     - service: light.turn_off  
@@ -801,11 +971,12 @@
 - id: move
   alias: Cube move
   initial_state: False
+  hide_entity: True
   trigger:
     platform: event
     event_type: cube_action
     event_data:
-      entity_id: binary_sensor.cube_158d0001035b08
+      entity_id: binary_sensor.cube
       action_type: move
   action:
     - service: mqtt.publish
@@ -815,17 +986,17 @@
         qos: 0
     - service: notify.hass
       data:
-        title: " "
         message: "Hauarde"
 
 - id: alert
   alias: 'Cube Alert'
   initial_state: False
+  hide_entity: True
   trigger:
     platform: event
     event_type: cube_action
     event_data:
-      entity_id: binary_sensor.cube_158d0001035b08
+      entity_id: binary_sensor.cube
       action_type: alert
   action:
     - service: notify.hass        
@@ -844,7 +1015,7 @@
     platform: event
     event_type: cube_action
     event_data:
-      entity_id: binary_sensor.cube_158d0001035b08
+      entity_id: binary_sensor.cube
       action_type: swing
   action:
     - service: notify.hass
@@ -863,14 +1034,14 @@
     - service: notify.hass
       data_template:
         message: >
-          New device:
-          {{trigger.event.data.host_name}}
-          ({{trigger.event.data.entity_id}})
-        title: new device connected
-    - service: input_select.select_option
+         New entity ID {{ trigger.event.data.entity_id }} and hostname {{ trigger.event.data.host_name }}
+    - service: input_boolean.turn_on
       data:
-        entity_id: 'input_select.guest'
-        option: Home
+        entity_id: input_boolean.guest
+    - service: input_text.set_value
+      data_template:
+        entity_id: input_text.guest
+        value: "{{trigger.event.data.entity_id}}"
 
 - id: 2c0e3de5e904
   hide_entity: True
@@ -883,4 +1054,15 @@
     - service: notify.hass
       data:
         message: "One of the tracked devices has connected"
-        title: "Tracking alert"
+
+- id: 'Sunset'
+  alias: 'Sunset'
+  initial_state: True
+  trigger:
+    platform: sun
+    event: sunset
+    offset: '-00:35:00'
+  action:
+    - service: input_boolean.turn_on
+      entity_id: input_boolean.mmode
+

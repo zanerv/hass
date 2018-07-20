@@ -1,5 +1,74 @@
-  restart_ha:
-    alias: Restart hass
-    sequence:
-      - alias: Restart HA
-        service: homeassistant.restart
+make_coffe:
+  alias: Coffee machine
+  sequence:
+    service: script.turn_on
+    data_template:
+      entity_id: >
+        {% if states.switch.coffee_machine.state == 'on' %} script.coffee_machine_on
+        {% elif states.switch.coffee_machine.state == 'off'%} script.coffee_machine_off
+        {% endif %}
+
+coffee_machine_off:
+  alias: Power on and make coffee
+  sequence:
+    - service: switch.turn_on
+      entity_id: switch.coffee_machine
+    - wait_template: "{{ states.switch.coffee_machine.state == 'on' }}"
+      timeout: '00:01:10'
+    - delay: '00:00:50'
+    - service: switch.turn_on
+      entity_id: switch.coffee
+    
+coffee_machine_on:
+  alias: Make coffee
+  sequence:
+    service: switch.turn_on
+    entity_id: switch.coffee
+
+
+movie_time:
+  alias: movie time
+  sequence:
+    - service: homeassistant.turn_off
+      entity_id: group.guster
+    - service: light.turn_on
+      entity_id: light.spot
+
+storj_information:
+  alias: storj information
+  sequence:
+    - service: shell_command.tts_storj
+    - service: media_player.play_media
+      data:
+        entity_id: media_player.living_room_speaker
+        media_content_id: https://hass.kpu.ro/local/storj.wav
+        media_content_type: music
+
+restart:
+  alias: abracadabra
+  sequence:
+    - service: homeassistant.restart
+
+house_mode_away:
+  sequence:
+    - service: light.turn_off
+      data_template:
+        entity_id: >
+          {%- for state in states.light if state.entity_id != 'light.entrance' -%}
+          {{- "," if not loop.first-}}{{ state.entity_id }}{{-endif-}}
+          {%- endfor -%}
+    - service: switch.turn_off
+      data_template:
+        entity_id: >
+          {%- for state in states.switch if
+          state.entity_id != 'switch.rikis_food' and
+          state.entity_id != 'switch.rikis_food'-%}
+          {{- "," if not loop.first-}}{{ state.entity_id }}{{-endif-}}
+          {%- endfor -%}
+    - service: media_player.turn_off
+      data_template:
+        entity_id: >
+          {%- for state in states.media_player if
+          state.entity_id != 'media_player.TEST'-%}
+          {{- "," if not loop.first-}}{{ state.entity_id }}{{-endif-}}
+          {%- endfor -%}

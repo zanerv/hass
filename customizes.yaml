@@ -1,3 +1,25 @@
+light.yeelight_rgb_7811dc6831d0:
+  hidden: true
+light.yeelight_rgb_7811dc683a06:
+  hidden: true
+light.yeelight_white_286c078690b9:
+  hidden: true
+light.yeelight_white_286c07ac5792:
+  hidden: true
+light.yeelight_white_286c07b18f43:
+  hidden: true
+light.yeelight_white_286c07b190c5:
+  hidden: true
+
+sensor.projector_status:
+  hidden: true
+
+binary_sensor.workday_sensor:
+  hidden: true
+
+sensor.quote_of_the_day:
+  hidden: true
+
 light.Hallway1:
   hidden: true
 
@@ -13,44 +35,44 @@ sensor.zalendar:
 sensor.ralendar:
   hidden: true
 
-device_tracker.hallway1:
+device_tracker.ping_hallway:
   hidden: true
 
-device_tracker.kitchen:
+device_tracker.ping_kitchen:
   hidden: true
 
-device_tracker.masa:
+device_tracker.ping_masa:
   hidden: true
 
-device_tracker.wc:
+device_tracker.ping_wc:
   hidden: true
 
-binary_sensor.switch_158d00021323b6:
+binary_sensor.switch_living:
   friendly_name: "Button"
   hidden: true
 
 sensor.firetv:
   hidden: true
 
-binary_sensor.switch_158d0001f4b243:
+binary_sensor.switch_monkey:
   hidden: true
 
-sensor.Temperature_158d0002271513:
+sensor.Temperature_bedroom:
   friendly_name: "Temperature"
 
-sensor.Humidity_158d0002271513:
+sensor.Humidity_bedroom:
   friendly_name: "Humidity"
 
-sensor.Pressure_158d0002271513:
+sensor.Pressure_bedroom:
   friendly_name: "Pressure"
 
-sensor.Temperature_158d000227b7d2:
+sensor.Temperature_living:
   friendly_name: "Temperature"
 
-sensor.Humidity_158d000227b7d2:
+sensor.Humidity_living:
   friendly_name: "Humidity"
 
-sensor.Pressure_158d000227b7d2:
+sensor.Pressure_living:
   friendly_name: "Pressure"
 
 light.masa:
@@ -86,9 +108,9 @@ sensor.masa_pir:
 
 light.kitchen:
   icon: mdi:ceiling-light
-  friendly_name: "Light"
+  friendly_name: "Kitchen"
 
-binary_sensor.cube_158d0001035b08:
+binary_sensor.cube:
   icon: mdi:cube-outline
   friendly_name: "Cube"
   hidden: true
@@ -96,38 +118,38 @@ binary_sensor.cube_158d0001035b08:
 sensor.cube_last:
   icon: mdi:cube
 
-binary_sensor.motion_sensor_158d000222cd2b:
+binary_sensor.motion_sensor_living:
   friendly_name: "Living"
 
-binary_sensor.motion_sensor_158d0002236930:
+binary_sensor.motion_sensor_hallway:
   friendly_name: "Hallway"
 
-binary_sensor.motion_sensor_158d0001e53c55:
+binary_sensor.motion_sensor_kitchen:
   friendly_name: "Kitchen"
 
-binary_sensor.motion_sensor_158d0001b1cd72:
+binary_sensor.motion_sensor_wc:
   friendly_name: "WC"
 
-sensor.illumination_158d000222cd2b:
+sensor.illumination_living:
   friendly_name: "Light"
 
-sensor.illumination_158d0002236930:
+sensor.illumination_hallway:
   friendly_name: "Light"
 
-sensor.illumination_158d0001e53c55:
+sensor.illumination_kitchen:
   friendly_name: "Light"
 
-sensor.illumination_158d0001b1cd72:
+sensor.illumination_wc:
   friendly_name: "Light"
 
-!secret xg_sensor:
+sensor.illumination_gateway:
   friendly_name: "Light"
 
-!secret xg_light:
+light.gateway:
   friendly_name: "Gateway"
   icon: mdi:ladybug
 
-binary_sensor.door_window_sensor_158d0002011816:
+binary_sensor.couch:
   friendly_name: "Couch"
   icon: mdi:sofa
   hidden: true
@@ -136,8 +158,13 @@ sensor.couch:
   friendly_name: "Couch"
   icon: mdi:sofa
 
-binary_sensor.door_window_sensor_158d0001fa8dce:
-  friendly_name: "Door"
+binary_sensor.door_entrance:
+  icon: mdi:door
+
+binary_sensor.door_lightroom:
+  icon: mdi:door
+
+binary_sensor.door_darkroom:
   icon: mdi:door
 
 sensor.bob:
@@ -178,6 +205,9 @@ sensor.t_total_since_17mar:
 
 sensor.plex:
   icon: mdi:plex
+
+sensor.tautulli:
+  hidden: true
 
 sensor.cpu_temperature:
   icon: mdi:temperature-celsius
@@ -267,12 +297,8 @@ sensor.dark_sky_hourly_summary:
 sensor.dark_sky_minutely_summary:
   friendly_name: 'Summary'
 
-switch.wakeup:
+switch.coffee_machine:
   icon: mdi:power-settings
-switch.wake_up:
-  icon: mdi:power-settings
-switch.cafea:
-  icon: mdi:coffee-to-go
 switch.espresso:
   icon: mdi:coffee
 switch.coffee:
@@ -295,10 +321,13 @@ switch.caruso:
 switch.holiday:
   icon: mdi:food
 
-sensor.z_status:
+input_boolean.z:
   entity_picture: /local/haiti.jpg
-sensor.ro_status:
+input_boolean.r:
   entity_picture: /local/she.jpg
 
 sensor.location:
-  icon: mdi:map-marker-radius
+  icon: mdi:home-map-marker
+sensor.house:
+  icon: mdi:home-account
+  friendly_name: "Who's Home"

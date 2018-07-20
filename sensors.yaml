@@ -5,18 +5,22 @@
 
 - platform: template
   sensors:
+    house:
+      value_template: >
+                       {% if states.input_boolean.away.state == 'on' %}Away
+                       {% elif states.input_boolean.vacation.state == 'on' %}Vacation
+                       {% elif states.input_boolean.guest.state == 'on' %}Guest
+                       {% elif states.input_boolean.r.state == 'on' and states.input_boolean.z.state == 'on' %}Home
+                       {% elif states.input_boolean.away.state == 'off' and states.input_boolean.r.state == 'off' and states.input_boolean.z.state == 'on' %}Z
+                       {% elif states.input_boolean.away.state == 'off' and states.input_boolean.r.state == 'on' and states.input_boolean.z.state == 'off' %}Ro
+                       {% elif states.input_boolean.away.state == 'off' and states.input_boolean.vacation.state == 'off' and states.input_boolean.guest.state == 'off' and states.input_boolean.r.state == 'off' and states.input_boolean.z.state == 'off' %}Away
+                       {% else%}Unknown{% endif %}
     location:
       value_template: '{{ states.input_select.location.state }}'
       friendly_name: 'Location'
-    z_status:
-      value_template: '{{ states.input_select.z_status_dropdown.state }}'
-      friendly_name: 'Z'
-    ro_status:
-      value_template: '{{ states.input_select.ro_status_dropdown.state }}'
-      friendly_name: !secret she
     cube_last:
       friendly_name: "Cube"
-      value_template: '{{ states.binary_sensor.cube_158d0001035b08.attributes.last_action }}'
+      value_template: '{{ states.binary_sensor.cube.attributes.last_action }}'
     dark_sky_template:
       value_template: "{{ states('sensor.dark_sky_summary') }}"
       icon_template: >
@@ -46,12 +50,18 @@
           mdi:help-circle
         {% endif %}
     couch:
-      value_template: "{% if is_state('binary_sensor.door_window_sensor_158d0002011816', 'off') %}Detected{% else %}Clear{% endif %}"
-    
+      value_template: "{% if is_state('binary_sensor.couch', 'off') %}Detected{% else %}Clear{% endif %}"
+    projector_status:
+      value_template: >-
+        {%- if states.sensor.t_power.state|int > 100 -%}
+          on
+        {% else %}
+          off
+        {% endif %}    
     # location:
       # friendly_name: 'Location'
       # value_template: >
-        # {%- set sensors = [states.binary_sensor.motion_sensor_158d0001b1cd72, states.binary_sensor.motion_sensor_158d0001e53c55, states.binary_sensor.motion_sensor_158d000222cd2b, states.binary_sensor.motion_sensor_158d0002236930, states.sensor.bob, states.sensor.masa_pir, states.sensor.entrance, states.binary_sensor.door_window_sensor_158d0002011816] %}
+        # {%- set sensors = [states.binary_sensor.motion_sensor_wc, states.binary_sensor.motion_sensor_kitchen, states.binary_sensor.motion_sensor_living, states.binary_sensor.motion_sensor_hallway, states.sensor.bob, states.sensor.masa_pir, states.sensor.entrance, states.binary_sensor.couch] %}
         # {% for sensor in sensors %}
             # {% if as_timestamp(sensor.last_changed) == as_timestamp(sensors | map(attribute='last_changed') | max) %}
               # {% if sensor.state == 'ON' %}
@@ -67,6 +77,10 @@
 #  origin: !secret waze_origin_gps
 #  destination: !secret waze_destination_gps
 #  region: 'EU'
+- platform: mqtt
+  name: "Tautulli"
+  state_topic: "plex/player/"
+  value_template: "{{ value_json.body }}"
 
 - platform: mqtt
   name: "masa pir"
@@ -189,6 +203,10 @@
       - precip_probability
 
 - platform: command_line
+  name: Storj
+  command: cat /config/Z.cal|grep -Po "(?<=by ).*(?= )"
+  
+- platform: command_line
   name: Zalendar
   command: cat /config/Z.cal
 
@@ -196,6 +214,13 @@
   name: Ralendar
   command: cat /config/R.cal
 
+#- platform: rest
+#  name: quote_of_the_day
+#  resource: http://api.forismatic.com/api/1.0/?method=getQuote&format=json&lang=en
+#  value_template: '{{ value_json.quoteText }}'
+#  scan_interval: 10
 
-
-
+- platform: command_line
+  name: quote_of_the_day
+  command: curl -s 'http://api.forismatic.com/api/1.0/?method=getQuote&format=json&lang=en'|awk -F '"' '{printf $4}'|tr -d '\\'
+  scan_interval: 43200

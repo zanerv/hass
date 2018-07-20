@@ -60,17 +60,16 @@
 
 # The following switch wakes up the coffee machine
 - platform: mqtt
-  name: "Wake Up"
+  name: "Coffee Machine"
   state_topic: "home/tweek/status"
   command_topic: "home/tweek/cmd"
-  qos: 0
+  qos: 2
   payload_on: "0"
   payload_off: "9"
-  retain: true
   value_template: >
         {% if value == 'on' %}
         0
-        {% elif value == 'standby' %}
+        {% elif value == 'off' %}
         9
         {% endif %}
 
@@ -79,14 +78,13 @@
   name: "Espresso"
   state_topic: "home/tweek/status"
   command_topic: "home/tweek/cmd"
-  qos: 0
+  qos: 2
   payload_on: "1"
   payload_off: "9"
-  retain: true
   value_template: >
-        {% if value == 'esspresso' %}
+        {% if value == 'espresso' %}
         1
-        {% elif value == 'standby' %}
+        {% elif value == 'off' %}
         9
         {% endif %}
 
@@ -94,18 +92,17 @@
   name: "Coffee"
   state_topic: "home/tweek/status"
   command_topic: "home/tweek/cmd"
-  qos: 0
+  qos: 2
   payload_on: "2"
   payload_off: ""
-  retain: true
   value_template: '{{ value == "coffee" }}'
 
-- platform: mqtt
-  name: "Projector"
-  state_topic: "home/lupa/cmd"
-#  state_topic: "home/lupa/status"
-  command_topic: "home/lupa/cmd"
-  qos: 0
-  payload_on: "on"
-  payload_off: "off"
-  retain: true
+# - platform: mqtt
+  # name: "Projector"
+  # state_topic: "home/lupa/cmd"
+# #  state_topic: "home/lupa/status"
+  # command_topic: "home/lupa/cmd"
+  # qos: 0
+  # payload_on: "on"
+  # payload_off: "off"
+  # retain: true

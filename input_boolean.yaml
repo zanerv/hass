@@ -1,0 +1,24 @@
+mmode:
+  initial: on
+
+vacation:
+  name: Vacation
+  icon: mdi:sunglasses
+  initial: off
+
+away:
+  name: Away
+  icon: mdi:account-off
+  initial: off  
+
+r:
+  name: !secret she
+  icon: mdi:human-female
+
+z:
+  name: Z
+  icon: mdi:human
+
+guest:
+  name: Guest
+  icon: mdi:account-box

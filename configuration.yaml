@@ -14,13 +14,10 @@ homeassistant:
   customize: !include customizes.yaml
   packages: !include_dir_named packages/
   
-input_boolean:
-  mmode:
-    initial: off
-
 #logger:
 #  default: debug
 influxdb:
+
 recorder:
   db_url: !secret db_url
 
@@ -71,7 +68,9 @@ updater:
   # include_used_components: true
 
 # Discover some devices automatically
-#discovery:
+discovery:
+  ignore:
+    - roku
 
 # Allows you to issue voice commands from the frontend in enabled browsers
 conversation:
@@ -100,12 +99,12 @@ shopping_list:
 # Plex
 media_player:
   - platform: plex
-    entity_namespace: 'plex'
-    include_non_clients: true
-    scan_interval: 5
-    show_all_controls: false
-    use_custom_entity_ids: true
-    use_episode_art: true
+    # entity_namespace: 'plex'
+    # include_non_clients: true
+    # scan_interval: 5
+    # show_all_controls: true
+    # use_custom_entity_ids: true
+    # use_episode_art: true
 
   - platform: firetv
     device: sleepingroom
@@ -121,23 +120,14 @@ device_tracker:
     baseoid: !secret snmp_baseoid
     interval_seconds: 30
     consider_home: 60
-  - platform: nmap_tracker
-    hosts: !secret nmap_hosts
-    home_interval: 10
-    exclude:
-     - !secret mqtt_broker
   - platform: ping
     hosts:
-      WC: !secret WC
-      masa: !secret masa
-      Hallway1: !secret Hallway1
-      Kitchen: !secret Kitchen
+      ping_WC: !secret WC
+      ping_masa: !secret masa
+      ping_Hallway: !secret Hallway1
+      ping_Kitchen: !secret Kitchen
     count: 2
 
-notify:
-  - name: hass
-    platform: pushbullet
-    api_key: !secret pushbullet_api
 
 # Enables the frontend
 frontend:
@@ -147,6 +137,16 @@ frontend:
   javascript_version: latest
   themes: !include themes.yaml
 
+notify: !include notify.yaml
+
+input_text: !include input_text.yaml
+
+input_boolean: !include input_boolean.yaml
+
+cloud: !include cloud.yaml
+
+alert: !include alert.yaml
+  
 scene: !include scenes.yaml
 
 automation: !include automation.yaml

@@ -1,5 +1,6 @@
 home-assistant.log
 .cloud/
+.storage/
 deps/
 www/
 tts/
@@ -8,9 +9,11 @@ custom_components/
 secrets.yaml
 known_devices.yaml
 entity_registry.yaml
+cloud.yaml
 .shopping_list.json
 .uuid
 plex.conf
 device.py
 configurator.py
 *.cal
+*.com
