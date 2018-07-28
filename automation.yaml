@@ -6,27 +6,29 @@
       entity_id: binary_sensor.motion_sensor_wc
       to: 'on'
   action:
+    - delay: '00:00:02'
     - service: automation.trigger
       data_template:
           entity_id: >
-            {% if (as_timestamp(now()) - as_timestamp(states.automation.hallway_on.attributes.last_triggered)) < 10 %} automation.hallway_off
+            {% if (as_timestamp(now()) - as_timestamp(states.automation.hallway_on.attributes.last_triggered)) < 20 %} automation.hallway_off
             {% else %} automation.nothing
             {% endif %}
     - service: automation.trigger
       data_template:
           entity_id: >
-            {% if (as_timestamp(now()) - as_timestamp(states.automation.kitchen_on.attributes.last_triggered)) < 10 %} automation.kitchen_off
+            {% if (as_timestamp(now()) - as_timestamp(states.automation.kitchen_on.attributes.last_triggered)) < 20 %} automation.kitchen_off
             {% else %} automation.nothing
             {% endif %}
     - service: automation.trigger
       data_template:
           entity_id: >
-            {% if (as_timestamp(now()) - as_timestamp(states.automation.dota_table_on.attributes.last_triggered)) < 10 %} automation.dota_table_off
+            {% if (as_timestamp(now()) - as_timestamp(states.automation.dota_table_on.attributes.last_triggered)) < 20 %} automation.dota_table_off
             {% else %} automation.nothing
             {% endif %}
 
 - id: nothing
   alias: 'nothing'
+  hide_entity: True
   initial_state: false
   trigger:
   action:
@@ -136,12 +138,6 @@
         {% elif states.sensor.tautulli.state == 'stop' %} light.turn_off
         {% endif %}
       entity_id: light.spot
-    # - service: automation.trigger
-      # data_template:
-          # entity_id: >
-            # {% if states.sensor.tautulli.state == 'play' %} automation.lazy_on
-            # {% elif states.sensor.tautulli.state == 'stop' %} automation.lazy_off
-            # {% endif %}
 
 - id: house_mode_guest
   alias: "House mode guest"
@@ -322,6 +318,7 @@
        entity_id: sensor.firetv
   action:
       - service: shell_command.restart_firetv
+      - delay: '00:00:20'
 
 - id: theme
   alias: 'Theme'
@@ -517,6 +514,9 @@
     - platform: state
       entity_id: sensor.couch
       to: 'Clear'
+    - platform: state
+      entity_id: media_player.firetv
+      from: 'playing'
   action:
     - service: automation.turn_on
       entity_id: automation.dota_table_on, automation.kitchen_on, automation.hallway_on
