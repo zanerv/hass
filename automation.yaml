@@ -1,14 +1,35 @@
-- id: test1
-  alias: test1
+- id: at_wc
+  alias: 'at WC'
+  initial_state: True
   trigger:
     - platform: state
-      entity_id: sensor.masa_pir
+      entity_id: binary_sensor.motion_sensor_wc
+      to: 'on'
   action:
-     - service: input_text.set_value
-       data_template:
-         entity_id: input_text.guest
-         value: "{{trigger.entity_id}}"
+    - service: automation.trigger
+      data_template:
+          entity_id: >
+            {% if (as_timestamp(now()) - as_timestamp(states.automation.hallway_on.attributes.last_triggered)) < 10 %} automation.hallway_off
+            {% else %} automation.nothing
+            {% endif %}
+    - service: automation.trigger
+      data_template:
+          entity_id: >
+            {% if (as_timestamp(now()) - as_timestamp(states.automation.kitchen_on.attributes.last_triggered)) < 10 %} automation.kitchen_off
+            {% else %} automation.nothing
+            {% endif %}
+    - service: automation.trigger
+      data_template:
+          entity_id: >
+            {% if (as_timestamp(now()) - as_timestamp(states.automation.dota_table_on.attributes.last_triggered)) < 10 %} automation.dota_table_off
+            {% else %} automation.nothing
+            {% endif %}
 
+- id: nothing
+  alias: 'nothing'
+  initial_state: false
+  trigger:
+  action:
 
 - id: bedroom_doors
   alias: 'Bedroom doors'
@@ -27,7 +48,7 @@
     - service: media_player.play_media
       data:
         entity_id: media_player.living_room_speaker
-        media_content_id: https://hass.kpu.ro/local/door.wav
+        media_content_id: !secret door_wav
         media_content_type: music
 
 - id: bedroom_doors_thanks
@@ -51,7 +72,7 @@
     - service: media_player.play_media
       data:
         entity_id: media_player.living_room_speaker
-        media_content_id: https://hass.kpu.ro/local/thanks.wav
+        media_content_id: !secret door_thanks
         media_content_type: music
 
 - id: Unknown
@@ -115,12 +136,25 @@
         {% elif states.sensor.tautulli.state == 'stop' %} light.turn_off
         {% endif %}
       entity_id: light.spot
-    - service: automation.trigger
-      data_template:
-          entity_id: >
-            {% if states.sensor.tautulli.state == 'play' %} automation.lazy_on
-            {% elif states.sensor.tautulli.state == 'stop' %} automation.lazy_off
-            {% endif %}
+    # - service: automation.trigger
+      # data_template:
+          # entity_id: >
+            # {% if states.sensor.tautulli.state == 'play' %} automation.lazy_on
+            # {% elif states.sensor.tautulli.state == 'stop' %} automation.lazy_off
+            # {% endif %}
+
+- id: house_mode_guest
+  alias: "House mode guest"
+  initial_state: 'on'
+  trigger:
+      - platform: state
+        entity_id: group.guests
+  action:
+    - service_template: >
+        {% if states.group.guests.state == 'home' %} homeassistant.turn_on
+        {% elif states.group.guests.state == 'not_home'%} homeassistant.turn_off
+        {% endif %}
+      entity_id: input_boolean.guest
 
 - id: house_mode_user_z
   alias: "House mode user Z"
@@ -130,31 +164,24 @@
         entity_id: device_tracker.z
   condition:
     condition: template
-    value_template: "{% if (as_timestamp(now()) - as_timestamp(states.binary_sensor.door_entrance.last_changed)) < 1000 %}true{% endif %}"
+    value_template: "{% if (as_timestamp(now()) - as_timestamp(states.binary_sensor.door_entrance.last_changed)) < 1800 %}true{% endif %}"
   action:
     - service_template: >
         {% if states.device_tracker.z.state == 'home' %} homeassistant.turn_on
         {% elif states.device_tracker.z.state != 'home'%} homeassistant.turn_off
         {% endif %}
       entity_id: input_boolean.z
-
+    
 - id: house_mode_user_r
   alias: "House mode user R"
   initial_state: 'on'
   trigger:
       - platform: state
         entity_id: device_tracker.r
-        # to: 'not_home'
-        # for:
-          # minutes: 5
-      # - platform: state
-        # entity_id: device_tracker.rdell, device_tracker.r, binary_sensor.door_entrance
   condition:
     condition: template
-    value_template: "{% if (as_timestamp(now()) - as_timestamp(states.binary_sensor.door_entrance.last_changed)) < 1000 %}true{% endif %}"
+    value_template: "{% if (as_timestamp(now()) - as_timestamp(states.binary_sensor.door_entrance.last_changed)) < 1800 %}true{% endif %}"
   action:
-        # {% if states.device_tracker.rdell.state == 'home' or states.device_tracker.r.state == 'home' and states.input_boolean.r.state == 'off' %} homeassistant.turn_on
-        # {% elif states.device_tracker.rdell.state != 'home' or states.device_tracker.r.state != 'home' and states.input_boolean.r.state == 'off'%} homeassistant.turn_off
     - service_template: >
         {% if states.device_tracker.rdell.state == 'home' or states.device_tracker.r.state == 'home' %} homeassistant.turn_on
         {% elif states.device_tracker.rdell.state != 'home' or states.device_tracker.r.state != 'home'%} homeassistant.turn_off
@@ -169,16 +196,18 @@
       entity_id: input_boolean.z, input_boolean.r, input_boolean.guest
   action:
     - service_template: >
-        {% if states.input_boolean.z.state == 'off' and states.input_boolean.r.state == 'off' and states.input_boolean.guest.state == 'off' and states.input_boolean.away.state == 'off' %} input_boolean.turn_on
-        {% elif states.input_boolean.z.state == 'on' or states.input_boolean.r.state == 'on' or states.input_boolean.guest.state == 'on' and states.input_boolean.away.state == 'on' %} input_boolean.turn_off
+        {% if states.input_boolean.z.state == 'off' and states.input_boolean.r.state == 'off' and states.input_boolean.guest.state == 'off' %} input_boolean.turn_on
+        {% elif states.input_boolean.z.state == 'on' or states.input_boolean.r.state == 'on' or states.input_boolean.guest.state == 'on' %} input_boolean.turn_off
         {% endif %}
       entity_id: input_boolean.away
     - service_template: >
         {% if states.input_boolean.away.state == 'on' %} script.house_mode_away
+        {% else %} script.nothing
         {% endif %}
     - service_template: >
-          {% if (as_timestamp(now()) - as_timestamp(states.input_boolean.away.last_changed)) < 60 %} notify.hass
-          {% endif %}
+        {% if (as_timestamp(now()) - as_timestamp(states.input_boolean.away.last_changed)) < 60 %} notify.hass
+        {% else %} script.nothing
+        {% endif %}
       data_template:
         message: >
          {% if states.input_boolean.away.state == 'off' and states.input_boolean.guest.state == 'off' %} Alarm is disarmed, Welcome Home
@@ -357,8 +386,8 @@
         entity_id: sensor.bob
         state: 'ON'
   action:
-    # # - wait_template: "{{ states.binary_sensor.motion_sensor_living.state == 'on' }}"
-      # # timeout: '00:00:20'
+    # - wait_template: "{{ states.binary_sensor.motion_sensor_living.state == 'on' }}"
+      # timeout: '00:00:20'
      - service: light.turn_on
        entity_id: light.kitchen
 
@@ -383,7 +412,7 @@
         
 - id: button
   alias: Button
-  initial_state: True
+  initial_state: true
   trigger:
    - platform: event
      event_type: click
@@ -539,16 +568,16 @@
     for:
       seconds: 0.1
   condition:
-    condition: or
+    condition: and
     conditions:
       - condition: state
+        entity_id: input_boolean.z
+        state: 'off'
+      - condition: state
+        entity_id: input_boolean.r
+        state: 'off'
+      - condition: state
         entity_id: input_boolean.guest
-        state: 'on'
-      - condition: state
-        entity_id: input_boolean.away
-        state: 'on'
-      - condition: state
-        entity_id: input_boolean.vacation
         state: 'on'
   action:
     - service: notify.hass
@@ -647,8 +676,8 @@
   - platform: state
     entity_id: binary_sensor.motion_sensor_kitchen
     to: 'on'
-    for:
-      seconds: 0.1
+    # for:
+      # seconds: 0.1
   condition:
     condition: and
     conditions:
@@ -716,7 +745,7 @@
     entity_id: sensor.masa_pir
     to: 'OFF'
     for:
-      minutes: 3
+      minutes: 5
   action:
       service: light.turn_off
       entity_id: light.masa
@@ -764,8 +793,8 @@
   - platform: state     
     entity_id: binary_sensor.motion_sensor_hallway
     to: 'on'
-    for:
-      seconds: 0.1
+    # for:
+      # seconds: 0.1
   condition:
     condition: and
     conditions:
@@ -818,8 +847,8 @@
   - platform: state     
     entity_id: binary_sensor.motion_sensor_wc
     to: 'on'
-    for:
-      seconds: 0.1
+    # for:
+      # seconds: 0.1
   condition:
     condition: and
     conditions:
@@ -1035,25 +1064,22 @@
       data_template:
         message: >
          New entity ID {{ trigger.event.data.entity_id }} and hostname {{ trigger.event.data.host_name }}
-    - service: input_boolean.turn_on
-      data:
-        entity_id: input_boolean.guest
-    - service: input_text.set_value
-      data_template:
-        entity_id: input_text.guest
-        value: "{{trigger.event.data.entity_id}}"
+    - service: shell_command.echo_groups
+      data_template: 
+        arg: "{{ trigger.event.data.entity_id }}"
+    - service: group.reload
 
 - id: 2c0e3de5e904
   hide_entity: True
   alias: 'Unknown MACs'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: state
       entity_id: !secret unknown_mac
   action:
     - service: notify.hass
-      data:
-        message: "One of the tracked devices has connected"
+      data_template:
+        message: "One of the tracked devices has connected {{ trigger.entity_id }} and hostname {{ trigger.host_name }}"
 
 - id: 'Sunset'
   alias: 'Sunset'

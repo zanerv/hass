@@ -33,7 +33,7 @@ $(curl -s 'https://cxl-services.appspot.com/proxy?url=https%3A%2F%2Ftexttospeech
 
 for i in {1..5}; do
   google_cloud
-    if [ "$(stat -c %s "$wav")" -gt 220000 ]
+    if [ "$(stat -c %s "$wav")" -gt 210000 ]
     then
       break
     fi

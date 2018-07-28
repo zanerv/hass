@@ -1,5 +1,5 @@
 make_coffe:
-  alias: Coffee machine
+  alias: Intelia coffee machine
   sequence:
     service: script.turn_on
     data_template:
@@ -29,10 +29,10 @@ coffee_machine_on:
 movie_time:
   alias: movie time
   sequence:
-    - service: homeassistant.turn_off
-      entity_id: group.guster
     - service: light.turn_on
       entity_id: light.spot
+    - service: homeassistant.turn_off
+      entity_id: group.guster
 
 storj_information:
   alias: storj information
@@ -72,3 +72,6 @@ house_mode_away:
           state.entity_id != 'media_player.TEST'-%}
           {{- "," if not loop.first-}}{{ state.entity_id }}{{-endif-}}
           {%- endfor -%}
+nothing:
+  alias: nothing
+  sequence:

@@ -205,6 +205,7 @@
 - platform: command_line
   name: Storj
   command: cat /config/Z.cal|grep -Po "(?<=by ).*(?= )"
+  scan_interval: 13200
   
 - platform: command_line
   name: Zalendar
