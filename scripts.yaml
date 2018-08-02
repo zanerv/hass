@@ -15,15 +15,18 @@ coffee_machine_off:
       entity_id: switch.coffee_machine
     - wait_template: "{{ states.switch.coffee_machine.state == 'on' }}"
       timeout: '00:01:10'
-    - delay: '00:00:50'
+    - wait_template: "{{ states.binary_sensor.motion_sensor_kitchen.state == 'on' }}"
+      timeout: '00:02:00'
+    - delay: '00:00:10'
     - service: switch.turn_on
       entity_id: switch.coffee
     
 coffee_machine_on:
   alias: Make coffee
   sequence:
-    service: switch.turn_on
-    entity_id: switch.coffee
+    - wait_template: "{{ states.binary_sensor.motion_sensor_kitchen.state == 'on' }}"
+    - service: switch.turn_on
+      entity_id: switch.coffee
 
 
 movie_time:

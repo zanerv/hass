@@ -90,7 +90,7 @@ Bedroom:
  - sensor.Temperature_bedroom
  - sensor.Humidity_bedroom
  - sensor.Pressure_bedroom
- - binary_sensor.motion_bedroom
+ - binary_sensor.motion_sensor_bedroom
  - sensor.illumination_bedroom
 
 Living:

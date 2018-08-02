@@ -1,3 +1,21 @@
+- id: going_to_bed
+  initial_state: True
+  trigger:
+    - platform: state
+      entity_id: sensor.projector_status
+      to: 'off'
+  condition:
+    - condition: state
+      entity_id: sun.sun
+      state: 'below_horizon'
+  action:
+    - service: light.turn_on
+      entity_id: light.spot
+    - wait_template: "{{ states.binary_sensor.motion_sensor_living.state == 'on' }}"
+      timeout: '00:00:20'
+    - service: light.turn_off
+      entity_id: light.bob, light.spot
+
 - id: at_wc
   alias: 'at WC'
   initial_state: True
@@ -32,6 +50,21 @@
   initial_state: false
   trigger:
   action:
+
+- id: got_brighter
+  alias: 'Got brighter'
+  initial_state: True
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.illumination_kitchen
+      above: 80
+  condition:
+    - condition: state
+      entity_id: light.kitchen
+      state: 'off'
+  action:
+    - service: light.turn_off
+      entity_id: light.masa
 
 - id: bedroom_doors
   alias: 'Bedroom doors'
@@ -563,7 +596,7 @@
   initial_state: True
   trigger:
     platform: state
-    entity_id: binary_sensor.motion_bedroom
+    entity_id: binary_sensor.motion_sensor_bedroom
     to: 'on'
     for:
       seconds: 0.1
@@ -799,7 +832,7 @@
     condition: and
     conditions:
       - condition: template
-        value_template: "{% if states.sensor.house.state != 'Away' or states.sensor.house.state != 'Vacation' %}true{% endif %}"
+        value_template: "{% if states.sensor.house.state != 'Away' and states.sensor.house.state != 'Vacation' %}true{% endif %}"
       - condition: numeric_state
         entity_id: sensor.illumination_hallway
         below: 45

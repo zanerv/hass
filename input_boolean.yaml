@@ -19,6 +19,10 @@ z:
   name: Z
   icon: mdi:human
 
+z_tasker:
+  name: Z Tasker
+  icon: mdi:human
+
 guest:
   name: Guest
   icon: mdi:account-box

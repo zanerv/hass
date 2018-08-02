@@ -21,7 +21,7 @@
       prob_given_false: 0.7
       platform: 'state'
       to_state: 'on'
-    - entity_id: 'binary_sensor.motion_bedroom'
+    - entity_id: 'binary_sensor.motion_sensor_bedroom'
       prob_given_true: 0.2
       prob_given_false: 0.5
       platform: 'state'

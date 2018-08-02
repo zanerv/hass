@@ -1,9 +1,12 @@
 #!/bin/bash
-wav="/config/www/storj.wav"
-#wav="www/storj.wav"
 
-cookie="/config/storjdash.com"
-#cookie="storjdash.com"
+if [ "$HOSTNAME" = hass ]; then
+    wav="/config/www/storj.wav"
+    cookie="/config/storjdash.com"
+else
+    wav="www/storj.wav"
+    cookie="storjdash.com"
+fi
 
 for i in {1..5}; do
   storj=$(curl -s --cookie $cookie https://www.storjdash.com/|grep "flipInX"|tail -1|grep -Po "(?<=>).*(?=<)")

@@ -321,6 +321,8 @@ switch.caruso:
 switch.holiday:
   icon: mdi:food
 
+input_boolean.z_tasker:
+  hidden: true
 input_boolean.z:
   entity_picture: /local/haiti.jpg
 input_boolean.r:
