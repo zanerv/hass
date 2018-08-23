@@ -1,3 +1,12 @@
+# - platform: command_line
+  # switches:
+    # door:
+      # friendly_name: Door Lock
+      # command_on: /bin/bash -c "/config/adb/adb.sh shell input keyevent 26&&sleep 0.2&&/config/adb/adb.sh shell input swipe 360 1000 150 1000;/config/adb/adb.sh shell input keyevent 26"
+      # command_off: /bin/bash -c "/config/adb/adb.sh shell input keyevent 26&&sleep 0.2&&/config/adb/adb.sh shell input swipe 360 1000 580 1000;/config/adb/adb.sh shell input keyevent 26"
+      # command_state: /bin/bash -c "/config/adb/adb.sh shell cat /storage/sdcard0/Android/data/com.xiaomi.smarthome/files/SherlockLog/$(date +%Y%m%d.log)|grep mOperateCommandType|tail -1| grep -oP '(?<=mOperateCommandType:).*?(?=\r)'"
+      # value_template: '{{ value == "Lock" }}'
+
 - platform: mqtt
   name: "Socket"
   state_topic: "stat/socket/POWER"
@@ -21,6 +30,24 @@
   payload_available: "Online"
   payload_not_available: "Offline"
   retain: true
+
+- platform: broadlink
+  host: !secret broadlink_host
+  mac: !secret broadlink_mac
+  timeout: 15
+  switches:
+    projector:
+      friendly_name: "Projector"
+      command_on: 'JgBYAAABJpURFBEUERQROREUERQQFRAUETkROhETERQROREUERQRFBE5EjgROREUERQRFBAVEDoRExEUERQRORI4ETkRORITEQAFswABJkwQAAxXAAEmTBAADQU='
+      command_off: 'JgBYAAABJpURFBEUERQROREUERQQFRAUETkROhETERQROREUERQRFBE5EjgROREUERQRFBAVEDoRExEUERQRORI4ETkRORITEQAFswABJkwQAAxXAAEmTBAADQU='
+    projector_esc:
+      friendly_name: "Projector ESC"
+      command_on: 'JgBQAAABJpUSExEUERQROREUEBUQFBEUETkROREUEhMROREUERQRFBE5ERQRORE5ETkRFBE5ERQQFRA6EBUQFBEUETkRFBE5EQAFswABJkwQAA0FAAAAAAAAAAA='
+      command_off: 'JgBYAAABJpURFBEUERQROREUERQQFRAUETkROhETERQROREUERQRFBE5EjgROREUERQRFBAVEDoRExEUERQRORI4ETkRORITEQAFswABJkwQAAxXAAEmTBAADQU='
+    ac:
+      friendly_name: "AC"
+      command_on: 'JgBAAAABGYgPNA4UDRQNFA41DhMOFA0UDRQOFA0UDRQNFA4UDRQNFA4UDRQNNg01DhQNNQ4UDRQNFA41DTYNNQ4ADQUAAAAAAAAAAA=='
+      command_off: 'JgBAAAABGogPNA0UDhQNFA01DhQNFA4UDTUNNg0UDRQOFA0UDRQOFA0UDRQOFA0UDRQONQ0UDjUNFA4TDhQNNQ4ADQUAAAAAAAAAAA=='
   # The following switch orders food
 # - platform: command_line
   # switches:
@@ -97,12 +124,3 @@
   payload_off: ""
   value_template: '{{ value == "coffee" }}'
 
-# - platform: mqtt
-  # name: "Projector"
-  # state_topic: "home/lupa/cmd"
-# #  state_topic: "home/lupa/status"
-  # command_topic: "home/lupa/cmd"
-  # qos: 0
-  # payload_on: "on"
-  # payload_off: "off"
-  # retain: true

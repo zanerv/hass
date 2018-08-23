@@ -1,3 +1,47 @@
+night_mode:
+  alias: Good night
+  sequence:
+    - service: script.turn_on
+      data_template:
+        entity_id: >
+          {% if states.sensor.projector_status.state == 'on' %} script.projector_off
+          {% else %} script.nothing
+          {% endif %}
+    - service: light.turn_off
+      data_template:
+        entity_id: >
+          {%- for state in states.light if state.entity_id != 'light.entrance' -%}
+          {{- "," if not loop.first-}}{{ state.entity_id }}{{-endif-}}
+          {%- endfor -%}
+    - service: light.turn_on
+      entity_id: light.kitchen
+    - service: switch.turn_off
+      data_template:
+        entity_id: >
+          {%- for state in states.switch if
+          state.entity_id != 'switch.projector' and
+          state.entity_id != 'switch.projector_esc' and
+          state.entity_id != 'switch.rikis_food' and
+          state.entity_id != 'switch.trantor_power'-%}
+          {{- "," if not loop.first-}}{{ state.entity_id }}{{-endif-}}
+          {%- endfor -%}
+    - service: light.turn_on
+      entity_id: light.kitchen
+    # - service: media_player.play_media
+      # data:
+        # entity_id: media_player.living_room_speaker
+        # media_content_id: !secret good_night_wav
+        # media_content_type: music
+
+projector_off:
+  alias: Turn Projector OFF
+  sequence:
+    - service: switch.turn_off
+      entity_id: switch.projector
+    - delay: '00:00:01'
+    - service: switch.turn_off
+      entity_id: switch.projector
+
 make_coffe:
   alias: Intelia coffee machine
   sequence:
@@ -15,11 +59,19 @@ coffee_machine_off:
       entity_id: switch.coffee_machine
     - wait_template: "{{ states.switch.coffee_machine.state == 'on' }}"
       timeout: '00:01:10'
+    - service: notify.hass
+      data:
+        message:  "intelia: is on and waiting"
     - wait_template: "{{ states.binary_sensor.motion_sensor_kitchen.state == 'on' }}"
       timeout: '00:02:00'
+    - service: notify.hass
+      data:
+        message:  "intelia: human detected, starting countdown 10s..."
     - delay: '00:00:10'
-    - service: switch.turn_on
-      entity_id: switch.coffee
+    # - service: switch.turn_on
+      # entity_id: switch.coffee
+    - service: light.turn_on
+      entity_id: light.bob
     
 coffee_machine_on:
   alias: Make coffee
@@ -36,11 +88,17 @@ movie_time:
       entity_id: light.spot
     - service: homeassistant.turn_off
       entity_id: group.guster
+    - service: switch.turn_on
+      entity_id: switch.projector
 
 storj_information:
   alias: storj information
   sequence:
+    - service: shell_command.storj
     - service: shell_command.tts_storj
+      data_template:
+        arg: "{{states.sensor.storj.state}}"
+    - delay: '00:00:01'
     - service: media_player.play_media
       data:
         entity_id: media_player.living_room_speaker
@@ -65,7 +123,7 @@ house_mode_away:
         entity_id: >
           {%- for state in states.switch if
           state.entity_id != 'switch.rikis_food' and
-          state.entity_id != 'switch.rikis_food'-%}
+          state.entity_id != 'switch.trantor_power'-%}
           {{- "," if not loop.first-}}{{ state.entity_id }}{{-endif-}}
           {%- endfor -%}
     - service: media_player.turn_off
@@ -78,3 +136,13 @@ house_mode_away:
 nothing:
   alias: nothing
   sequence:
+
+door_lock:
+  alias: Door Lock
+  sequence:
+    - service: shell_command.lock
+
+door_unlock:
+  alias: Door Unlock
+  sequence:
+    - service: shell_command.unlock

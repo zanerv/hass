@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ "$HOSTNAME" = hass ]; then
+if [[ "$HOSTNAME" = hass ]]; then
     wav="/config/www/storj.wav"
     cookie="/config/storjdash.com"
 else
@@ -8,13 +8,19 @@ else
     cookie="storjdash.com"
 fi
 
-for i in {1..5}; do
+if [[ -z "$1" ]]; then
+ for i in {1..5}; do
   storj=$(curl -s --cookie $cookie https://www.storjdash.com/|grep "flipInX"|tail -1|grep -Po "(?<=>).*(?=<)")
-    if [[ $storj =~ "-" ]]
+echo "$storj"
+    if [[ $storj =~ "B" ]]
     then
       break
     fi
-done
+ done
+else
+echo $1
+storj="$1"
+fi
 
 if [[ $storj =~ "-" ]] ; then
   verb="decreased"
@@ -36,7 +42,8 @@ $(curl -s 'https://cxl-services.appspot.com/proxy?url=https%3A%2F%2Ftexttospeech
 
 for i in {1..5}; do
   google_cloud
-    if [ "$(stat -c %s "$wav")" -gt 210000 ]
+echo "google cloud $(stat -c %s "$wav")"
+    if [ "$(stat -c %s "$wav")" -gt 150000 ]
     then
       break
     fi

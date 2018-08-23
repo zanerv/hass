@@ -73,6 +73,7 @@ guster:
  name: 'Guster switch'
  entities:
  - light.bob
+ - light.joe
  - input_boolean.mmode
 
 Masa:
@@ -83,6 +84,27 @@ Masa:
  - sensor.masa_pir
  - vacuum.harry_potter
 
+Darkroom:
+ name: 'Darkroom'
+ control: hidden
+ entities:
+ - light.Darkroom
+ - sensor.Temperature_Darkroom
+ - sensor.Humidity_Darkroom
+ - sensor.Pressure_Darkroom
+ - binary_sensor.door_Darkroom
+
+Lightroom:
+ name: 'Lightroom'
+ control: hidden
+ entities:
+ - light.Lightroom
+ - sensor.Temperature_Lightroom
+ - sensor.Humidity_Lightroom
+ - sensor.Pressure_Lightroom
+ - binary_sensor.window_Lightroom
+ - binary_sensor.door_lightroom
+
 Bedroom:
  name: 'Bedroom'
  control: hidden
@@ -92,6 +114,7 @@ Bedroom:
  - sensor.Pressure_bedroom
  - binary_sensor.motion_sensor_bedroom
  - sensor.illumination_bedroom
+ - binary_sensor.door_sensor_bedroom
 
 Living:
  name: 'Living'
@@ -115,6 +138,7 @@ Kitchen:
  control: hidden
  entities:
  - light.kitchen
+ - light.kitchen_strip
  - switch.coffee_machine
  - switch.espresso
  - switch.coffee
@@ -142,8 +166,6 @@ Hallway:
  - light.entrance
  - sensor.entrance
  - binary_sensor.switch_monkey
- - binary_sensor.door_lightroom
- - binary_sensor.door_darkroom
  
 Hallway_Light:
  name: Hallway Lights
@@ -157,11 +179,15 @@ Lights:
  entities:
  - group.hallway_light
  - light.bob
+ - light.joe
  - light.spot
  - light.masa
  - light.kitchen
+ - light.kitchen_strip
  - light.wc
  - switch.socket
+ - light.lightroom
+ - light.darkroom
 
 Environment:
  name: Afara 3D
@@ -245,6 +271,9 @@ Monitoring:
  - sensor.today
  - sensor.yesterday
  - sensor.total_since_04feb
+ - sensor.temperature_shiny
+ - sensor.humidity_shiny
+ - sensor.pressure_shiny
 
 media_players:
  name: Media Players
@@ -261,3 +290,11 @@ guests:
  name: Guests
  entities:
  - device_tracker.puiul
+ - device_tracker.34ea346ff7a4
+ - device_tracker.1c151f94f38f
+ - device_tracker.7c49ebaccfa2
+ - device_tracker.7c49ebacd9b0
+ - device_tracker.7c49eb1dd7ce
+ - device_tracker.002637acfbd7
+ - device_tracker.f85971aa1cde
+ - device_tracker.7c49ebaeec2b

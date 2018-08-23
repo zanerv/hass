@@ -1,20 +1,46 @@
 - platform: command_line
+  name: storj
+  command: /config/storj_sensor.sh
+  scan_interval: 9000
+
+- platform: command_line
   hidden: true
   name: firetv
-  command: "grep -o 'rror while setting up platform firetv' /config/home-assistant.log | wc -l"
+  command: "egrep 'rror while setting up platform firetv|Update for media_player.firetv fails' /config/home-assistant.log | wc -l"
 
 - platform: template
   sensors:
+    battery:
+      icon_template: >
+        {% if states.sensor.battery.state != '' %}mdi:battery-alert
+        {% else %}mdi:battery
+        {% endif %}
+      value_template: >
+        {%- for item in states if (item.attributes.battery_level is defined) %}
+        {%- if item.attributes.battery_level < 25 %}
+        {{ item.attributes.battery_level }}
+        {%- endif -%}
+        {%- endfor -%}
+      friendly_name_template: >
+        {% if states.sensor.battery.state == '' %}Batteries Nominal
+        {% else %}
+        {%- for item in states if (item.attributes.battery_level is defined) %}
+        {%- if item.attributes.battery_level < 25 %}
+        {{ item.name }}
+        {%- endif -%}
+        {%- endfor -%}
+        {% endif %}
+
     house:
       value_template: >
-                       {% if states.input_boolean.away.state == 'on' %}Away
-                       {% elif states.input_boolean.vacation.state == 'on' %}Vacation
-                       {% elif states.input_boolean.guest.state == 'on' %}Guest
-                       {% elif states.input_boolean.r.state == 'on' and states.input_boolean.z.state == 'on' %}Home
-                       {% elif states.input_boolean.away.state == 'off' and states.input_boolean.r.state == 'off' and states.input_boolean.z.state == 'on' %}Z
-                       {% elif states.input_boolean.away.state == 'off' and states.input_boolean.r.state == 'on' and states.input_boolean.z.state == 'off' %}Ro
-                       {% elif states.input_boolean.away.state == 'off' and states.input_boolean.vacation.state == 'off' and states.input_boolean.guest.state == 'off' and states.input_boolean.r.state == 'off' and states.input_boolean.z.state == 'off' %}Away
-                       {% else%}Unknown{% endif %}
+        {% if states.input_boolean.away.state == 'on' %}Away
+        {% elif states.input_boolean.vacation.state == 'on' %}Vacation
+        {% elif states.input_boolean.guest.state == 'on' %}Guest
+        {% elif states.input_boolean.r.state == 'on' and states.input_boolean.z.state == 'on' %}Home
+        {% elif states.input_boolean.away.state == 'off' and states.input_boolean.r.state == 'off' and states.input_boolean.z.state == 'on' %}Z
+        {% elif states.input_boolean.away.state == 'off' and states.input_boolean.r.state == 'on' and states.input_boolean.z.state == 'off' %}Ro
+        {% elif states.input_boolean.away.state == 'off' and states.input_boolean.vacation.state == 'off' and states.input_boolean.guest.state == 'off' and states.input_boolean.r.state == 'off' and states.input_boolean.z.state == 'off' %}Away
+        {% else%}Unknown{% endif %}
     location:
       value_template: '{{ states.input_select.location.state }}'
       friendly_name: 'Location'
@@ -53,11 +79,12 @@
       value_template: "{% if is_state('binary_sensor.couch', 'off') %}Detected{% else %}Clear{% endif %}"
     projector_status:
       value_template: >-
-        {%- if states.sensor.t_power.state|int > 100 -%}
+        {%- if states.sensor.t_power.state|int > 200 -%}
           on
         {% else %}
           off
-        {% endif %}    
+        {% endif %} 
+        
     # location:
       # friendly_name: 'Location'
       # value_template: >
@@ -203,23 +230,14 @@
       - precip_probability
 
 - platform: command_line
-  name: Storj
-  command: cat /config/Z.cal|grep -Po "(?<=by ).*(?= )"
-  scan_interval: 13200
-  
-- platform: command_line
   name: Zalendar
   command: cat /config/Z.cal
+  scan_interval: 9000
 
 - platform: command_line
   name: Ralendar
   command: cat /config/R.cal
-
-#- platform: rest
-#  name: quote_of_the_day
-#  resource: http://api.forismatic.com/api/1.0/?method=getQuote&format=json&lang=en
-#  value_template: '{{ value_json.quoteText }}'
-#  scan_interval: 10
+  scan_interval: 9000
 
 - platform: command_line
   name: quote_of_the_day

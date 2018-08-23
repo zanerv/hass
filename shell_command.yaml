@@ -1,3 +1,6 @@
-restart_firetv: curl --unix-socket /var/run/docker.sock -X POST http:/v1.24/containers/firetv/restart
-tts_storj: /config/storj_inc.sh
+restart_firetv: /bin/bash -c "curl --unix-socket /var/run/docker.sock -X POST http:/v1.24/containers/firetv/restart"
+storj: /bin/bash -c "/config/storj_sensor.sh"
+tts_storj: /bin/bash -c "/config/storj_inc.sh '{{ arg }}'"
 echo_groups: /bin/bash -c "echo ' - {{ arg }}' >> /config/groups.yaml"
+lock: /bin/bash -c "/config/adb/adb.sh shell input keyevent 26&&sleep 0.2&&/config/adb/adb.sh shell input swipe 360 1000 150 1000;/config/adb/adb.sh shell input keyevent 26"
+unlock: /bin/bash -c "/config/adb/adb.sh shell input keyevent 26&&sleep 0.2&&/config/adb/adb.sh shell input swipe 360 1000 580 1000;/config/adb/adb.sh shell input keyevent 26"

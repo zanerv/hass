@@ -24,9 +24,9 @@
   
 - name: Kitchen Morning
   entities:
-    light.kitchen:
+    light.kitchen_strip:
       state: on
-      brightness_pct: 5
+    #  brightness_pct: 5
 
 - name: Kitchen Night
   entities:

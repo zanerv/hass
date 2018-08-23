@@ -33,32 +33,22 @@
       to_state: 'playing'
 
 - platform: bayesian
-  prior: 0.25
+  prior: 0.2
   name: 'Z Presence'
   probability_threshold: 0.9
   observations:
+    - entity_id: 'media_player.audio_funk'
+      prob_given_true: 0.8
+      # prob_given_false: 0.3
+      platform: 'state'
+      to_state: 'playing'
     - entity_id: 'device_tracker.z'
       prob_given_true: 0.9
-      prob_given_false: 0.3
+      # prob_given_false: 0.3
       platform: 'state'
       to_state: 'home'
-    - entity_id: 'device_tracker.zpc'
-      prob_given_true: 0.3
-      prob_given_false: 0.5
-      platform: 'state'
-      to_state: 'home'
-    - entity_id: 'sensor.projector_status'
-      prob_given_true: 0.6
-      prob_given_false: 0.4
-      platform: 'state'
-      to_state: 'on'
-    - entity_id: 'device_tracker.brad_nodered'
-      prob_given_true: 0.8
-      prob_given_false: 0.2
-      platform: 'state'
-      to_state: 'home'
-    - entity_id: 'device_tracker.tile_keys'
-      prob_given_true: 0.8
-      prob_given_false: 0.4
-      platform: 'state'
-      to_state: 'home'
+    # - entity_id: 'device_tracker.zpc'
+      # prob_given_true: 0.5
+      # # prob_given_false: 0.4
+      # platform: 'state'
+      # to_state: 'home'

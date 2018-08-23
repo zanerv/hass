@@ -6,6 +6,7 @@ www/
 tts/
 ssl/
 custom_components/
+adb/
 secrets.yaml
 known_devices.yaml
 entity_registry.yaml
@@ -17,3 +18,4 @@ device.py
 configurator.py
 *.cal
 *.com
+jq
