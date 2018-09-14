@@ -39,7 +39,8 @@
     light.wc:
       state: on
       brightness_pct: 17
-      color_name: darkred
+#      color_name: darkre
+      rgb_color: [255,126,000]
 
 - name: WC Night
   entities:

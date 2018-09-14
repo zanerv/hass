@@ -51,6 +51,10 @@ mqtt:
 config:
 
 http:
+  trusted_networks:
+    - 127.0.0.1
+    - 192.168.0.0/24
+    - 172.19.0.0/24
   #ssl_certificate: !secret ssl_certificate
   #ssl_key: !secret ssl_key
   # Secrets are defined in the file secrets.yaml
@@ -107,7 +111,7 @@ media_player:
     # use_episode_art: true
 
   - platform: firetv
-    device: sleepingroom
+    device: default
     name: FireTV
     host: !secret firetv_host
     port: !secret firetv_port

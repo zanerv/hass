@@ -18,13 +18,39 @@ for i in {0..2}
 done
 }
 
+bytesToHuman() {
+increase=""
+  if [[ ${1} =~ "-" ]]
+   then
+    a=${1/-/}
+    increase="-"
+   else
+    a=${1}
+  fi
+    b=${a:-0}; d=''; s=0; S=(Bytes {K,M,G,T,P,E,Z,Y}B)
+    while ((b > 1024)); do
+        d="$(printf ".%02d" $((b % 1024 * 100 / 1024)))"
+        b=$((b / 1024))
+        let s++
+    done
+    increase=$increase"$b$d${S[$s]}"
+echo $increase
+}
+
 bytes_today=$(extract "${today}")
 
 bytes_yesterday=$(extract "${yesterday}")
 
 bytes_diff=$(expr  $bytes_today - $bytes_yesterday)
 
-increase=$(expr $bytes_diff / 1024 / 1024 / 1024)
-increase+="GB"
-curl -s -X POST -H "Content-Type: application/json" -d '{"attributes": {"friendly_name":  "Storj increase", "icon": "mdi:nas"}, "entity_id": "sensor.storj", "state": "'"$increase"'"}'  http://localhost:8123/api/states/sensor.storj
+if [[ ${1} =~ "-" ]]
+	then
+		a=${1/-/}
+		increase="-"
+	else
+		a=${1}
+fi
+
+bytesToHuman "${bytes_diff}"
+curl -s -X POST -H "Content-Type: application/json" -d '{"attributes": {"friendly_name":  "Storj increase", "icon": "mdi:nas"}, "entity_id": "sensor.storj", "state": "'"$increase"'"}'  http://localhost:8123/api/states/sensor.storj >/dev/null 2>&1
 

@@ -1,3 +1,38 @@
+- id: spotify_ads
+  alias: 'Spotify ads'
+  initial_state: True
+  trigger:
+    platform: template
+    # value_template: "{{ states.media_player.audio_funk.attributes['media_title'] }}"
+    value_template: "{%if is_state_attr('media_player.audio_funk', 'media_title', 'Spotify') %}true{%endif%}"
+  action:
+    - service: media_player.volume_mute
+      entity_id: media_player.audio_funk
+    - service: notify.hass
+      data_template:
+        title: "Spotify ads"
+        message: "Title: {{states.media_player.audio_funk.attributes['media_title']}}, Artist: {{states.media_player.audio_funk.attributes['media_artist']}}"
+    - service_template: >
+        {% if states.media_player.audio_funk.attributes['media_title'] == 'Spotify' %} is_volume_muted: true
+        {% else %}is_volume_muted: false
+        {% endif %}
+      entity_id: media_player.audio_funk
+
+- id: led_strip
+  alias: 'Led Stip Off'
+  initial_state: True
+  trigger:
+    platform: state
+    entity_id: light.kitchen
+    to: 'on'
+  condition:
+    - condition: state
+      entity_id: light.kitchen_strip
+      state: 'on'
+  action:
+    - service: light.turn_off
+      entity_id: light.kitchen_strip
+
 - id: ac_off
   alias: 'AC Off'
   initial_state: False
@@ -47,7 +82,7 @@
   action:
     - service: switch.turn_off
       entity_id: switch.projector
-    - delay: 00:00:10
+    - delay: 00:00:03
     - service_template: >
         {% if (as_timestamp(now()) - as_timestamp(states.sensor.bob.last_changed)) < 20 %} switch.turn_on
         {% else %}switch.turn_off
@@ -70,6 +105,7 @@
       entity_id: light.spot
     - wait_template: "{{ states.binary_sensor.motion_sensor_living.state == 'on' }}"
       timeout: '00:00:20'
+      continue_on_timeout: false
     - service: light.turn_off
       entity_id: light.bob, light.spot
 
@@ -136,7 +172,7 @@
   action:
     - service_template: >
         {% if trigger.to_state.state  == 'on' %} light.turn_on
-        {% elif trigger.to_state.state  == 'off' %}light.turn_off
+        {% else %}light.turn_off
         {% endif %}
       data_template:
         entity_id: >
@@ -188,6 +224,10 @@
         entity_id: media_player.living_room_speaker
         media_content_id: !secret door_thanks
         media_content_type: music
+    - service: media_player.volume_set
+      data_template:
+        entity_id: media_player.living_room_speaker
+        volume_level: 0.3
 
 - id: Unknown
   alias: "Home Unknown state"
@@ -203,18 +243,18 @@
       data_template:
         message:  "vacation: {{states.input_boolean.vacation.state}}, away: {{states.input_boolean.away.state}}, guest: {{states.input_boolean.guest.state}}, z: {{states.input_boolean.z.state}}, r: {{states.input_boolean.r.state}}"
 
-- id: welcome_home
-  alias: "Welcome Home"
-  initial_state: 'on'
-  trigger:
-      - platform: state
-        entity_id: sensor.house
-  action:
-    - service_template: >
-        {% if states.sensor.house.state == 'Vacation' %} switch.turn_off
-        {% else %}switch.turn_on
-        {% endif %}
-      entity_id: switch.trantor_power
+# - id: vacation
+  # alias: "Vacatiom"
+  # initial_state: 'on'
+  # trigger:
+      # - platform: state
+        # entity_id: sensor.house
+  # action:
+    # - service_template: >
+        # {% if states.sensor.house.state == 'Vacation' %} switch.turn_off
+        # {% else %}switch.turn_on
+        # {% endif %}
+      # entity_id: switch.trantor_power
 
 - id: movie_time
   alias: "Movie"
@@ -309,7 +349,7 @@
         {% endif %}
       entity_id: input_boolean.away
     - service_template: >
-        {% if states.input_boolean.away.state == 'on' %} script.house_mode_away
+        {% if states.input_boolean.away.state == 'on' %} script.house_mode_away, script.door_lock
         {% else %} script.nothing
         {% endif %}
     - service_template: >
@@ -340,13 +380,7 @@
         {% elif states.input_boolean.vacation.state == 'on' and states.input_boolean.away.state == 'off' %} homeassistant.turn_off
         {% endif %}
       entity_id: input_boolean.vacation
-    - service: notify.hass
-      data_template:
-        message: >
-         {% if states.input_boolean.vacation.state == 'off' %} Welcome Home I trust your time away was nice.
-         {% elif states.input_boolean.vacation.state == 'on'%} Vacation Mode is now activated. Have a nice time away.
-         {% endif %}
-         
+  
 - id: Notify_Vacation_Mode
   alias: "Notify Vacation Mode"
   initial_state: 'on'
@@ -358,9 +392,31 @@
       data:
         message: 'Vacation Mode is now {{states.input_boolean.vacation.state}}'
 
+- id: Door_lock
+  alias: "Door Lock"
+  initial_state: 'on'
+  trigger:
+    - platform: state
+      entity_id: sensor.house
+      to: 'Away'
+      for:
+        minutes: 1
+  action:
+    - service: script.door_lock
+    
+- id: Door_unlock
+  alias: "Door Unlock"
+  initial_state: 'off'
+  trigger:
+    - platform: state
+      entity_id: sensor.house
+      from: 'Away'
+  action:
+    - service: script.door_unlock
+    
 - id: Notify_Guest_Mode
   alias: "Notify Guest Mode"
-  initial_state: 'on'
+  initial_state: 'off'
   trigger:
     - platform: state
       entity_id: input_boolean.guest
@@ -371,6 +427,7 @@
 
 - id: zriefing
   alias: "Morning Briefing Z"
+  initial_state: 'on'
   trigger:
     platform: time
     at: '07:00'
@@ -396,6 +453,7 @@
 
 - id: rriefing
   alias: "Morning Briefing R"
+  initial_state: 'on'
   trigger:
     platform: time
     at: '07:00'
@@ -543,7 +601,7 @@
         
 - id: unavailable
   alias: 'unavailable'
-  initial_state: True
+  initial_state: False
   trigger:
     - platform: state
       entity_id: light.bob, light.wc, light.kitchen, light.Hallway1, light.masa
@@ -599,7 +657,8 @@
            {% elif trigger.entity_id == "binary_sensor.door_darkroom" %} Darkroom
            {% endif %}
 
-- alias: Lazy ON
+- id: Lazy_ON
+  alias: Lazy ON
   initial_state: True
   trigger:
     - platform: state
@@ -623,7 +682,8 @@
         entity_id: input_select.location
         option: Couch
 
-- alias: Lazy OFF
+- id: Lazy_OFF
+  alias: Lazy OFF
   initial_state: True
   trigger:
     - platform: state
@@ -636,7 +696,8 @@
     - service: automation.turn_on
       entity_id: automation.dota_table_on, automation.kitchen_on, automation.hallway_on
 
-- alias: 'WC Auto OFF'
+- id: WC_Auto_OFF
+  alias: 'WC Auto OFF'
   initial_state: True
   trigger:
   - platform: state
@@ -720,10 +781,12 @@
       data:
         target:
           - !secret she_mail
-          - !secret he_mail        
+          - !secret he_mail
+        title: "{{now().strftime('%H:%M:%S')}}"
         message: "Door opened"
 
-- alias: 'Home Alone'
+- id: Home_Alone
+  alias:  'Home Alone'
   initial_state: True
   trigger:
   - platform: state
@@ -751,9 +814,10 @@
         state: 'Detected'
   action:
     - service: light.turn_off
-      entity_id: light.kitchen, light.kitchen_strip, light.masa, light.wc, light.bob, light.Hallway1, light.Hallway2, light.Hallway3
+      entity_id: light.kitchen, light.kitchen_strip, light.masa, light.wc, light.hallway1, light.hallway2, light.hallway3
 
-- alias: Gateway light ON
+- id: Gateway_ON
+  alias:  Gateway light ON
   initial_state: True
   trigger:
   - platform: state
@@ -773,7 +837,8 @@
     - service: scene.turn_on
       entity_id: scene.gateway
 
-- alias: Gateway light OFF
+- id: Gateway_OFF
+  alias:  Gateway light OFF
   initial_state: True
   trigger:
     platform: state
@@ -785,7 +850,8 @@
     - service: light.turn_off
       entity_id: light.gateway
 
-- alias: 'Kitchen ON'
+- id: Kitchen_ON
+  alias:  'Kitchen ON'
   initial_state: True
   trigger:
   - platform: state
@@ -811,7 +877,8 @@
               scene.kitchen_night
             {% endif %}
 
-- alias: 'Kitchen OFF'
+- id: Kitchen_OFF
+  alias:  'Kitchen OFF'
   initial_state: True
   trigger:
   - platform: state
@@ -832,7 +899,8 @@
       service: light.turn_off
       entity_id: light.kitchen, light.kitchen_strip
 
-- alias: 'Dota Table ON'
+- id: Dota_ON
+  alias:  'Dota Table ON'
   initial_state: True
   trigger:
   - platform: state
@@ -853,7 +921,8 @@
       service: light.turn_on
       entity_id: light.masa
 
-- alias: 'Dota Table OFF'
+- id: Dota_OFF
+  alias:  'Dota Table OFF'
   initial_state: True
   trigger:
   - platform: state
@@ -865,7 +934,8 @@
       service: light.turn_off
       entity_id: light.masa
 
-- alias: 'Bob ON'
+- id: Bob_ON
+  alias:  'Bob ON'
   initial_state: True
   trigger:
   - platform: state
@@ -879,14 +949,15 @@
         state: 'on'
       - condition: template
         value_template: "{% if states.sensor.house.state != 'Away' or states.sensor.house.state != 'Vacation' %}true{% endif %}"
-      - condition: state
-        entity_id: sun.sun
-        state: 'below_horizon'
+      - condition: sun
+        after: sunset
+        after_offset: "-00:15:00"
   action:
       service: light.turn_on
       entity_id: light.bob
 
-- alias: 'Bob OFF'
+- id: Bob_OFF
+  alias:  'Bob OFF'
   initial_state: True
   trigger:
     platform: state
@@ -899,7 +970,8 @@
       entity_id: light.bob, light.spot
 #, switch.projector
 
-- alias: 'Hallway ON'
+- id: Hallway_ON
+  alias:  'Hallway ON'
   initial_state: True
   trigger:
   - platform: state     
@@ -931,7 +1003,8 @@
             scene.hallway_night
           {% endif %}
 
-- alias: 'Hallway OFF'
+- id: Hallway_OFF
+  alias:  'Hallway OFF'
   initial_state: True
   trigger:
   - platform: state
@@ -959,7 +1032,8 @@
       service: light.turn_off
       entity_id: light.Hallway1,light.Hallway2,light.Hallway3
 
-- alias: 'WC ON'
+- id: WC_ON
+  alias: 'WC ON'
   initial_state: True
   trigger:
   - platform: state     
@@ -983,7 +1057,8 @@
             scene.wc_night
           {% endif %}
 
-- alias: 'WC OFF'
+- id: WC_OFF
+  alias:  'WC OFF'
   initial_state: True
   trigger:
   - platform: state
@@ -995,7 +1070,8 @@
       service: light.turn_off
       entity_id: light.WC
 
-- alias: 'Feed ze animal 8&14&18'
+- id: Riki
+  alias:  'Feed ze animal 8&14&18'
   initial_state: True
   trigger: 
   - platform: time
@@ -1011,8 +1087,11 @@
     minutes: 0
     seconds: 0
   action:
-      service: switch.turn_on
-      entity_id: switch.rikis_food
+      - service: switch.turn_on
+        entity_id: switch.rikis_food
+      - delay: '00:00:07'
+      - service: switch.turn_on
+        entity_id: switch.rikis_food
 
 ####Cube####
 - id: cube_rotate

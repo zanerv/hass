@@ -59,11 +59,13 @@ coffee_machine_off:
       entity_id: switch.coffee_machine
     - wait_template: "{{ states.switch.coffee_machine.state == 'on' }}"
       timeout: '00:01:10'
+      continue_on_timeout: false
     - service: notify.hass
       data:
         message:  "intelia: is on and waiting"
     - wait_template: "{{ states.binary_sensor.motion_sensor_kitchen.state == 'on' }}"
       timeout: '00:02:00'
+      continue_on_timeout: false
     - service: notify.hass
       data:
         message:  "intelia: human detected, starting countdown 10s..."
@@ -77,6 +79,7 @@ coffee_machine_on:
   alias: Make coffee
   sequence:
     - wait_template: "{{ states.binary_sensor.motion_sensor_kitchen.state == 'on' }}"
+      continue_on_timeout: false
     - service: switch.turn_on
       entity_id: switch.coffee
 
@@ -141,8 +144,14 @@ door_lock:
   alias: Door Lock
   sequence:
     - service: shell_command.lock
+    - service: notify.hass
+      data:
+        message:  "door locked"
 
 door_unlock:
   alias: Door Unlock
   sequence:
     - service: shell_command.unlock
+    - service: notify.hass
+      data:
+        message:  "door unlocked"
