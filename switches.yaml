@@ -48,33 +48,6 @@
       friendly_name: "AC"
       command_on: 'JgBAAAABGYgPNA4UDRQNFA41DhMOFA0UDRQOFA0UDRQNFA4UDRQNFA4UDRQNNg01DhQNNQ4UDRQNFA41DTYNNQ4ADQUAAAAAAAAAAA=='
       command_off: 'JgBAAAABGogPNA0UDhQNFA01DhQNFA4UDTUNNg0UDRQOFA0UDRQOFA0UDRQOFA0UDRQONQ0UDjUNFA4TDhQNNQ4ADQUAAAAAAAAAAA=='
-  # The following switch orders food
-# - platform: command_line
-  # switches:
-    # fortys:
-      # command_on: " "
-      # command_off: " "
-      # command_state: " "
-      # #value_template: '{{ value == "1" }}'
-      # friendly_name: "Forty Cowboy Pizza"
-
-# - platform: command_line
-  # switches:
-    # caruso:
-      # command_on: " "
-      # command_off: " "
-      # command_state: " "
-      # #value_template: '{{ value == "1" }}'
-      # friendly_name: "Caruso Contadina Pizza"
-
-# - platform: command_line
-  # switches:
-    # holiday:
-      # command_on: " "
-      # command_off: " "
-      # command_state: " "
-      # #value_template: '{{ value == "1" }}'
-      # friendly_name: "Holiday Zebra"
 
 - platform: mqtt
   name: "Riki's food"

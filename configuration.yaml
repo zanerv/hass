@@ -74,7 +74,8 @@ updater:
 # Discover some devices automatically
 discovery:
   ignore:
-    - roku
+    - roku 
+    - yeelight
 
 # Allows you to issue voice commands from the frontend in enabled browsers
 conversation:
@@ -118,12 +119,17 @@ media_player:
     
 
 device_tracker:
-  - platform: snmp
-    host: !secret snmp_host
-    community: !secret snmp_community
-    baseoid: !secret snmp_baseoid
-    interval_seconds: 30
-    consider_home: 60
+  # - platform: snmp
+    # host: !secret snmp_host
+    # community: !secret snmp_community
+    # baseoid: !secret snmp_baseoid
+    # interval_seconds: 30
+    # consider_home: 60
+  - platform: nmap_tracker
+    hosts:
+      - !secret nmap_hosts
+    home_interval: 5
+    interval_seconds: 20
 # Enables the frontend
 frontend:
 #  extra_html_url:

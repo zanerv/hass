@@ -43,14 +43,6 @@ bytes_yesterday=$(extract "${yesterday}")
 
 bytes_diff=$(expr  $bytes_today - $bytes_yesterday)
 
-if [[ ${1} =~ "-" ]]
-	then
-		a=${1/-/}
-		increase="-"
-	else
-		a=${1}
-fi
-
 bytesToHuman "${bytes_diff}"
-curl -s -X POST -H "Content-Type: application/json" -d '{"attributes": {"friendly_name":  "Storj increase", "icon": "mdi:nas"}, "entity_id": "sensor.storj", "state": "'"$increase"'"}'  http://localhost:8123/api/states/sensor.storj >/dev/null 2>&1
+#curl -s -X POST -H "Content-Type: application/json" -d '{"attributes": {"friendly_name":  "Storj increase", "icon": "mdi:nas"}, "entity_id": "sensor.storj", "state": "'"$increase"'"}'  http://localhost:8123/api/states/sensor.storj >/dev/null 2>&1
 

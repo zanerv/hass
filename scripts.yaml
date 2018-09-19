@@ -93,6 +93,16 @@ movie_time:
       entity_id: group.guster
     - service: switch.turn_on
       entity_id: switch.projector
+    - service: light.turn_off
+      data_template:
+        entity_id: >
+          {%- for state in states.light if state.entity_id != 'light.spot' and
+          state.entity_id != 'light.entrance' -%}
+          {{- "," if not loop.first-}}{{ state.entity_id }}{{-endif-}}
+          {%- endfor -%}
+    - service: media_player.media_stop
+      data:
+        entity_id: media_player.audio_funk
 
 storj_information:
   alias: storj information
@@ -132,10 +142,11 @@ house_mode_away:
     - service: media_player.turn_off
       data_template:
         entity_id: >
-          {%- for state in states.media_player if
-          state.entity_id != 'media_player.TEST'-%}
+          {%- for state in states.media_player -%}
           {{- "," if not loop.first-}}{{ state.entity_id }}{{-endif-}}
           {%- endfor -%}
+    - service: script.door_lock
+
 nothing:
   alias: nothing
   sequence:
@@ -143,15 +154,19 @@ nothing:
 door_lock:
   alias: Door Lock
   sequence:
-    - service: shell_command.lock
+ #   - service: shell_command.lock
     - service: notify.hass
       data:
-        message:  "door locked"
+        message:  "Door locked"
+    - service: automation.turn_on
+      entity_id: automation.door_unlock
 
 door_unlock:
   alias: Door Unlock
   sequence:
-    - service: shell_command.unlock
+#    - service: shell_command.unlock
     - service: notify.hass
       data:
-        message:  "door unlocked"
+        message:  "Door unlocked"
+    - service: automation.turn_off
+      entity_id: automation.door_unlock
