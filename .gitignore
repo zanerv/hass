@@ -19,3 +19,4 @@ configurator.py
 *.cal
 *.com
 jq
+upc.sh

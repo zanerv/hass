@@ -1,6 +1,11 @@
 - platform: command_line
   name: Door
-  command: /bin/bash -c "/config/adb/adb.sh shell cat /storage/sdcard0/Android/data/com.xiaomi.smarthome/files/SherlockLog/$(date +%Y%m%d.log)|grep mOperateCommandType|tail -1| grep -oP '(?<=mOperateCommandType:).*?(?=\r)'|echo unknown"
+  command: /bin/bash -c "/config/adb/adb.sh shell cat /storage/sdcard0/Android/data/com.xiaomi.smarthome/files/SherlockLog/$(date +%Y%m%d.log)|grep mOperateCommandType|tail -1| grep -oP '(?<=mOperateCommandType:).*?(?=\r)'||echo unknown"
+
+# - platform: command_line
+  # name: UPC
+  # command:  /bin/bash -c "/config/upc.sh"
+  # scan_interval: 1200
 
 - platform: command_line
   name: storj

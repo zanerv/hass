@@ -17,6 +17,11 @@ homeassistant:
 #logger:
 #  default: debug
 influxdb:
+  exclude:
+    entities:
+       - sensor.bob
+       - sensor.masa_pir
+       - sensor.entrance
 
 recorder:
   db_url: !secret db_url

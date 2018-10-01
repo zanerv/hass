@@ -79,6 +79,7 @@ coffee_machine_on:
   alias: Make coffee
   sequence:
     - wait_template: "{{ states.binary_sensor.motion_sensor_kitchen.state == 'on' }}"
+      timeout: '00:02:00'
       continue_on_timeout: false
     - service: switch.turn_on
       entity_id: switch.coffee
@@ -136,7 +137,9 @@ house_mode_away:
         entity_id: >
           {%- for state in states.switch if
           state.entity_id != 'switch.rikis_food' and
-          state.entity_id != 'switch.trantor_power'-%}
+          state.entity_id != 'switch.trantor_power' and
+          state.entity_id != 'switch.projector_esc' and
+          state.entity_id != 'switch.projector' -%}
           {{- "," if not loop.first-}}{{ state.entity_id }}{{-endif-}}
           {%- endfor -%}
     - service: media_player.turn_off
@@ -145,7 +148,6 @@ house_mode_away:
           {%- for state in states.media_player -%}
           {{- "," if not loop.first-}}{{ state.entity_id }}{{-endif-}}
           {%- endfor -%}
-    - service: script.door_lock
 
 nothing:
   alias: nothing
@@ -154,9 +156,10 @@ nothing:
 door_lock:
   alias: Door Lock
   sequence:
- #   - service: shell_command.lock
+    - service: shell_command.lock
     - service: notify.hass
       data:
+        title: "{{now().strftime('%H:%M:%S')}}"
         message:  "Door locked"
     - service: automation.turn_on
       entity_id: automation.door_unlock
@@ -164,9 +167,89 @@ door_lock:
 door_unlock:
   alias: Door Unlock
   sequence:
-#    - service: shell_command.unlock
+    - service: shell_command.unlock
     - service: notify.hass
       data:
-        message:  "Door unlocked"
+        title: "{{now().strftime('%H:%M:%S')}}"
+        message:  "Unlocking door for {{states.sensor.house.state}}"
     - service: automation.turn_off
       entity_id: automation.door_unlock
+
+vacuum_livingroom:
+  alias: livingroom cleansing
+  sequence:
+    - service: vacuum.send_command
+      data:
+        entity_id: vacuum.harry_potter
+        command: app_zoned_clean
+        params: [[13866,25300,26000,29200,1],[21700,29200,26000,31200,1]]
+
+vacuum_hallway:
+  alias: hallway cleansing
+  sequence:
+    - service: vacuum.send_command
+      data:
+        entity_id: vacuum.harry_potter
+        command: app_zoned_clean
+        params: [[18400,29800,21100,32100,1],[19950,32100,21100,35800,1],[21100,34800,23500,35800,1]]
+
+vacuum_toilet:
+  alias: toilet cleansing
+  sequence:
+    - service: vacuum.send_command
+      data:
+        entity_id: vacuum.harry_potter
+        command: app_zoned_clean
+        params: [[18200,32700,19800,34500,1]]
+
+vacuum_lightroom:
+  alias: lightroom cleansing
+  sequence:
+    - service: vacuum.send_command
+      data:
+        entity_id: vacuum.harry_potter
+        command: app_zoned_clean
+        params: [[18000,36000,20500,39200,1]]
+
+vacuum_darkroom:
+  alias: darkroom room cleansing
+  sequence:
+    - service: vacuum.send_command
+      data:
+        entity_id: vacuum.harry_potter
+        command: app_zoned_clean
+        params: [[23500,34800,25800,39200,1]]
+
+vacuum_bedroom:
+  alias: bedroom cleansing
+  sequence:
+    - service: vacuum.send_command
+      data:
+        entity_id: vacuum.harry_potter
+        command: app_zoned_clean
+        params: [[21200,37900,26600,34700,1]]
+
+vacuum_bathroom:
+  alias: bathroom cleansing
+  sequence:
+    - service: vacuum.send_command
+      data:
+        entity_id: vacuum.harry_potter
+        command: app_zoned_clean
+        params: [[20800,36000,23400,39200,1]]
+
+vacuum_kitchen:
+  alias: kitchen cleansing
+  sequence:
+    - service: vacuum.send_command
+      data:
+        entity_id: vacuum.harry_potter
+        command: app_zoned_clean
+        params: [[21700,29200,26000,31200,1]]
+
+vacuum_stop:
+  alias: vacuum stop
+  sequence:
+    - service: vacuum.return_to_base
+      data:
+        entity_id: vacuum.harry_potter

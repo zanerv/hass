@@ -31,6 +31,10 @@
 light.entrance:
   hidden: true
 
+sensor.upc:
+  friendly_name: "UPC"
+  icon: mdi:ethernet-cable
+
 sensor.door:
   friendly_name: "Door"
   icon: mdi:door
@@ -236,6 +240,11 @@ sensor.yr_cloudiness:
   friendly_name: Cloud Level
   icon: mdi:cloud
 
+group.all_scripts:
+  control: hidden
+  hidden: false
+  friendly_name: "Scripts"
+
 group.all_sensors:
   control: hidden
   hidden: false
@@ -351,5 +360,5 @@ input_boolean.r:
 sensor.location:
   icon: mdi:home-map-marker
 sensor.house:
-  icon: mdi:home-account
-  friendly_name: "Who's Home"
+  icon: mdi:home-assistant
+  friendly_name: "Status"
