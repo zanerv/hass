@@ -45,6 +45,10 @@
       transition: 1000
       save_on_change: False
       use_music_mode: True
+    !secret Bedroom:
+      name: Bedroom
+      transition: 1000
+      save_on_change: False
 
 - platform: mqtt
   name: "Masa"

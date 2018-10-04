@@ -17,7 +17,8 @@ Automation:
   - group.all_scripts
   - scene.hallway_morning
   - scene.hallway_night
-  - scene.hallway_off
+  - scene.bedroom_morning
+  - scene.bedroom_night
   - scene.wc_morning
   - scene.wc_night
   - scene.wc_off
@@ -104,6 +105,7 @@ dev:
   - group.all_lights
   - group.all_devices
   - group.all_vacuum_cleaners
+  - binary_sensor.floorplan
 
 Shiny:
   name: Shiny
@@ -140,6 +142,7 @@ Masa:
  - light.masa
  - sensor.masa_pir
  - vacuum.harry_potter
+ - binary_sensor.floorplan
 
 Darkroom:
  name: 'Darkroom'
@@ -166,6 +169,7 @@ Bedroom:
  name: 'Bedroom'
  control: hidden
  entities:
+ - light.bedroom
  - sensor.Temperature_bedroom
  - sensor.Humidity_bedroom
  - sensor.Pressure_bedroom
@@ -312,7 +316,6 @@ Monitoring:
  name: Shiny
  entities:
  - sensor.storj
- - sensor.upc
  - sensor.stats_count
  - sensor.disk_use_percent_
  - sensor.memory_use_percent

@@ -1,3 +1,6 @@
+binary_sensor.floorplan:
+  custom_ui_state_card: state-card-floorplan
+  config: !include floorplan.yaml
 # light.yeelight_rgb_7811dc6831d0:
   # friendly_name: "WC"
   # hidden: true

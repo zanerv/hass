@@ -229,6 +229,19 @@ vacuum_bedroom:
         command: app_zoned_clean
         params: [[21200,37900,26600,34700,1]]
 
+vacuum_mop_bathroom:
+  alias: bathroom mop
+  sequence:
+    - service: vacuum.send_command
+      data:
+        entity_id: vacuum.harry_potter
+        command: app_zoned_clean
+        params: [[20800,36000,23400,39200,1]]
+    - service: vacuum.set_fan_speed
+      data:
+        entity_id: vacuum.harry_potter
+        fan_speed: '105'
+
 vacuum_bathroom:
   alias: bathroom cleansing
   sequence:

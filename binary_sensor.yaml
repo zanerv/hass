@@ -1,3 +1,7 @@
+- platform: mqtt
+  state_topic: dummy/floorplan/sensor
+  name: Floorplan
+
 - platform: workday
   country: CZ
 
@@ -33,6 +37,47 @@
       to_state: 'playing'
 
 - platform: bayesian
+  prior: 0.5
+  name: 'Bayesian Sleeping'
+  probability_threshold: 0.90
+  observations:
+      - entity_id: 'input_boolean.r'
+        prob_given_true: 0.99
+        prob_given_false: 0.5
+        platform: 'state'
+        to_state: 'on'
+      - entity_id: 'device_tracker.rdell'
+        prob_given_true: 0.99
+        prob_given_false: 0.5
+        platform: 'state'
+        to_state: 'not_home'
+      - entity_id: 'sensor.sun'
+        prob_given_true: 0.9
+        prob_given_false: 0.2
+        platform: 'state'
+        to_state: 'below_horizon'
+      - entity_id: 'group.all_lights'
+        prob_given_true: 0.9
+        prob_given_false: 0.4
+        platform: 'state'
+        to_state: 'off'
+      - entity_id: 'switch.coffee_machine'
+        prob_given_true: 0.9
+        prob_given_false: 0.4
+        platform: 'state'
+        to_state: 'off'
+      - entity_id: 'input_select.location'
+        prob_given_true: 0.9
+        prob_given_false: 0.3
+        platform: 'state'
+        to_state: 'Bedroom'
+      - entity_id: 'media_player.firetv'
+        prob_given_true: 0.95
+        prob_given_false: 0.5
+        platform: 'state'
+        to_state: 'playing'
+
+- platform: bayesian
   prior: 0.2
   name: 'Z Presence'
   probability_threshold: 0.9
@@ -52,3 +97,4 @@
       # # prob_given_false: 0.4
       # platform: 'state'
       # to_state: 'home'
+

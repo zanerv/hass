@@ -34,6 +34,18 @@
       state: on
       brightness_pct: 100
 
+- name: Bedroom Morning
+  entities:
+    light.bedroom:
+      state: on
+      brightness: 1
+
+- name: Bedroom Night
+  entities:
+    light.bedroom:
+      state: on
+      brightness_pct: 100
+
 - name: WC Morning
   entities:
     light.wc:

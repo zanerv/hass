@@ -1,16 +1,3 @@
-- id: upc
-  alias: UPC Outage
-  initial_state: False
-  trigger:
-    platform: state
-    entity_id: sensor.upc
-    from: 'ok'
-  action:
-    - service: notify.hass
-      data:
-        title: "UPC Planned Outage"
-        message: "https://web.upc.cz/vypadky/"
-
 - id: spotify_ads
   alias: 'Spotify ads'
   initial_state: True
@@ -20,10 +7,6 @@
     - platform: template
       value_template: "{{ states.media_player.audio_funk.attributes['media_title'] == 'Vice Informaci' }}"
   action:
-    # - service: notify.hass
-      # data_template:
-        # title: "Spotify ads"
-        # message: "Title: {{states.media_player.audio_funk.attributes['media_title']}}, Artist: {{states.media_player.audio_funk.attributes['media_artist']}}"
     - service: media_player.volume_mute
       data:
         entity_id: media_player.audio_funk
@@ -78,11 +61,6 @@
       to: 'OFF'
       for:
         minutes: 20
-    - platform: state
-      entity_id: sensor.projector_status
-      to: 'on'
-      for:
-        minutes: 180
   condition:
     - condition: state
       entity_id: sensor.projector_status
@@ -695,6 +673,7 @@
            {% elif trigger.entity_id == "sensor.masa_pir" %} Masa
            {% elif trigger.entity_id == "binary_sensor.couch" %} Couch
            {% elif trigger.entity_id == "sensor.entrance" %} Entrance
+           {% elif trigger.entity_id == "binary_sensor.motion_sensor_bedroom" %} Bedroom
            {% elif trigger.entity_id == "binary_sensor.motion_sensor_kitchen" %} Kitchen
            {% elif trigger.entity_id == "binary_sensor.motion_sensor_wc" %} WC
            {% elif trigger.entity_id == "binary_sensor.motion_sensor_living" %} Living
@@ -900,6 +879,54 @@
   action:
     - service: light.turn_off
       entity_id: light.gateway
+
+- id: Bedroom_ON
+  alias:  'Bedroom ON'
+  initial_state: True
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.motion_sensor_bedroom
+    to: 'on'
+    # for:
+      # seconds: 0.1
+  condition:
+    condition: and
+    conditions:
+      #- condition: state
+     #   entity_id: sensor.house
+    #    state: 'Z'
+      - condition: template
+        value_template: "{% if states.media_player.firetv.state != 'playing' %}true{% endif %}"
+  action:
+      - service: light.yeelight_set_mode
+        entity_id: light.bedroom
+        data_template:
+          mode: >
+           {% if now().strftime('%H')|int >= 0 and now().strftime('%H')|int <= 8 %} moonlight
+           {% else %}normal
+           {% endif %}        
+      - service: scene.turn_on
+        data_template:
+          entity_id: >
+            {% if now().strftime('%H')|int >= 0 and now().strftime('%H')|int <= 8 %}
+              scene.bedroom_morning
+            {% else %}
+              scene.bedroom_night
+            {% endif %}
+
+- id: Bedroom_OFF
+  alias:  'Bedroom OFF'
+  initial_state: True
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.motion_sensor_bedroom
+    to: 'off'
+  - platform: state
+    entity_id: media_player.firetv
+    from: 'off'
+  action:
+      service: light.turn_off
+      entity_id: light.bedroom
 
 - id: Kitchen_ON
   alias:  'Kitchen ON'

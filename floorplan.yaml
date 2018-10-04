@@ -1,0 +1,210 @@
+      name: Demo Floorplan
+      image: /local/custom_ui/floorplan/floorplan.svg
+      stylesheet: /local/custom_ui/floorplan/floorplan.css
+      
+      # These options are optional
+      # warnings:                  # enable warnings (to find out why things might ot be working correctly)
+      # pan_zoom:                  # enable experimental panning / zooming
+      # hide_app_toolbar:          # hide the application toolbar (when used as a custom panel)
+      # date_format: DD-MMM-YYYY   # Date format to use in hover-over text
+      
+      last_motion_entity: sensor.location
+      last_motion_class: last-motion
+
+      groups:
+
+        # - name: Sensors
+          # entities:
+             # -  sensor.dark_sky_temperature
+          # #text_template: '${entity.state ? entity.state : "unknown"}'
+          # # An example of rounding up a number, i.e. a temperature of 90.1 becomes 91
+          # text_template: '${entity.state ? Math.ceil(entity.state) : "undefined"}'  
+          # class_template: '
+            # var temp = parseFloat(entity.state.replace("°", ""));
+            # if (temp < 10)
+              # return "temp-low";
+            # else if (temp < 30)
+              # return "temp-medium";
+            # else
+              # return "temp-high";
+            # '
+
+        - name: Lights
+          entities:
+             - light.kitchen
+             - light.masa
+             - light.bedroom
+             - light.wc
+             - light.lightroom
+             - light.darkroom
+             - group.hallway_light
+             - group.guster
+          states:
+            - state: 'on'
+              class: 'light-on'
+            - state: 'off'
+              class: 'light-off'
+          action:
+            domain: homeassistant   # This optional parameter allows you to use other services such as homeassistant.toggle like here.
+            service: toggle
+
+        - name: Binary sensors
+          entities:
+            - light.entrance
+            - binary_sensor.door_lightroom
+            - binary_sensor.window_lightroom
+            - binary_sensor.door_darkroom
+            - binary_sensor.door_bedroom
+            - binary_sensor.door_entrance
+          states:
+            - state: 'off'
+              # class: 'info-background'
+              class: 'door-off'
+            - state: 'on'
+              # class: 'warning-background'
+              class: 'door-on'
+          state_transitions:
+            - name: On to off
+              from_state: 'on'
+              to_state: 'off'
+              duration: 10
+
+        - name: Blue sensors
+          entities:
+            - binary_sensor.couch
+            - sensor.masa_pir
+            - sensor.bob
+            - binary_sensor.motion_sensor_wc
+          states:
+            - state: 'off'
+              class: 'couch-off'
+            - state: 'OFF'
+              class: 'couch-off'
+            - state: 'on'
+              class: 'couch-on'
+            - state: 'ON'
+              class: 'couch-on'
+          state_transitions:
+            - name: On to off
+              from_state: 'on'
+              to_state: 'off'
+              duration: 10
+
+        - name: Couch sensors
+          entities:
+            - binary_sensor.couch
+          states:
+            - state: 'on'
+              class: 'couch-off'
+            - state: 'off'
+              class: 'couch-on'
+          state_transitions:
+            - name: On to off
+              from_state: 'on'
+              to_state: 'off'
+              duration: 5
+
+        - name: Motion sensors
+          entities:
+            - binary_sensor.motion_sensor_living
+            - binary_sensor.motion_sensor_kitchen
+            - binary_sensor.motion_sensor_hallway
+            - binary_sensor.motion_sensor_bedroom
+          states:
+            - state: 'off'
+              class: 'steps-off'
+            - state: 'Still'
+              class: 'steps-off'
+            - state: 'on'
+              class: 'steps-on'
+            - state: 'Motion'
+              class: 'steps-on'
+          state_transitions:
+            - name: On to off
+              from_state: 'on'
+              to_state: 'off'
+              duration: 10
+
+        - name: Entrance sensors
+          entities:
+            - sensor.entrance
+          states:
+            - state: 'Still'
+              class: 'steps-off'
+            - state: 'Motion'
+              class: 'steps-on'
+          state_transitions:
+            - name: On to off
+              from_state: 'Still'
+              to_state: 'Motion'
+              duration: 10
+
+        - name: Media Player
+          entities:
+            - media_player.firetv
+            - media_player.audio_funk
+            - media_player.living_room_speaker
+          states:
+            - state: 'off'
+              # class: 'info-background'
+              class: 'couch-off'
+            - state: 'on'
+              # class: 'warning-background'
+              class: 'couch-on'
+#10c4e6
+        # - name: Switches 
+          # entities:
+             # - switch.doorbell
+          # states:
+            # - state: 'on'
+              # class: 'doorbell-on'
+            # - state: 'off'
+              # class: 'doorbell-off'
+
+        # - name: NVR
+          # entities:
+             # - binary_sensor.blue_iris_nvr
+          # text_template: '${(entity.state === "on") ? "online" : "offline"}'
+          # states:
+            # - state: 'off'
+              # class: 'danger-text'
+            # - state: 'on'
+              # class: 'success-text'
+
+        # - name: Alarm Panel
+          # entities:
+             # - alarm_control_panel.alarm
+          # states:
+            # - state: 'armed_away'
+              # class: 'alarm-armed'
+            # - state: 'armed_home'
+              # class: 'alarm-armed'
+            # - state: 'disarmed'
+              # class: 'alarm-disarmed'
+
+        # - name: Cameras
+          # entities:
+            # - camera.hallway
+            # - camera.driveway
+            # - camera.front_door
+            # - camera.backyard
+          # states:
+            # - state: 'idle'
+              # class: 'camera-idle'
+              
+#        - name: thermostat_temp
+#          entities:
+#            - climate.downstairs
+#            - climate.upstairs
+#          text_template: '${entity.attributes.current_temperature ? entity.attributes.current_temperature : "undefined"}'
+#
+# The above text_template uses extended attributes from the climate.* objects to get current temperature.
+
+#        - name: text_states
+#          entities:
+#            - sensor.downstairs_thermostat_humidity
+#            - sensor.dark_sky_temperature
+#            - sensor.last_message
+#          text_template: '${entity.state ? entity.state.replace(/\s{2,}/g,"") : "undefined"}'
+#
+# The above text_template uses jQuery syntax to search and replace any instance of 2 consecutive (or more) spaces in a string of text.

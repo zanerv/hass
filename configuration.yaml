@@ -32,6 +32,20 @@ panel_iframe:
     icon: mdi:creation
     url: !secret url
 
+# Enables the frontend
+frontend:
+  javascript_version: latest
+  themes: !include themes.yaml
+  extra_html_url:
+    - /local/custom_ui/state-card-floorplan.html
+
+panel_custom:
+  - name: floorplan
+    sidebar_title: Floorplan
+    sidebar_icon: mdi:home
+    url_path: floorplan
+    config: !include floorplan.yaml
+
 vacuum:
   - platform: xiaomi_miio
     host: !secret vaccum
@@ -135,13 +149,6 @@ device_tracker:
       - !secret nmap_hosts
     home_interval: 5
     interval_seconds: 20
-# Enables the frontend
-frontend:
-#  extra_html_url:
-#    - /local/custom_ui/state-card-custom_light.html
-
-  javascript_version: latest
-  themes: !include themes.yaml
 
 notify: !include notify.yaml
 
