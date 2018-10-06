@@ -38,7 +38,7 @@
   entities:
     light.bedroom:
       state: on
-      brightness: 1
+      brightness: 10
 
 - name: Bedroom Night
   entities:

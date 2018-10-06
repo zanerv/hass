@@ -181,3 +181,16 @@ script: !include scripts.yaml
 input_select: !include input_select.yaml
 
 shell_command: !include shell_command.yaml  
+input_datetime:
+  both_date_and_time:
+    name: Input with both date and time
+    has_date: true
+    has_time: true
+  only_date:
+    name: Input with only date
+    has_date: true
+    has_time: false
+  only_time:
+    name: Input with only time
+    has_date: false
+    has_time: true

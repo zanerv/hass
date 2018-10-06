@@ -309,8 +309,6 @@
       - platform: state
         entity_id: device_tracker.z, device_tracker.r, device_tracker.rdell
   condition:
-    condition: and
-    conditions:
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.binary_sensor.door_entrance.last_changed) | int < 1800 }}"
   action:
@@ -529,6 +527,8 @@
      - platform: time
        at: '06:00'
   action:
+      - service: switch.turn_on
+        entity_id: switch.flux
       - service: frontend.set_theme
         data_template:
           name: >
@@ -902,7 +902,7 @@
         entity_id: light.bedroom
         data_template:
           mode: >
-           {% if now().strftime('%H')|int >= 0 and now().strftime('%H')|int <= 8 %} moonlight
+           {% if now().strftime('%H')|int >= 22 and now().strftime('%H')|int <= 8 %} moonlight
            {% else %}normal
            {% endif %}        
       - service: scene.turn_on

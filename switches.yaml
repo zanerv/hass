@@ -1,3 +1,15 @@
+- platform: flux
+  lights:
+    - light.bob
+    - light.kitchen
+    - light.joe
+    - light.hallway1
+    - light.hallway2
+    - light.hallway3
+    - light.wc
+    - light.lightroom
+    - light.darkroom
+    - light.bedroom
 # - platform: command_line
   # switches:
     # door:
@@ -67,9 +79,9 @@
   payload_on: "0"
   payload_off: "9"
   value_template: >
-        {% if value == 'on' %}
+        {% if value == 'ready' %}
         0
-        {% elif value == 'off' %}
+        {% elif value == 'standby' %}
         9
         {% endif %}
 
@@ -80,13 +92,8 @@
   command_topic: "home/tweek/cmd"
   qos: 2
   payload_on: "1"
-  payload_off: "9"
-  value_template: >
-        {% if value == 'espresso' %}
-        1
-        {% elif value == 'off' %}
-        9
-        {% endif %}
+  payload_off: "0"
+  value_template: '{{ value == "espresso" }}'
 
 - platform: mqtt
   name: "Coffee"
