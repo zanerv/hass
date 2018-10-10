@@ -11,8 +11,8 @@ const char* password = "xxx";
 const int sw_c1 = D7; // espresso
 const int sw_c2 = D6; // coffee
 const int sw_on = D8; // switch on/off
-int led_coffee = D4; // status LED hight=led on, low=led off
-int led_on = D3;  // coffee LED high=led on, low=led off
+int led_coffee = D4; // coffee LED hight=led on, low=led off
+int led_on = D3;  // status LED high=led on, low=led off
 int lastHighMillis;
 int intervalMillis = 1500;
 int stare = '0';
@@ -195,9 +195,10 @@ void coffee() {
     }
   
   }
-  if ((digitalRead(led_on) == LOW) && (stare == '1')) { // machine was manually turn off
+  if ((digitalRead(led_on) == LOW) && (stare == '1')) { // machine was turn off
     client.publish("home/tweek/status", "standby");
     stare = '0';
+    type = '0';
   }
 
  

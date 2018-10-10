@@ -1,3 +1,8 @@
+# - platform: command_line
+  # name: song
+  # command: /bin/bash -c "cat /config/song"
+  # scan_interval: 1200
+  
 - platform: command_line
   name: Door
   command: /bin/bash -c "/config/adb/adb.sh shell cat /storage/sdcard0/Android/data/com.xiaomi.smarthome/files/SherlockLog/$(date +%Y%m%d.log)|grep mOperateCommandType|tail -1| grep -oP '(?<=mOperateCommandType:).*?(?=\r)'||echo unknown"
@@ -97,7 +102,7 @@
     # location:
       # friendly_name: 'Location'
       # value_template: >
-        # {%- set sensors = [states.binary_sensor.motion_sensor_wc, states.binary_sensor.motion_sensor_kitchen, states.binary_sensor.motion_sensor_living, states.binary_sensor.motion_sensor_hallway, states.sensor.bob, states.sensor.masa_pir, states.sensor.entrance, states.binary_sensor.couch] %}
+        # {%- set sensors = [states.binary_sensor.motion_sensor_wc, states.binary_sensor.motion_sensor_kitchen, states.binary_sensor.motion_sensor_living, states.binary_sensor.motion_sensor_hallway, states.sensor.bob, states.sensor.table_pir, states.sensor.entrance, states.binary_sensor.couch] %}
         # {% for sensor in sensors %}
             # {% if as_timestamp(sensor.last_changed) == as_timestamp(sensors | map(attribute='last_changed') | max) %}
               # {% if sensor.state == 'ON' %}
@@ -119,8 +124,8 @@
   value_template: "{{ value_json.body }}"
 
 - platform: mqtt
-  name: "masa pir"
-  state_topic: "masa/PIR/cmnd/POWER1"
+  name: "table pir"
+  state_topic: "table/PIR/cmnd/POWER1"
 
 - platform: mqtt
   name: "bob"

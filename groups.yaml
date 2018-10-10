@@ -37,10 +37,10 @@ a1:
   - switch.trantor_power
   
 a2:
-  name: Masa
+  name: Table
   view: yes
   entities:
-  - group.masa
+  - group.table
 
 a3:
   name: Kitchen
@@ -135,12 +135,12 @@ guster:
  - light.joe
  - input_boolean.mmode
 
-Masa:
- name: 'Masa'
+Table:
+ name: 'Table'
  control: hidden
  entities:
- - light.masa
- - sensor.masa_pir
+ - light.table
+ - sensor.table_pir
  - vacuum.harry_potter
  - binary_sensor.floorplan
 
@@ -243,7 +243,7 @@ Lights:
  - light.bob
  - light.joe
  - light.spot
- - light.masa
+ - light.table
  - light.kitchen
  - light.kitchen_strip
  - light.wc

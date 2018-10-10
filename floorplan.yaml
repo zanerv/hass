@@ -35,7 +35,7 @@
         - name: Lights
           entities:
              - light.kitchen
-             - light.masa
+             - light.table
              - light.bedroom
              - light.wc
              - light.lightroom
@@ -75,7 +75,7 @@
         - name: Blue sensors
           entities:
             - binary_sensor.couch
-            - sensor.masa_pir
+            - sensor.table_pir
             - sensor.bob
             - binary_sensor.motion_sensor_wc
           states:

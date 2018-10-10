@@ -20,7 +20,7 @@ influxdb:
   exclude:
     entities:
        - sensor.bob
-       - sensor.masa_pir
+       - sensor.table_pir
        - sensor.entrance
 
 recorder:
@@ -125,8 +125,8 @@ media_player:
   - platform: plex
     # entity_namespace: 'plex'
     # include_non_clients: true
-    # scan_interval: 5
-    # show_all_controls: true
+    scan_interval: 5
+    show_all_controls: true
     # use_custom_entity_ids: true
     # use_episode_art: true
 

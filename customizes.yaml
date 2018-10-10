@@ -76,7 +76,7 @@ device_tracker.ping_hallway:
 device_tracker.ping_kitchen:
   hidden: true
 
-device_tracker.ping_masa:
+device_tracker.ping_table:
   hidden: true
 
 device_tracker.ping_wc:
@@ -110,9 +110,9 @@ sensor.Humidity_living:
 sensor.Pressure_living:
   friendly_name: "Pressure"
 
-light.masa:
+light.table:
   icon: mdi:ceiling-light
-  friendly_name: "Dota Table"
+  friendly_name: "Table"
 
 light.spot:
   icon: mdi:spotlight-beam
@@ -129,9 +129,9 @@ sensor.entrance:
             # mdi:help-circle
           # {%- endif -%}
 
-sensor.masa_pir:
+sensor.table_pir:
   icon: mdi:walk
-  friendly_name: "Masa"
+  friendly_name: "Table"
 
 light.kitchen:
   icon: mdi:ceiling-light

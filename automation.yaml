@@ -1,3 +1,22 @@
+- id: cast
+  alias: Cast
+  initial_state: True
+  trigger:
+    - platform: state
+      entity_id: media_player.audio_funk
+      to: 'idle'
+    - platform: state
+      entity_id: input_boolean.play
+      to: 'on'
+  condition:
+    - condition: state
+      entity_id: input_boolean.play
+      state: 'on'
+  action:
+    - service: shell_command.song
+    - service: script.cast
+    - delay: '00:00:03'
+
 - id: spotify_ads
   alias: 'Spotify ads'
   initial_state: True
@@ -144,7 +163,7 @@
       state: 'off'
   action:
     - service: light.turn_off
-      entity_id: light.masa
+      entity_id: light.table
 
 # - id: bedroom_lights
   # alias: 'Bedroom Lights'
@@ -323,6 +342,45 @@
           {% elif trigger.entity_id  == 'device_tracker.r' or trigger.entity_id  == 'device_tracker.rdell' %} input_boolean.r
           {% endif %}
 
+- id: house_mode_Z
+  alias: "House mode Z"
+  initial_state: 'on'
+  trigger:
+    - platform: state
+      entity_id: device_tracker.z
+      to: 'home'
+      for:
+        minutes: 3
+  condition:
+      - condition: state
+        entity_id: input_boolean.z
+        state: 'off'
+  action:
+    - service: homeassistant.turn_on
+      entity_id: input_boolean.z
+
+- id: house_mode_R
+  alias: "House mode R"
+  initial_state: 'on'
+  trigger:
+    - platform: state
+      entity_id: device_tracker.r
+      to: 'home'
+      for:
+        minutes: 3
+    - platform: state
+      entity_id: device_tracker.rdell
+      to: 'home'
+      for:
+        minutes: 3
+  condition:
+      - condition: state
+        entity_id: input_boolean.r
+        state: 'off'
+  action:
+    - service: homeassistant.turn_on
+      entity_id: input_boolean.r
+
 - id: house_mode_guest
   alias: "House mode guest"
   initial_state: 'on'
@@ -419,7 +477,7 @@
 
 - id: Door_lock
   alias: "Door Lock"
-  initial_state: 'off'
+  initial_state: 'on'
   trigger:
     - platform: state
       entity_id: sensor.house
@@ -431,7 +489,7 @@
     
 - id: Door_unlock
   alias: "Door Unlock"
-  initial_state: 'off'
+  initial_state: 'on'
   trigger:
     - platform: state
       entity_id: input_boolean.away
@@ -628,7 +686,7 @@
   initial_state: False
   trigger:
     - platform: state
-      entity_id: light.bob, light.wc, light.kitchen, light.Hallway1, light.masa
+      entity_id: light.bob, light.wc, light.kitchen, light.Hallway1, light.table
       to: 'unavailable'
       for:
         seconds: 5
@@ -650,9 +708,9 @@
     - platform: state
       entity_id: sensor.bob
       to: 'ON'
-    #masa
+    #table
     - platform: state
-      entity_id: sensor.masa_pir
+      entity_id: sensor.table_pir
       to: 'ON'
     #entrance
     - platform: state
@@ -670,7 +728,7 @@
          entity_id: input_select.location
          option: >
            {% if trigger.entity_id == "sensor.bob" %} Bob
-           {% elif trigger.entity_id == "sensor.masa_pir" %} Masa
+           {% elif trigger.entity_id == "sensor.table_pir" %} Table
            {% elif trigger.entity_id == "binary_sensor.couch" %} Couch
            {% elif trigger.entity_id == "sensor.entrance" %} Entrance
            {% elif trigger.entity_id == "binary_sensor.motion_sensor_bedroom" %} Bedroom
@@ -708,7 +766,7 @@
     - service: automation.turn_off
       entity_id: automation.dota_table_on, automation.kitchen_on, automation.hallway_on
     - service: light.turn_off
-      entity_id: light.wc,light.kitchen,light.kitchen_strip,light.masa,light.Hallway1,light.Hallway2,light.Hallway3
+      entity_id: light.wc,light.kitchen,light.kitchen_strip,light.table,light.Hallway1,light.Hallway2,light.Hallway3
     - service: input_select.select_option
       data:
         entity_id: input_select.location
@@ -844,7 +902,7 @@
         state: 'Detected'
   action:
     - service: light.turn_off
-      entity_id: light.kitchen, light.kitchen_strip, light.masa, light.wc, light.hallway1, light.hallway2, light.hallway3
+      entity_id: light.kitchen, light.kitchen_strip, light.table, light.wc, light.hallway1, light.hallway2, light.hallway3
 
 - id: Gateway_ON
   alias:  Gateway light ON
@@ -892,27 +950,51 @@
   condition:
     condition: and
     conditions:
-      #- condition: state
-     #   entity_id: sensor.house
-    #    state: 'Z'
       - condition: template
         value_template: "{% if states.media_player.firetv.state != 'playing' %}true{% endif %}"
+      # - condition: template
+        # value_template: "{% if states.sensor.house.state != 'Z' %}true{% endif %}"
   action:
-      - service: light.yeelight_set_mode
-        entity_id: light.bedroom
-        data_template:
-          mode: >
-           {% if now().strftime('%H')|int >= 22 and now().strftime('%H')|int <= 8 %} moonlight
-           {% else %}normal
-           {% endif %}        
-      - service: scene.turn_on
-        data_template:
-          entity_id: >
-            {% if now().strftime('%H')|int >= 0 and now().strftime('%H')|int <= 8 %}
-              scene.bedroom_morning
-            {% else %}
-              scene.bedroom_night
-            {% endif %}
+    - service: light.yeelight_set_mode
+      entity_id: light.bedroom
+      data_template:
+        mode: >
+         {% if now().strftime('%H')|int >= 22 or now().strftime('%H')|int <= 9 %} moonlight
+         {% else %}normal
+         {% endif %}        
+    - service: scene.turn_on
+      data_template:
+        entity_id: >
+         {% if now().strftime('%H')|int >= 22 or now().strftime('%H')|int <= 9 %}
+           scene.bedroom_morning
+         {% else %}
+           scene.bedroom_night
+         {% endif %}
+
+- id: BedroomZ_on
+  alias:  'BedroomZ ON'
+  initial_state: True
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.motion_sensor_bedroom
+    to: 'on'
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: sensor.house
+        state: 'Z'
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.binary_sensor.motion_sensor_kitchen.last_changed) | int < 600 }}"
+  action:
+    - service: scene.turn_on
+      data_template:
+        entity_id: >
+         {% if now().strftime('%H')|int >= 22 or now().strftime('%H')|int <= 9 %}
+           scene.bedroom_morning
+         {% else %}
+           scene.bedroom_night
+         {% endif %}
 
 - id: Bedroom_OFF
   alias:  'Bedroom OFF'
@@ -969,33 +1051,33 @@
   initial_state: True
   trigger:
   - platform: state
-    entity_id: sensor.masa_pir
+    entity_id: sensor.table_pir
     to: 'ON'
   condition:
     condition: and
     conditions:
       - condition: state
-        entity_id: light.masa
+        entity_id: light.table
         state: 'off'
       - condition: numeric_state
         entity_id: sensor.illumination_kitchen
-        below: 30
+        below: 35
   action:
       service: light.turn_on
-      entity_id: light.masa
+      entity_id: light.table
 
 - id: Dota_OFF
   alias:  'Dota Table OFF'
   initial_state: True
   trigger:
   - platform: state
-    entity_id: sensor.masa_pir
+    entity_id: sensor.table_pir
     to: 'OFF'
     for:
       minutes: 5
   action:
       service: light.turn_off
-      entity_id: light.masa
+      entity_id: light.table
 
 - id: Bob_ON
   alias:  'Bob ON'
@@ -1054,6 +1136,8 @@
       - condition: numeric_state
         entity_id: sensor.illumination_hallway
         below: 45
+      - condition: template
+        value_template: "{% if states.sensor.house.state != 'Away' or states.sensor.house.state != 'Vacation' %}true{% endif %}"
   action:
     - service: scene.turn_on
       data_template:
@@ -1108,7 +1192,7 @@
     - service: scene.turn_on
       data_template:
         entity_id: >
-          {% if now().strftime('%H')|int >= 2 and now().strftime('%H')|int <= 9 %}scene.wc_morning
+          {% if now().strftime('%H')|int >= 02 and now().strftime('%H')|int <= 09 %}scene.wc_morning
           {% else %}scene.wc_night
           {% endif %}
 
@@ -1175,7 +1259,7 @@
     - service: input_boolean.turn_off
       entity_id: input_boolean.mmode
     - service: light.turn_off
-      entity_id: light.kitchen, light.kitchen_strip, light.masa, light.bob
+      entity_id: light.kitchen, light.kitchen_strip, light.table, light.bob
 
 - id: flip90
   alias: Cube flip90
@@ -1201,7 +1285,7 @@
       action_type: flip180
   action:
     - service: light.toggle
-      entity_id: light.masa 
+      entity_id: light.table 
 
 - id: free_fall
   alias: Cube toggle

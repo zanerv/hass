@@ -1,3 +1,4 @@
+song: /bin/bash -c "/config/song.sh"
 restart_firetv: /bin/bash -c "curl --unix-socket /var/run/docker.sock -X POST http:/v1.24/containers/firetv/restart"
 storj: /bin/bash -c "/config/storj_sensor.sh"
 tts_storj: /bin/bash -c "/config/storj_inc.sh '{{ arg }}'"

@@ -1,3 +1,21 @@
+cast:
+  alias: Cast
+  sequence:
+    - service: media_player.play_media
+      entity_id: media_player.audio_funk
+      data_template:
+        media_content_id: "{{states.input_boolean.song.state}}"
+        media_content_type: audio/flac
+
+media_extractor_test:
+  alias: Media Extractor Test
+  sequence:
+    - service: media_extractor.play_media
+      entity_id: media_player.audio_funk
+      data:
+        media_content_id: "https://www.youtube.com/watch?v=RKcxNsaLxEM"
+        media_content_type: video/youtube
+
 night_mode:
   alias: Good night
   sequence:
@@ -46,8 +64,8 @@ projector_off:
 coffee_machine_on:
   alias: Make coffee
   sequence:
-    - service: switch.turn_on
-      entity_id: switch.coffee_machine
+    # - service: switch.turn_on
+      # entity_id: switch.coffee_machine
     - wait_template: "{{ states.binary_sensor.motion_sensor_kitchen.state == 'on' }}"
       timeout: '00:02:00'
       continue_on_timeout: false
@@ -125,7 +143,7 @@ nothing:
 door_lock:
   alias: Door Lock
   sequence:
-    - service: shell_command.lock
+    # - service: shell_command.lock
     - service: notify.hass
       data:
         title: "{{now().strftime('%H:%M:%S')}}"
@@ -136,7 +154,7 @@ door_lock:
 door_unlock:
   alias: Door Unlock
   sequence:
-    - service: shell_command.unlock
+    # - service: shell_command.unlock
     - service: notify.hass
       data:
         title: "{{now().strftime('%H:%M:%S')}}"
@@ -196,7 +214,7 @@ vacuum_bedroom:
       data:
         entity_id: vacuum.harry_potter
         command: app_zoned_clean
-        params: [[21200,37900,26600,34700,1]]
+        params: [[21700,31900,26500,34500,1]]
 
 vacuum_mop_bathroom:
   alias: bathroom mop

@@ -1,3 +1,9 @@
+song:
+  initial: off
+
+play:
+  initial: off
+
 mmode:
   initial: on
 

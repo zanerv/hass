@@ -51,13 +51,13 @@
       save_on_change: False
 
 - platform: mqtt
-  name: "Masa"
-#  state_topic: "stat/masa/POWER"
-#  state_topic: "home/masa/tele/STATE"
+  name: "Table"
+#  state_topic: "stat/table/POWER"
+#  state_topic: "home/table/tele/STATE"
 #  state_value_template: "{{ value_json.POWER }}"
-  state_topic: "masa/cmnd/POWER"
-  command_topic: "masa/cmnd/POWER"
-  availability_topic: "masa/tele/LWT"
+  state_topic: "table/cmnd/POWER"
+  command_topic: "table/cmnd/POWER"
+  availability_topic: "table/tele/LWT"
   qos: 1
   payload_on: "ON"
   payload_off: "OFF"

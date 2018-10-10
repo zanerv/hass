@@ -14,13 +14,13 @@
   entities:
     light.Hallway1:
       state: on
-      brightness: 250
+      brightness: 255
     light.Hallway2:
       state: on
-      brightness: 250
+      brightness: 255
     light.Hallway3:
       state: on
-      brightness: 250
+      brightness: 255
   
 - name: Kitchen Morning
   entities:
@@ -38,7 +38,7 @@
   entities:
     light.bedroom:
       state: on
-      brightness: 10
+      brightness: 15
 
 - name: Bedroom Night
   entities:
