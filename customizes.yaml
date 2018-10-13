@@ -118,6 +118,24 @@ light.spot:
   icon: mdi:spotlight-beam
   friendly_name: "Spot"
 
+sensor.spacex_next_rocket:
+  icon: mdi:rocket
+  
+sensor.spacex_next_launch_day:
+  icon: mdi:calendar
+  
+sensor.spacex_next_launch_time:
+  icon: mdi:clock-outline
+  
+sensor.spacex_next_launch_site_name_long:
+  icon: mdi:map-marker-radius
+  
+sensor.spacex_next_mission_video_link:
+  icon: mdi:message-video
+  
+sensor.spacex:
+  hidden: true
+
 sensor.entrance:
   friendly_name: "Entrance"
   icon: mdi:walk

@@ -253,3 +253,15 @@ vacuum_stop:
     - service: vacuum.return_to_base
       data:
         entity_id: vacuum.harry_potter
+
+spacex:
+  alias: Space X Launch
+  sequence:
+    - service: notify.hass
+      data:
+        title: "SPACE X START IN 10MIN"
+        message: >
+          Location: {{ states('sensor.spacex_next_launch_site_name_long') }}
+            ├─ Start Time: {{ states('sensor.spacex_next_launch_time') }}
+            ├─ Rocket:     {{ states('sensor.spacex_next_rocket') }}
+            └─ Link:   {{ states.sensor.spacex.attributes.links.video_link }}

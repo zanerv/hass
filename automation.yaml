@@ -326,14 +326,14 @@
   initial_state: 'on'
   trigger:
       - platform: state
-        entity_id: device_tracker.z, device_tracker.r, device_tracker.rdell
+        entity_id: device_tracker.z, device_tracker.r, device_tracker.rdell, device_tracker.rpc
   condition:
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.binary_sensor.door_entrance.last_changed) | int < 1800 }}"
   action:
     - service_template: >
         {% if trigger.to_state.state == 'home' %} homeassistant.turn_on
-        {% elif (states.device_tracker.rdell.state == states.device_tracker.r.state) or trigger.entity_id  == 'device_tracker.z' %} homeassistant.turn_off
+        {% elif (states.device_tracker.rdell.state == states.device_tracker.r.state == states,device_tracker.rpc.state) or trigger.entity_id  == 'device_tracker.z' %} homeassistant.turn_off
         {% else %} script.nothing
         {% endif %}
       data_template:
@@ -766,7 +766,7 @@
     - service: automation.turn_off
       entity_id: automation.dota_table_on, automation.kitchen_on, automation.hallway_on
     - service: light.turn_off
-      entity_id: light.wc,light.kitchen,light.kitchen_strip,light.table,light.Hallway1,light.Hallway2,light.Hallway3
+      entity_id: light.wc,light.kitchen,light.bedroom,light.kitchen_strip,light.table,light.Hallway1,light.Hallway2,light.Hallway3
     - service: input_select.select_option
       data:
         entity_id: input_select.location
@@ -1427,6 +1427,14 @@
   action:
     - service: input_boolean.turn_on
       entity_id: input_boolean.mmode
+
+- id: space_x_launch_notify
+  alias: Launch Notify
+  trigger:
+    - platform: template
+      value_template: '{{ (now().strftime("%s") | int + 600) == (states.sensor.spacex.state | int) }}'
+  action:
+    - service: script.spacex
 
 - id: nothing
   alias: 'nothing'

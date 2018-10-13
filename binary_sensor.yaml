@@ -15,7 +15,7 @@
       prob_given_false: 0.2
       platform: 'state'
       to_state: 'not_home'
-    - entity_id: 'device_tracker.aristica'
+    - entity_id: 'device_tracker.rpc'
       prob_given_true: 0.3
       prob_given_false: 0.2
       platform: 'state'

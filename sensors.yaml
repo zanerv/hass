@@ -257,3 +257,32 @@
   name: quote_of_the_day
   command: curl -s 'http://api.forismatic.com/api/1.0/?method=getQuote&format=json&lang=en'|awk -F '"' '{printf $4}'|tr -d '\\'
   scan_interval: 43200
+
+- platform: rest
+  name: SpaceX
+  json_attributes:
+    - launch_site
+    - rocket
+    - links
+  value_template: '{{ value_json["launch_date_unix"] }}'
+  resource: 'https://api.spacexdata.com/v3/launches/next'
+#https://api.spacexdata.com/v2/launches/next?pretty=true
+  
+- platform: template
+  sensors:
+    spacex_next_rocket:
+      friendly_name: 'Rocket'
+      value_template: '{{ states.sensor.spacex.attributes["rocket"]["rocket_name"] }}'
+    spacex_next_launch_day:
+      friendly_name: 'Launch Day'
+      value_template: '{{ states.sensor.spacex.state | int | timestamp_custom("%d.%m.%Y")}}'
+    spacex_next_launch_time:
+      friendly_name: 'Launch Time'
+      value_template: '{{ states.sensor.spacex.state | int | timestamp_custom("%H:%M")}}'
+      unit_of_measurement: 'h'
+    spacex_next_mission_video_link:
+      friendly_name: 'Mission Video Link'
+      value_template: '{{ states.sensor.spacex.attributes.links.video_link }}'
+    spacex_next_launch_site_name_long:
+      friendly_name: 'Launch Site'
+      value_template: '{{ states.sensor.spacex.attributes["launch_site"]["site_name_long"] }}'

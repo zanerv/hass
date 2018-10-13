@@ -85,6 +85,7 @@ Weather:
   icon: mdi:weather-cloudy
   entities:
   - group.Environment
+  - group.Space_X
 
 devices:
   name: Devices
@@ -292,7 +293,7 @@ ro:
  control: hidden
  entities:
  - device_tracker.rdell
- - device_tracker.aristica
+ - device_tracker.rpc
  - device_tracker.r
  - input_boolean.r
  
@@ -345,6 +346,14 @@ media_players:
  - media_player.plex_web_chrome
  - media_player.living_room_speaker
  - media_player.audio_funk
+
+Space X:
+  - sensor.spacex_next_rocket
+  - sensor.spacex_next_launch_day
+  - sensor.spacex_next_launch_time
+  - sensor.spacex_next_mission_video_link
+  - sensor.spacex_next_launch_site_name_long
+  - automation.space_x_launch_notify
 
 ###NEEDS TO BE LAST###shell_command guest
 guests:
