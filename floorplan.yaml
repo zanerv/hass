@@ -77,7 +77,7 @@
             - binary_sensor.couch
             - sensor.table_pir
             - sensor.bob
-            - binary_sensor.motion_sensor_wc
+            - binary_sensor.motion_wc
           states:
             - state: 'off'
               class: 'couch-off'
@@ -109,10 +109,10 @@
 
         - name: Motion sensors
           entities:
-            - binary_sensor.motion_sensor_living
-            - binary_sensor.motion_sensor_kitchen
-            - binary_sensor.motion_sensor_hallway
-            - binary_sensor.motion_sensor_bedroom
+            - binary_sensor.motion_living
+            - binary_sensor.motion_kitchen
+            - binary_sensor.motion_hallway
+            - binary_sensor.motion_bedroom
           states:
             - state: 'off'
               class: 'steps-off'

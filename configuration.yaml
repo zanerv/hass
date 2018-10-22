@@ -6,7 +6,7 @@ homeassistant:
   longitude: !secret longitude
   # Impacts weather/sunrise data (altitude above sea level in meters)
   elevation: 185
-  # metric for Metric, imperial for Imperial
+  # metric for Metric, imperial for Retarted
   unit_system: metric
   # Pick yours from here: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
   time_zone: !secret time_zone
@@ -180,7 +180,18 @@ script: !include scripts.yaml
 
 input_select: !include input_select.yaml
 
-shell_command: !include shell_command.yaml  
+shell_command: !include shell_command.yaml
+
+calendar:
+  - platform: caldav
+    username: !secret n_user
+    password: !secret n_pass
+    url: !secret n_url
+    custom_calendars:
+      - name: 'Birthday'
+        calendar: 'Android'
+        search: '.*Birthday.*'
+
 input_datetime:
   both_date_and_time:
     name: Input with both date and time

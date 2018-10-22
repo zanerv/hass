@@ -35,6 +35,7 @@ a1:
   - switch.projector
   - switch.ac
   - switch.trantor_power
+  - input_boolean.play
   
 a2:
   name: Table
@@ -100,6 +101,7 @@ dev:
   view: yes
   icon: mdi:test-tube
   entities:
+  - sensor.battery
   - group.all_automations
   - group.all_scripts
   - group.all_switches
@@ -174,7 +176,7 @@ Bedroom:
  - sensor.Temperature_bedroom
  - sensor.Humidity_bedroom
  - sensor.Pressure_bedroom
- - binary_sensor.motion_sensor_bedroom
+ - binary_sensor.motion_bedroom
  - sensor.illumination_bedroom
  - binary_sensor.door_bedroom
 
@@ -190,7 +192,7 @@ Living:
  - sensor.bob
  - binary_sensor.cube
  - sensor.cube_last
- - binary_sensor.motion_sensor_living
+ - binary_sensor.motion_living
  - sensor.illumination_living
  - sensor.couch
  - binary_sensor.switch_living
@@ -204,14 +206,14 @@ Kitchen:
  - switch.coffee_machine
  - switch.espresso
  - switch.coffee
- - binary_sensor.motion_sensor_kitchen
+ - binary_sensor.motion_kitchen
  - sensor.illumination_kitchen
  - switch.rikis_food
 
 WC:
  name: 'WC'
  entities:
- - binary_sensor.motion_sensor_wc
+ - binary_sensor.motion_wc
  - sensor.illumination_wc
  - light.WC
 
@@ -222,7 +224,7 @@ Hallway:
  - group.Hallway_Light
  - light.gateway
  - sensor.illumination_gateway
- - binary_sensor.motion_sensor_hallway
+ - binary_sensor.motion_hallway
  - sensor.illumination_hallway
  - binary_sensor.door_entrance
  - light.entrance
@@ -336,6 +338,7 @@ Monitoring:
  - sensor.temperature_shiny
  - sensor.humidity_shiny
  - sensor.pressure_shiny
+ - sensor.battery
 
 media_players:
  name: Media Players

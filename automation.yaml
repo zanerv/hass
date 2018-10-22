@@ -84,6 +84,9 @@
     - condition: state
       entity_id: sensor.projector_status
       state: 'on'
+    - condition: state
+      entity_id: binary_sensor.motion_living
+      state: 'off'
   action:
     - service: switch.turn_off
       entity_id: switch.projector
@@ -112,7 +115,7 @@
   action:
     - service: light.turn_on
       entity_id: light.spot
-    - wait_template: "{{ states.binary_sensor.motion_sensor_living.state == 'on' }}"
+    - wait_template: "{{ states.binary_sensor.motion_living.state == 'on' }}"
       timeout: '00:00:20'
       continue_on_timeout: false
     - service: light.turn_off
@@ -123,7 +126,7 @@
   initial_state: True
   trigger:
     - platform: state
-      entity_id: binary_sensor.motion_sensor_wc
+      entity_id: binary_sensor.motion_wc
       to: 'on'
   condition:
     - condition: state
@@ -289,11 +292,6 @@
       to: 'play'
       for:
         seconds: 3
-    - platform: state
-      entity_id: sensor.tautulli
-      to: 'stop'
-      for:
-        seconds: 3
   condition:
     condition: and
     conditions:
@@ -310,15 +308,9 @@
         entity_id: sensor.couch
         state: 'Detected'
   action:
-    - service_template: >
-        {% if states.sensor.tautulli.state == 'play' %} light.turn_off
-        {% else %} light.turn_on
-        {% endif %}
+    - service: light.turn_off
       entity_id: light.bob
-    - service_template: >
-        {% if states.sensor.tautulli.state == 'play' %} light.turn_on
-        {% else %} light.turn_off
-        {% endif %}
+    - service_template: light.turn_on
       entity_id: light.spot
 
 - id: house_mode_us
@@ -333,7 +325,7 @@
   action:
     - service_template: >
         {% if trigger.to_state.state == 'home' %} homeassistant.turn_on
-        {% elif (states.device_tracker.rdell.state == states.device_tracker.r.state == states,device_tracker.rpc.state) or trigger.entity_id  == 'device_tracker.z' %} homeassistant.turn_off
+        {% elif (states.device_tracker.rdell.state == states.device_tracker.r.state == states.device_tracker.rpc.state) or trigger.entity_id  == 'device_tracker.z' %} homeassistant.turn_off
         {% else %} script.nothing
         {% endif %}
       data_template:
@@ -364,12 +356,7 @@
   initial_state: 'on'
   trigger:
     - platform: state
-      entity_id: device_tracker.r
-      to: 'home'
-      for:
-        minutes: 3
-    - platform: state
-      entity_id: device_tracker.rdell
+      entity_id: device_tracker.r, device_tracker.rpc, device_tracker.rdell
       to: 'home'
       for:
         minutes: 3
@@ -529,6 +516,8 @@
                   {{ "\n" }}
                   {{states('sensor.zalendar')}}{{ "\n" }}
                   {{ "\n" }}
+                  {{states('sensor.sensor')}}{{ "\n" }}
+                  {{ "\n" }}
                   {%- if states.sensor.quote_of_the_day == 'unknown' -%}
                   Do or do not. There is no Try.
                   {%- else -%}
@@ -585,8 +574,6 @@
      - platform: time
        at: '06:00'
   action:
-      - service: switch.turn_on
-        entity_id: switch.flux
       - service: frontend.set_theme
         data_template:
           name: >
@@ -620,7 +607,7 @@
   initial_state: True
   trigger:
      - platform: state
-       entity_id: binary_sensor.motion_sensor_living
+       entity_id: binary_sensor.motion_living
        to: 'on'
   condition:
      condition: and
@@ -641,7 +628,7 @@
         entity_id: sensor.bob
         state: 'ON'
   action:
-    # - wait_template: "{{ states.binary_sensor.motion_sensor_living.state == 'on' }}"
+    # - wait_template: "{{ states.binary_sensor.motion_living.state == 'on' }}"
       # timeout: '00:00:20'
      - service: light.turn_on
        entity_id: light.kitchen_strip
@@ -718,7 +705,7 @@
       to: 'Motion'
     #kitchen, WC, Living, Hallway, couch
     - platform: state
-      entity_id: binary_sensor.motion_sensor_kitchen, binary_sensor.motion_sensor_wc, binary_sensor.motion_sensor_living, binary_sensor.motion_sensor_hallway, binary_sensor.couch, binary_sensor.door_lightroom, binary_sensor.door_darkroom, binary_sensor.door_bedroom
+      entity_id: binary_sensor.motion_kitchen, binary_sensor.motion_wc, binary_sensor.motion_living, binary_sensor.motion_hallway, binary_sensor.couch, binary_sensor.door_lightroom, binary_sensor.door_darkroom, binary_sensor.door_bedroom
       to: 'on'
       for:
         seconds: 0.1
@@ -731,11 +718,11 @@
            {% elif trigger.entity_id == "sensor.table_pir" %} Table
            {% elif trigger.entity_id == "binary_sensor.couch" %} Couch
            {% elif trigger.entity_id == "sensor.entrance" %} Entrance
-           {% elif trigger.entity_id == "binary_sensor.motion_sensor_bedroom" %} Bedroom
-           {% elif trigger.entity_id == "binary_sensor.motion_sensor_kitchen" %} Kitchen
-           {% elif trigger.entity_id == "binary_sensor.motion_sensor_wc" %} WC
-           {% elif trigger.entity_id == "binary_sensor.motion_sensor_living" %} Living
-           {% elif trigger.entity_id == "binary_sensor.motion_sensor_hallway" %} Hallway
+           {% elif trigger.entity_id == "binary_sensor.motion_bedroom" %} Bedroom
+           {% elif trigger.entity_id == "binary_sensor.motion_kitchen" %} Kitchen
+           {% elif trigger.entity_id == "binary_sensor.motion_wc" %} WC
+           {% elif trigger.entity_id == "binary_sensor.motion_living" %} Living
+           {% elif trigger.entity_id == "binary_sensor.motion_hallway" %} Hallway
            {% elif trigger.entity_id == "binary_sensor.door_lightroom" %} Lightroom
            {% elif trigger.entity_id == "binary_sensor.door_darkroom" %} Darkroom
            {% elif trigger.entity_id == "binary_sensor.door_bedroom" %} Bedroom
@@ -793,7 +780,7 @@
   initial_state: True
   trigger:
   - platform: state
-    entity_id: binary_sensor.motion_sensor_kitchen
+    entity_id: binary_sensor.motion_kitchen
     to: 'on'
     for:
       seconds: 0.1
@@ -818,7 +805,7 @@
   initial_state: True
   trigger:
     platform: state
-    entity_id: binary_sensor.motion_sensor_bedroom
+    entity_id: binary_sensor.motion_bedroom
     to: 'on'
     for:
       seconds: 0.1
@@ -909,7 +896,7 @@
   initial_state: True
   trigger:
   - platform: state
-    entity_id: binary_sensor.motion_sensor_hallway
+    entity_id: binary_sensor.motion_hallway
     from: 'off'
     to: 'on'
     for:
@@ -930,7 +917,7 @@
   initial_state: True
   trigger:
     platform: state
-    entity_id: binary_sensor.motion_sensor_hallway
+    entity_id: binary_sensor.motion_hallway
     to: 'off'
     for:
       minutes: 5
@@ -943,7 +930,7 @@
   initial_state: True
   trigger:
   - platform: state
-    entity_id: binary_sensor.motion_sensor_bedroom
+    entity_id: binary_sensor.motion_bedroom
     to: 'on'
     # for:
       # seconds: 0.1
@@ -976,7 +963,7 @@
   initial_state: True
   trigger:
   - platform: state
-    entity_id: binary_sensor.motion_sensor_bedroom
+    entity_id: binary_sensor.motion_bedroom
     to: 'on'
   condition:
     condition: and
@@ -985,7 +972,7 @@
         entity_id: sensor.house
         state: 'Z'
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.binary_sensor.motion_sensor_kitchen.last_changed) | int < 600 }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.binary_sensor.motion_kitchen.last_changed) | int < 600 }}"
   action:
     - service: scene.turn_on
       data_template:
@@ -1001,11 +988,14 @@
   initial_state: True
   trigger:
   - platform: state
-    entity_id: binary_sensor.motion_sensor_bedroom
+    entity_id: binary_sensor.motion_bedroom
     to: 'off'
   - platform: state
     entity_id: media_player.firetv
     from: 'off'
+  - platform: state
+    entity_id: media_player.firetv
+    to: 'playing'
   action:
       service: light.turn_off
       entity_id: light.bedroom
@@ -1015,7 +1005,7 @@
   initial_state: True
   trigger:
   - platform: state
-    entity_id: binary_sensor.motion_sensor_kitchen
+    entity_id: binary_sensor.motion_kitchen
     to: 'on'
     # for:
       # seconds: 0.1
@@ -1038,7 +1028,7 @@
   initial_state: True
   trigger:
   - platform: state
-    entity_id: binary_sensor.motion_sensor_kitchen
+    entity_id: binary_sensor.motion_kitchen
     to: 'off'
     for:
        minutes: 5
@@ -1074,7 +1064,7 @@
     entity_id: sensor.table_pir
     to: 'OFF'
     for:
-      minutes: 5
+      minutes: 7
   action:
       service: light.turn_off
       entity_id: light.table
@@ -1123,7 +1113,7 @@
     entity_id: sensor.entrance
     to: 'Motion'
   - platform: state     
-    entity_id: binary_sensor.motion_sensor_hallway
+    entity_id: binary_sensor.motion_hallway
     to: 'on'
     for:
       seconds: 0.1
@@ -1158,13 +1148,13 @@
     for:
       seconds: 30
   - platform: state
-    entity_id: binary_sensor.motion_sensor_hallway
+    entity_id: binary_sensor.motion_hallway
     to: 'off'
   condition:
     condition: and
     conditions:
       - condition: state
-        entity_id: binary_sensor.motion_sensor_hallway
+        entity_id: binary_sensor.motion_hallway
         state: 'off'
       - condition: state
         entity_id: sensor.entrance
@@ -1180,7 +1170,7 @@
   initial_state: True
   trigger:
   - platform: state     
-    entity_id: binary_sensor.motion_sensor_wc
+    entity_id: binary_sensor.motion_wc
     to: 'on'
   condition:
     condition: and
@@ -1201,7 +1191,7 @@
   initial_state: True
   trigger:
   - platform: state
-    entity_id: binary_sensor.motion_sensor_wc
+    entity_id: binary_sensor.motion_wc
     to: 'off'
     for:
       seconds: 10

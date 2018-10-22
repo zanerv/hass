@@ -40,7 +40,6 @@ night_mode:
           state.entity_id != 'switch.projector' and
           state.entity_id != 'switch.projector_esc' and
           state.entity_id != 'switch.rikis_food' and
-          state.entity_id != 'switch.flux' and
           state.entity_id != 'switch.trantor_power'-%}
           {{- "," if not loop.first-}}{{ state.entity_id }}{{-endif-}}
           {%- endfor -%}
@@ -66,7 +65,7 @@ coffee_machine_on:
   sequence:
     # - service: switch.turn_on
       # entity_id: switch.coffee_machine
-    - wait_template: "{{ states.binary_sensor.motion_sensor_kitchen.state == 'on' }}"
+    - wait_template: "{{ states.binary_sensor.motion_kitchen.state == 'on' }}"
       timeout: '00:02:00'
       continue_on_timeout: false
     - service: switch.turn_on
@@ -85,7 +84,8 @@ movie_time:
       data_template:
         entity_id: >
           {%- for state in states.light if state.entity_id != 'light.spot' and
-          state.entity_id != 'light.entrance' -%}
+          state.entity_id != 'light.entrance' and
+          state.entity_id != 'light.kitchen' -%}
           {{- "," if not loop.first-}}{{ state.entity_id }}{{-endif-}}
           {%- endfor -%}
     - service: media_player.media_stop
