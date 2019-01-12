@@ -1,19 +1,19 @@
-- name: Hallway Morning
-  entities:
-    light.Hallway1:
-      state: on
-      brightness: 10
-    light.Hallway2:
-      state: on
-      brightness: 10
-    light.Hallway3:
-      state: on
-      brightness: 10
-  
 - name: Hallway Night
   entities:
     light.Hallway1:
       state: on
+      brightness: 10
+    light.Hallway2:
+      state: on
+      brightness: 10
+    light.Hallway3:
+      state: on
+      brightness: 10
+  
+- name: Hallway Day
+  entities:
+    light.Hallway1:
+      state: on
       brightness: 255
     light.Hallway2:
       state: on
@@ -22,39 +22,41 @@
       state: on
       brightness: 255
   
-- name: Kitchen Morning
+- name: Kitchen Night
   entities:
     light.kitchen_strip:
       state: on
-    #  brightness_pct: 5
+    light.bar:
+      state: on
 
-- name: Kitchen Night
+- name: Kitchen Day
   entities:
+    light.bar:
+      state: on
     light.kitchen:
       state: on
       brightness_pct: 100
-
-- name: Bedroom Morning
-  entities:
-    light.bedroom:
-      state: on
-      brightness: 15
 
 - name: Bedroom Night
   entities:
     light.bedroom:
       state: on
+      brightness: 15
+
+- name: Bedroom Day
+  entities:
+    light.bedroom:
+      state: on
       brightness_pct: 100
 
-- name: WC Morning
+- name: WC Night
   entities:
     light.wc:
       state: on
       brightness_pct: 17
-#      color_name: darkre
       rgb_color: [255,126,000]
 
-- name: WC Night
+- name: WC Day
   entities:
     light.wc:
       state: on

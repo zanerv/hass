@@ -15,13 +15,15 @@ Automation:
   entities:
   - group.all_automations
   - group.all_scripts
-  - scene.hallway_morning
+  - scene.hallway_day
   - scene.hallway_night
-  - scene.bedroom_morning
+  - scene.kitchen_day
+  - scene.kitchen_night
+  - scene.bedroom_day
   - scene.bedroom_night
   - scene.wc_morning
   - scene.wc_night
-  - scene.wc_off
+  - scene.gateway
 
 a1:
   name: Living 
@@ -66,7 +68,6 @@ a6:
   view: yes
   entities:
   - group.bedroom
-  - media_player.firetv
 
 a7:
   name: LightRoom
@@ -79,6 +80,12 @@ a8:
   view: yes
   entities:
   - group.darkroom
+
+a9:
+  name: Bathroom
+  view: yes
+  entities:
+  - group.bathroom
 
 Weather:
   name: Weather 
@@ -123,8 +130,7 @@ Shiny:
 prezenta:
  name: 'Prezenta'
  control: hidden
- entities:  
-  - script.test
+ entities:
   - input_boolean.r
   - input_boolean.z
   - sensor.travel_time
@@ -135,7 +141,6 @@ guster:
  name: 'Guster switch'
  entities:
  - light.bob
- - light.joe
  - input_boolean.mmode
 
 Table:
@@ -151,11 +156,19 @@ Darkroom:
  name: 'Darkroom'
  control: hidden
  entities:
- - light.Darkroom
+# - light.darkroom
  - sensor.Temperature_Darkroom
  - sensor.Humidity_Darkroom
  - sensor.Pressure_Darkroom
  - binary_sensor.door_Darkroom
+
+Bathroom:
+ name: 'Bathroom'
+ control: hidden
+ entities:
+ - light.bathroom
+ - sensor.bathroom_pir
+ - binary_sensor.door_bathroom
 
 Lightroom:
  name: 'Lightroom'
@@ -179,6 +192,7 @@ Bedroom:
  - binary_sensor.motion_bedroom
  - sensor.illumination_bedroom
  - binary_sensor.door_bedroom
+ - media_player.firetv
 
 Living:
  name: 'Living'
@@ -195,7 +209,7 @@ Living:
  - binary_sensor.motion_living
  - sensor.illumination_living
  - sensor.couch
- - binary_sensor.switch_living
+ - binary_sensor.switch_bedroom
 
 Kitchen:
  name: 'Kitchen'
@@ -203,12 +217,13 @@ Kitchen:
  entities:
  - light.kitchen
  - light.kitchen_strip
+ - light.bar
  - switch.coffee_machine
  - switch.espresso
  - switch.coffee
- - binary_sensor.motion_kitchen
+ - sensor.bar_pir
  - sensor.illumination_kitchen
- - switch.rikis_food
+ - switch.riki_s_food
 
 WC:
  name: 'WC'
@@ -244,35 +259,29 @@ Lights:
  entities:
  - group.hallway_light
  - light.bob
- - light.joe
  - light.spot
  - light.table
+ - light.bar
  - light.kitchen
  - light.kitchen_strip
  - light.wc
  - switch.socket
  - light.lightroom
- - light.darkroom
+ - light.bedroom
+# - light.darkroom
+ - light.bathroom
 
 Environment:
  name: Afara 3D
  entities:
- - sun.sun 
- - sensor.dark_sky_template
- - sensor.yr_symbol
+ - sun.sun
  - sensor.dark_sky_apparent_temperature
- - sensor.yr_temperature
- - sensor.yr_wind_speed
- - sensor.yr_precipitation
- - sensor.dark_sky_cloud_coverage
- - sensor.yr_cloudiness
- - sensor.dark_sky_daytime_high_apparent_temperature
- - sensor.dark_sky_overnight_low_apparent_temperature
- - sensor.dark_sky_precip_probability
- - sensor.dark_sky_hourly_summary
- - sensor.dark_sky_minutely_summary
- - sensor.dark_sky_precip
+ - sensor.dark_sky_daytime_high_apparent_temperature_0
+ - sensor.dark_sky_overnight_low_apparent_temperature_0
+ - sensor.dark_sky_summary_0
+ - sensor.dark_sky_precip_probability_0
 
+ 
 Canapea:
  name: "Canapea"
  entities:
@@ -280,49 +289,14 @@ Canapea:
  - sensor.t_power
  - sensor.t_today
  - sensor.t_yesterday
- - sensor.t_total_since_17mar
-
-us:
- name: "Tracked"
- control: hidden
- entities:
- - device_tracker.z
- - device_tracker.r
- - device_tracker.rdell
-
-ro:
- name: !secret she
- control: hidden
- entities:
- - device_tracker.rdell
- - device_tracker.rpc
- - device_tracker.r
- - input_boolean.r
- 
-me:
- name: "Z"
- control: hidden
- entities:
- - device_tracker.z
- - device_tracker.zpc
- - input_boolean.z
-
-Food:
- control: hidden
- name: Food</dev>
- entities:
- - switch.caruso
- - switch.fortys
- - switch.holiday
+ - sensor.t_total_since_17_mar
 
 Monitoring:
  name: Shiny
  entities:
  - sensor.storj
- - sensor.stats_count
- - sensor.disk_use_percent_
+ - sensor.disk_use_percent
  - sensor.memory_use_percent
- - sensor.cpu_speed
  - sensor.cpu_temp
  - sensor.processor_use
  - sensor.load_1m
@@ -334,7 +308,7 @@ Monitoring:
  - sensor.power
  - sensor.today
  - sensor.yesterday
- - sensor.total_since_04feb
+ - sensor.total_since_04_feb
  - sensor.temperature_shiny
  - sensor.humidity_shiny
  - sensor.pressure_shiny
@@ -344,35 +318,35 @@ media_players:
  name: Media Players
  entities:
  - media_player.firetv
- - sensor.plex
- - media_player.plex
- - media_player.plex_web_chrome
+ - sensor.tautulli
  - media_player.living_room_speaker
  - media_player.audio_funk
 
 Space X:
+ control: hidden
+ name: SpaceX
+ entities:
   - sensor.spacex_next_rocket
   - sensor.spacex_next_launch_day
   - sensor.spacex_next_launch_time
   - sensor.spacex_next_mission_video_link
   - sensor.spacex_next_launch_site_name_long
-  - automation.space_x_launch_notify
+  - automation.launch_notify
+  - sensor.launch
+  - sensor.launch_day
+  - sensor.launch_time
+  - sensor.mission_video_link
 
 ###NEEDS TO BE LAST###shell_command guest
 guests:
  name: Guests
  entities:
  - device_tracker.puiul
- - device_tracker.34ea346ff7a4
- - device_tracker.1c151f94f38f
- - device_tracker.7c49ebaccfa2
- - device_tracker.7c49ebacd9b0
- - device_tracker.7c49eb1dd7ce
- - device_tracker.002637acfbd7
- - device_tracker.f85971aa1cde
- - device_tracker.7c49ebaeec2b
  - device_tracker.a028ed81d9bf
  - device_tracker.dc0b34cc373b
  - device_tracker.f832e4f172b4
  - device_tracker.9822ef1c911c
  - device_tracker.40a3ccefea7f
+ - device_tracker.2c598a57e84a
+ - device_tracker.64899a0bbf63
+ - device_tracker.5ccf7f3a17b9

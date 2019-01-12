@@ -39,12 +39,16 @@ night_mode:
           {%- for state in states.switch if
           state.entity_id != 'switch.projector' and
           state.entity_id != 'switch.projector_esc' and
-          state.entity_id != 'switch.rikis_food' and
+          state.entity_id != 'switch.riki_s_food' and
           state.entity_id != 'switch.trantor_power'-%}
           {{- "," if not loop.first-}}{{ state.entity_id }}{{-endif-}}
           {%- endfor -%}
-    - service: light.turn_on
+    - delay: "00:01:00"
+    - service: input_boolean.turn_on
+      entity_id: input_boolean.mmode
+    - service: light.turn_off
       entity_id: light.kitchen
+    
     # - service: media_player.play_media
       # data:
         # entity_id: media_player.living_room_speaker
@@ -56,16 +60,16 @@ projector_off:
   sequence:
     - service: switch.turn_off
       entity_id: switch.projector
-    - delay: '00:00:01'
+    - delay: '00:00:02'
     - service: switch.turn_off
       entity_id: switch.projector
    
 coffee_machine_on:
   alias: Make coffee
   sequence:
-    # - service: switch.turn_on
-      # entity_id: switch.coffee_machine
-    - wait_template: "{{ states.binary_sensor.motion_kitchen.state == 'on' }}"
+    - service: switch.turn_on
+      entity_id: switch.coffee_machine
+    - wait_template: "{{ states.sensor.bar_pir.state == 'ON' }}"
       timeout: '00:02:00'
       continue_on_timeout: false
     - service: switch.turn_on
@@ -88,7 +92,7 @@ movie_time:
           state.entity_id != 'light.kitchen' -%}
           {{- "," if not loop.first-}}{{ state.entity_id }}{{-endif-}}
           {%- endfor -%}
-    - service: media_player.media_stop
+    - service: media_player.turn_off
       data:
         entity_id: media_player.audio_funk
 
@@ -123,7 +127,7 @@ house_mode_away:
       data_template:
         entity_id: >
           {%- for state in states.switch if
-          state.entity_id != 'switch.rikis_food' and
+          state.entity_id != 'switch.riki_s_food' and
           state.entity_id != 'switch.trantor_power' and
           state.entity_id != 'switch.projector_esc' and
           state.entity_id != 'switch.projector' -%}
@@ -144,10 +148,10 @@ door_lock:
   alias: Door Lock
   sequence:
     # - service: shell_command.lock
-    - service: notify.hass
-      data:
-        title: "{{now().strftime('%H:%M:%S')}}"
-        message:  "Door locked"
+    # - service: notify.hass
+    #   data:
+    #     title: "{{now().strftime('%H:%M:%S')}}"
+    #     message:  "Door locked"
     - service: automation.turn_on
       entity_id: automation.door_unlock
 
@@ -265,3 +269,14 @@ spacex:
             ├─ Start Time: {{ states('sensor.spacex_next_launch_time') }}
             ├─ Rocket:     {{ states('sensor.spacex_next_rocket') }}
             └─ Link:   {{ states.sensor.spacex.attributes.links.video_link }}
+            
+launch:
+  alias: Launch
+  sequence:
+    - service: notify.hass
+      data:
+        title: "LAUNCH STARTS IN 10MIN"
+        message: >
+          Location: {{ states.sensor.launch.state }}
+            ├─ Start Time: {{ states.sensor.launch_time.state }}
+            └─ Link:   {{ states.sensor.mission_video_link }}

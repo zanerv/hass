@@ -1,156 +1,380 @@
-name: Home
+title: My Lovely Home Automation
 views:
-- name: Home
-  cards:
-  - type: entities
-    title: Thermostat
-    entities:
-    - climate.thermostat
-    - sensor.thermostat_temperature
-    - sensor.thermostat_setpoint
-    - sensor.thermostat_state
-    - sensor.thermostat_fan_status
-    - sensor.ac_runtime_today
-    - sensor.ac_runtime_yesterday
-  - type: entities
-    title: Automation Control
-    entities:
-    - input_boolean.door_notify
-    - input_boolean.ac_automation
-    - input_boolean.plant_light_automation
-    - input_boolean.ac_change_notification
-    - input_boolean.occusim
-  - type: entities
-    title: Scenes
-    entities:
-    - script.master_bedroom_light_full
-    - script.master_bedroom_light_dim
-    - script.master_bedroom_bedtime
-  - type: entities
-    title: Security
-    entities:
-    - input_boolean.arlo_status
-    - sensor.front_door_status
-    - sensor.back_door_status
-  - type: entities
-    title: Trackers
-    entities:
-    - device_tracker.owntracks_android
-    - device_tracker.bethany_iphone
-  - type: entities
-    title: Weather
-    entities:
-    - sensor.dark_sky_summary
-    - sensor.dark_sky_temperature
-    - sensor.dark_sky_humidity
-    - sensor.dark_sky_precip_probability
-    - sun.sun
-    - sensor.moon_phase
-  - type: camera-preview
-    entity: camera.weather_radar
-  - type: camera-preview
-    entity: camera.weather
-  - type: camera-preview
-    entity: camera.outdoor
-  - type: camera-preview
-    entity: camera.usps_mail
-  - type: media-control
-    entity: media_player.andrews_chromecast
-  - type: entities
-    title: Misc
-    entities:
-    - sensor.usps_mail
-    - sensor.deliveries_today
-    - sensor.packages_in_transit
-- name: Common Areas
-  cards:
-  - type: entities
-    title: Thermostat
-    entities:
-    - climate.thermostat
-    - sensor.thermostat_temperature
-    - sensor.thermostat_setpoint
-    - sensor.thermostat_state
-    - sensor.thermostat_fan_status
-    - sensor.ac_runtime_today
-    - sensor.ac_runtime_yesterday
-  - type: entities
-    title: Living Room
-    entities:
-    - switch.wemo_switch
-    - switch.living_room_lamp
-    - switch.wemo_switch
-    - switch.decorative_led
-    - switch.tv
-  - type: entities
-    title: Kitchen
-    entities:
-    - switch.kitchen_table_light_switch
-    - switch.kitchen_plant_light_switch
-    - switch.kitchen_plant_light_incandescent
-  - type: entities
-    title: Office
-    entities:
-    - light.andrew_monitor_backlight
-    - fan.office_ceiling_fan_level
-    - switch.outdoor_zwave_switch
-  - type: camera-preview
-    entity: camera.office
-- name: Master Bedroom
-  cards:
-  - type: entities
-    title: Master Bedroom
-    entities:
-    - sensor.master_bedroom_temperature
-    - light.master_bedroom
-    - switch.master_bedroom_sound_machine
-    - fan.master_bedroom_ceiling_fan_level
-    - switch.master_bathroom_light_switch
-    - switch.andrews_lamp
-    - switch.bethanys_lamp
-  - type: entities
-    title: Scenes
-    entities:
-    - script.master_bedroom_light_full
-    - script.master_bedroom_light_dim
-    - script.master_bedroom_bedtime
-- name: Server Status
-  cards:
-  - type: entities
-    title: System
-    entities:
-    - sensor.ssl_certificate_expiry
-    - sensor.rack_exhaust_temperature
-    - switch.rack_exhaust_fan
-    - sensor.processor_use
-    - sensor.load_1m
-    - sensor.memory_use_percent
-    - sensor.disk_use_percent_
-    - sensor.disk_use_percent_home
-    - sensor.last_boot
-    - sensor.network_out_eno1
-    - sensor.network_in_eno1
-    - switch.nas
-  - type: entities
-    title: UPS
-    entities:
-    - sensor.ups_time_left
-    - sensor.ups_load
-    - sensor.ups_battery
-  - type: entities
-    title: Power
-    entities:
-    - sensor.sonoff_pow_current
-    - sensor.sonoff_pow_power
-    - sensor.sonoff_pow_today_energy
-    - sensor.sonoff_pow_today_cost
-    - sensor.sonoff_pow_yesterday_energy
-    - sensor.sonoff_pow_yesterday_cost
-- cards:
-  - card_config:
-      title: All Entities
-    filter:
-    - {}
-    type: entity-filter
-  name: All Entities
-  tab_icon: mdi:settings
+  - title: Home
+    cards:
+      - type: media-control
+        entity: media_player.audio_funk
+
+      - type: media-control
+        entity: media_player.living_room_speaker
+
+      - type: entities
+        title: Automations
+        show_header_toggle: true
+        entities:
+          - automation.arrived_home
+          - automation.at_wc
+          - automation.bedroom_doors
+          - automation.bedroom_doors_closed
+          - automation.bedroom_off
+          - automation.bedroom_on
+          - automation.bedroom_toggle
+          - automation.bedroomz_on
+          - automation.bob_off
+          - automation.bob_on
+          - automation.cast
+          - automation.cube_alert
+          - automation.cube_flip180
+          - automation.cube_flip90
+          - automation.cube_move
+          - automation.cube_rotate
+          - automation.cube_shake
+          - automation.cube_shake_bob
+          - automation.cube_swing
+          - automation.cube_tap
+          - automation.cube_toggle
+          - automation.darkroom_light
+          - automation.door_lock
+          - automation.door_opened
+          - automation.door_unlock
+          - automation.dota_table_off
+          - automation.dota_table_on
+          - automation.feed_ze_animal_7201418
+          - automation.from_couch_to_kitchen
+          - automation.from_kitchen_to_couch
+          - automation.gateway_light_off
+          - automation.gateway_light_on
+          - automation.going_to_bed
+          - automation.got_brighter
+          - automation.hallway_off
+          - automation.hallway_on
+          - automation.home
+          - automation.home_alone
+          - automation.home_unknown_state
+          - automation.house_mode_away
+          - automation.house_mode_guest
+          - automation.house_mode_r
+          - automation.house_mode_us
+          - automation.house_mode_vacation
+          - automation.house_mode_z
+          - automation.kitchen_off
+          - automation.kitchen_on
+          - automation.last_movement
+          - automation.launch_notify
+          - automation.lazy_off
+          - automation.lazy_on
+          - automation.led_stip_off
+          - automation.lightroom_light
+          - automation.monkey
+          - automation.morning_briefing_r
+          - automation.morning_briefing_z
+          - automation.movie
+          - automation.nothing
+          - automation.notify_for_new_devices
+          - automation.notify_house_mode
+          - automation.projector_off
+          - automation.projector_on
+          - automation.restart_firetv
+          - automation.snooping
+          - automation.spotify_ads
+          - automation.sunset
+          - automation.theme
+          - automation.unavailable
+          - automation.unknown_macs
+          - automation.wc_auto_off
+          - automation.wc_off
+          - automation.wc_on
+
+      - type: entities
+        title: Binary Sensors
+        show_header_toggle: true
+        entities:
+          - binary_sensor.bayesian_sleeping
+          - binary_sensor.couch
+          - binary_sensor.cube
+          - binary_sensor.door_darkroom
+          - binary_sensor.door_entrance
+          - binary_sensor.door_lightroom
+          - binary_sensor.floorplan
+          - binary_sensor.motion_bedroom
+          - binary_sensor.motion_hallway
+          - binary_sensor.motion_kitchen
+          - binary_sensor.motion_living
+          - binary_sensor.motion_wc
+          - binary_sensor.sleep
+          - binary_sensor.switch_bedroom
+          - binary_sensor.switch_monkey
+          - binary_sensor.vibration_158d0002a51d09
+          - binary_sensor.window_lightroom
+          - binary_sensor.workday_sensor
+          - binary_sensor.z_presence
+
+      - type: entity-filter
+        title: Device Trackers
+        show_header_toggle: true
+        entities:
+          - device_tracker.2c598a57e84a
+          - device_tracker.40a3ccefea7f
+          - device_tracker.64899a0bbf63
+          - device_tracker.9822ef1c911c
+          - device_tracker.a028ed81d9bf
+          - device_tracker.adrian
+          - device_tracker.dc0b34cc373b
+          - device_tracker.f832e4f172b4
+          - device_tracker.htpc
+          - device_tracker.puiul
+          - device_tracker.r_phone
+          - device_tracker.rdell
+          - device_tracker.rpc
+          - device_tracker.z_phone
+          - device_tracker.zold
+          - device_tracker.zpc
+        state_filter:
+          - 'home'
+        card:
+          type: glance
+          title: My Device Trackers
+
+
+      - type: entities
+        title: Groups
+        show_header_toggle: true
+        entities:
+          - group.a1
+          - group.a2
+          - group.a3
+          - group.a4
+          - group.a5
+          - group.a6
+          - group.a7
+          - group.a8
+          - group.all_automations
+          - group.all_devices
+          - group.all_lights
+          - group.all_scripts
+          - group.all_switches
+          - group.all_vacuum_cleaners
+          - group.automation
+          - group.bedroom
+          - group.canapea
+          - group.darkroom
+          - group.default
+          - group.dev
+          - group.devices
+          - group.environment
+          - group.food
+          - group.guests
+          - group.guster
+          - group.hallway
+          - group.hallway_light
+          - group.kitchen
+          - group.lightroom
+          - group.lights
+          - group.living
+          - group.me
+          - group.media_players
+          - group.monitoring
+          - group.prezenta
+          - group.ro
+          - group.shiny
+          - group.space_x
+          - group.table
+          - group.us
+          - group.wc
+          - group.weather
+
+      - type: entities
+        title: Input Booleans
+        show_header_toggle: true
+        entities:
+          - input_boolean.away
+          - input_boolean.guest
+          - input_boolean.mmode
+          - input_boolean.play
+          - input_boolean.r
+          - input_boolean.song
+          - input_boolean.vacation
+          - input_boolean.z
+          - input_boolean.z_tasker
+
+      - type: entities
+        title: Input Select
+        show_header_toggle: true
+        entities:
+          - input_select.location
+
+      - type: entities
+        title: Lights
+        show_header_toggle: true
+        entities:
+          - light.bedroom
+          - light.bob
+          - light.darkroom
+          - light.entrance
+          - light.gateway
+          - light.hallway1
+          - light.hallway2
+          - light.hallway3
+          - light.bathroom
+          - light.kitchen
+          - light.kitchen_strip
+          - light.lightroom
+          - light.spot
+          - light.table
+          - light.wc
+
+      - type: entities
+        title: Scenes
+        show_header_toggle: true
+        entities:
+          - scene.bedroom_day
+          - scene.bedroom_night
+          - scene.gateway
+          - scene.hallway_day
+          - scene.hallway_night
+          - scene.kitchen_day
+          - scene.kitchen_night
+          - scene.wc_day
+          - scene.wc_night
+
+      - type: entities
+        title: Scripts
+        show_header_toggle: true
+        entities:
+          - script.cast
+          - script.coffee_machine_on
+          - script.door_lock
+          - script.door_unlock
+          - script.house_mode_away
+          - script.media_extractor_test
+          - script.movie_time
+          - script.night_mode
+          - script.nothing
+          - script.projector_off
+          - script.restart
+          - script.spacex
+          - script.storj_information
+          - script.vacuum_bathroom
+          - script.vacuum_bedroom
+          - script.vacuum_darkroom
+          - script.vacuum_hallway
+          - script.vacuum_kitchen
+          - script.vacuum_lightroom
+          - script.vacuum_livingroom
+          - script.vacuum_mop_bathroom
+          - script.vacuum_stop
+          - script.vacuum_toilet
+
+      - type: entities
+        title: Sensors
+        show_header_toggle: true
+        entities:
+          - sensor.battery
+          - sensor.bed_activity_158d0002a51d09
+          - sensor.bob
+          - sensor.coordination_158d0002a51d09
+          - sensor.couch
+          - sensor.cpu_temp
+          - sensor.cube_last
+          - sensor.dark_sky_apparent_temperature
+          - sensor.dark_sky_daytime_high_apparent_temperature_0
+          - sensor.dark_sky_hourly_summary
+          - sensor.dark_sky_overnight_low_apparent_temperature_0
+          - sensor.dark_sky_precip_probability
+          - sensor.dark_sky_precip_probability_0
+          - sensor.dark_sky_summary
+          - sensor.dark_sky_summary_0
+          - sensor.disk_use_percent
+          - sensor.door
+          - sensor.entrance
+          - sensor.firetv
+          - sensor.house
+          - sensor.humidity_bedroom
+          - sensor.humidity_darkroom
+          - sensor.humidity_lightroom
+          - sensor.humidity_living
+          - sensor.humidity_shiny
+          - sensor.illumination_bedroom
+          - sensor.illumination_gateway
+          - sensor.illumination_hallway
+          - sensor.illumination_kitchen
+          - sensor.illumination_living
+          - sensor.illumination_wc
+          - sensor.last_boot
+          - sensor.launch
+          - sensor.load_15m
+          - sensor.load_1m
+          - sensor.load_5m
+          - sensor.location
+          - sensor.memory_use_percent
+          - sensor.plex
+          - sensor.power
+          - sensor.pressure_bedroom
+          - sensor.pressure_darkroom
+          - sensor.pressure_lightroom
+          - sensor.pressure_living
+          - sensor.pressure_shiny
+          - sensor.processor_use
+          - sensor.projector_status
+          - sensor.quote_of_the_day
+          - sensor.ralendar
+          - sensor.spacex
+          - sensor.spacex_next_launch_day
+          - sensor.spacex_next_launch_site_name_long
+          - sensor.spacex_next_launch_time
+          - sensor.spacex_next_mission_video_link
+          - sensor.spacex_next_rocket
+          - sensor.storj
+          - sensor.t_power
+          - sensor.t_today
+          - sensor.t_total_since_17_mar
+          - sensor.t_voltage
+          - sensor.t_yesterday
+          - sensor.table_pir
+          - sensor.bar_pir
+          - sensor.tautulli
+          - sensor.temperature_bedroom
+          - sensor.temperature_darkroom
+          - sensor.temperature_lightroom
+          - sensor.temperature_living
+          - sensor.temperature_shiny
+          - sensor.tilt_angle_158d0002a51d09
+          - sensor.today
+          - sensor.total_since_04_feb
+          - sensor.uptime
+          - sensor.voltage
+          - sensor.yesterday
+          - sensor.zalendar
+
+      - type: entities
+        title: Sun
+        show_header_toggle: true
+        entities:
+          - sun.sun
+
+      - type: entities
+        title: Switchs
+        show_header_toggle: true
+        entities:
+          - switch.ac
+          - switch.coffee
+          - switch.coffee_machine
+          - switch.espresso
+          - switch.projector
+          - switch.projector_esc
+          - switch.riki_s_food
+          - switch.socket
+          - switch.trantor_power
+
+      - type: entities
+        title: Vacuum
+        show_header_toggle: true
+        entities:
+          - vacuum.harry_potter
+
+      - type: entities
+        title: Zones
+        show_header_toggle: true
+        entities:
+          - zone.home
+          - zone.work

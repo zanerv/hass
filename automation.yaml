@@ -1,3 +1,98 @@
+- id: shiny
+  alias: 'shiny'
+  initial_state: True
+  trigger:
+    platform: numeric_state
+    entity_id: sensor.temperature_shiny
+    above: 30
+  action:
+    - service: notify.hass
+      data_template:
+        message: "shiny temp above 30"
+
+- id: lights_refresh
+  alias: 'lights_refresh'
+  initial_state: False
+  trigger:
+    platform: time
+    minutes: '/60'
+    seconds: 00
+  action:
+    - service: light.turn_off
+      data_template:
+        entity_id: >
+          {%- for i in states.light if i.state == 'off' -%}
+          {{- "," if not loop.first-}}{{ i.entity_id }}{{-endif-}}
+          {%- endfor -%}
+    - service: light.turn_on
+      data_template:
+        entity_id: >
+          {%- for i in states.light if i.state == 'on' -%}
+          {{- "," if not loop.first-}}{{ i.entity_id }}{{-endif-}}
+          {%- endfor -%}
+
+- id: onboot
+  alias: 'on boot'
+  initial_state: True
+  hide_entity: True
+  trigger:
+    - platform: homeassistant
+      event: start
+  action:
+    - service: homeassistant.update_entity
+      entity_id: sensor.battery
+    # - service: recorder.purge
+    #   data:
+    #     keep_days: 1
+    #     repack: true
+
+
+- id: hammock
+  alias: 'hammock'
+  initial_state: True
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.motion_living
+      to: 'on'
+      for:
+        seconds: 30
+  condition:
+    - condition: state
+      entity_id: sensor.bar_pir
+      state: 'OFF'
+      for:
+        seconds: 60
+    - condition: or
+      conditions:
+      - condition: state
+        entity_id: light.kitchen
+        state: 'on'
+      - condition: state
+        entity_id: light.kitchen_strip
+        state: 'on'
+  action:
+    - service: light.turn_off
+      entity_id: light.kitchen, light.kitchen_strip, light.bar
+
+- id: dota_auto
+  alias: 'Dota Auto'
+  initial_state: True
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.motion_living
+      to: 'on'
+      for:
+        seconds: 30
+  condition:
+    - condition: template
+      value_template: "{{ as_timestamp(now()) - as_timestamp(states.sensor.table_pir.last_changed) | int > 30 }}"
+    - condition: state
+      entity_id: light.table
+      state: 'on'
+  action:
+    - service: light.turn_off
+      entity_id: light.table
+      
 - id: cast
   alias: Cast
   initial_state: True
@@ -87,6 +182,8 @@
     - condition: state
       entity_id: binary_sensor.motion_living
       state: 'off'
+    - condition: template
+      value_template: "{{ as_timestamp(now()) - as_timestamp(states.binary_sensor.motion_living.last_changed) | int > 1200 }}"
   action:
     - service: switch.turn_off
       entity_id: switch.projector
@@ -158,8 +255,8 @@
   initial_state: True
   trigger:
     - platform: numeric_state
-      entity_id: sensor.illumination_kitchen
-      above: 80
+      entity_id: sensor.illumination_living
+      above: 70
   condition:
     - condition: state
       entity_id: light.kitchen
@@ -167,32 +264,6 @@
   action:
     - service: light.turn_off
       entity_id: light.table
-
-# - id: bedroom_lights
-  # alias: 'Bedroom Lights'
-  # initial_state: True
-  # trigger:
-    # - platform: state
-      # entity_id: binary_sensor.door_lightroom, binary_sensor.door_darkroom
-  # condition:
-    # - condition: state
-      # entity_id: input_boolean.guest
-      # state: 'off'
-  # action:
-    # # - wait_template: >
-        # # {% if is_state('binary_sensor.door_darkroom', 'on') or is_state('binary_sensor.door_lightroom', 'on') or is_state('binary_sensor.door_lightroom', 'off')%} True {% endif %}
-      # # timeout: '00:00:10'
-      # # continue_on_timeout: true
-    # - service_template: >
-        # {% if is_state('binary_sensor.door_lightroom', 'on') or is_state('binary_sensor.door_darkroom', 'on') %} light.turn_on
-        # {% else %}light.turn_off
-        # {% endif %}
-      # data_template:
-        # entity_id: >
-          # {% if trigger.entity_id  == 'binary_sensor.door_lightroom' and states.sensor.illumination_kitchen.state <= '30'%} light.lightroom
-          # {% elif trigger.entity_id  == 'binary_sensor.door_darkroom' %}light.darkroom
-          # {% else %} light.gateway
-          # {% endif %}
 
 - id: lightroom_light
   alias: 'Lightroom Light'
@@ -206,13 +277,18 @@
       state: 'off'
   action:
     - service_template: >
-        {% if trigger.to_state.state == 'on' and states.sensor.illumination_kitchen.state <= '50' %} light.turn_on
+        {% if trigger.to_state.state == 'on' and states.sensor.illumination_living.state|int <= 50 %} light.turn_on
         {% else %} light.turn_off{% endif %}
       entity_id: light.lightroom
-
+    - delay: '00:00:02'
+    - service_template: >
+        {% if trigger.to_state.state == 'on' and states.sensor.illumination_living.state|int <= 50 %} light.turn_on
+        {% else %} light.turn_off{% endif %}
+      entity_id: light.lightroom
+    
 - id: darkroom_light
   alias: 'Darkroom Light'
-  initial_state: True
+  initial_state: False
   trigger:
     - platform: state
       entity_id: binary_sensor.door_darkroom
@@ -285,13 +361,10 @@
 
 - id: movie_time
   alias: "Movie"
-  initial_state: 'on'
+  initial_state: true
   trigger:
-    - platform: state
-      entity_id: sensor.tautulli
-      to: 'play'
-      for:
-        seconds: 3
+    - platform: template
+      value_template: "{{ states.sensor.tautulli.attributes['zanerv']['Activity'] == 'playing' }}"
   condition:
     condition: and
     conditions:
@@ -310,36 +383,36 @@
   action:
     - service: light.turn_off
       entity_id: light.bob
-    - service_template: light.turn_on
+    - service: light.turn_on
       entity_id: light.spot
 
 - id: house_mode_us
   alias: "House mode us"
-  initial_state: 'on'
+  initial_state: true
   trigger:
       - platform: state
-        entity_id: device_tracker.z, device_tracker.r, device_tracker.rdell, device_tracker.rpc
+        entity_id: device_tracker.z_phone, device_tracker.r, device_tracker.rdell, device_tracker.rpc
   condition:
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.binary_sensor.door_entrance.last_changed) | int < 1800 }}"
   action:
     - service_template: >
         {% if trigger.to_state.state == 'home' %} homeassistant.turn_on
-        {% elif (states.device_tracker.rdell.state == states.device_tracker.r.state == states.device_tracker.rpc.state) or trigger.entity_id  == 'device_tracker.z' %} homeassistant.turn_off
+        {% elif (states.device_tracker.rdell.state == states.device_tracker.r.state == states.device_tracker.rpc.state) or trigger.entity_id == 'device_tracker.z_phone' %} homeassistant.turn_off
         {% else %} script.nothing
         {% endif %}
       data_template:
         entity_id: >
-          {% if trigger.entity_id  == 'device_tracker.z' %} input_boolean.z
-          {% elif trigger.entity_id  == 'device_tracker.r' or trigger.entity_id  == 'device_tracker.rdell' %} input_boolean.r
+          {% if trigger.entity_id == 'device_tracker.z_phone' %} input_boolean.z
+          {% elif trigger.entity_id == 'device_tracker.r' or trigger.entity_id == 'device_tracker.rdell' or trigger.entity_id == 'device_tracker.rpc' %} input_boolean.r
           {% endif %}
 
 - id: house_mode_Z
   alias: "House mode Z"
-  initial_state: 'on'
+  initial_state: true
   trigger:
     - platform: state
-      entity_id: device_tracker.z
+      entity_id: device_tracker.z_phone
       to: 'home'
       for:
         minutes: 3
@@ -353,7 +426,7 @@
 
 - id: house_mode_R
   alias: "House mode R"
-  initial_state: 'on'
+  initial_state: true
   trigger:
     - platform: state
       entity_id: device_tracker.r, device_tracker.rpc, device_tracker.rdell
@@ -370,7 +443,7 @@
 
 - id: house_mode_guest
   alias: "House mode guest"
-  initial_state: 'on'
+  initial_state: true
   trigger:
       - platform: state
         entity_id: group.guests
@@ -391,7 +464,7 @@
 
 - id: house_mode_away
   alias: "House mode Away"
-  initial_state: 'on'
+  initial_state: true
   trigger:
     - platform: state
       entity_id: input_boolean.z, input_boolean.r, input_boolean.guest
@@ -415,7 +488,7 @@
 
 - id: house_mode_vacation
   alias: "House mode Vacation"
-  initial_state: 'on'
+  initial_state: true
   trigger:
     - platform: state
       entity_id: input_boolean.away
@@ -434,7 +507,7 @@
   
 - id: Unknown
   alias: "Home Unknown state"
-  initial_state: 'on'
+  initial_state: true
   trigger:
       - platform: state
         entity_id: sensor.house
@@ -448,7 +521,7 @@
 
 - id: Notify_House_Mode
   alias: "Notify House Mode"
-  initial_state: 'on'
+  initial_state: true
   trigger:
     - platform: state
       entity_id: input_boolean.vacation, input_boolean.guest, input_boolean.away
@@ -457,14 +530,14 @@
       data_template:
         title: "{{now().strftime('%H:%M:%S')}}"
         message: >
-          {% if trigger.entity_id  == 'input_boolean.vacation' %} Vacation Mode is now {{states.input_boolean.vacation.state}}
-          {% elif trigger.entity_id  == 'input_boolean.away' %} Away Mode is now {{states.input_boolean.away.state}}
-          {% elif trigger.entity_id  == 'input_boolean.guest' %} Guest Mode is now {{states.input_boolean.guest.state}}
+          {% if trigger.entity_id == 'input_boolean.vacation' %} Vacation Mode is now {{states.input_boolean.vacation.state}}
+          {% elif trigger.entity_id == 'input_boolean.away' %} Away Mode is now {{states.input_boolean.away.state}}
+          {% elif trigger.entity_id == 'input_boolean.guest' %} Guest Mode is now {{states.input_boolean.guest.state}}
           {% endif %}
 
 - id: Door_lock
   alias: "Door Lock"
-  initial_state: 'on'
+  initial_state: true
   trigger:
     - platform: state
       entity_id: sensor.house
@@ -473,10 +546,16 @@
         minutes: 5
   action:
     - service: script.door_lock
+    - service: automation.turn_off
+      data_template:
+        entity_id: >
+          {%- for state in states.automation if 'ON' in state.name -%}
+          {{- ", " if not loop.first-}}{{ state.entity_id }}{{-endif-}}
+          {%- endfor -%}
     
 - id: Door_unlock
   alias: "Door Unlock"
-  initial_state: 'on'
+  initial_state: true
   trigger:
     - platform: state
       entity_id: input_boolean.away
@@ -498,7 +577,7 @@
        
 - id: zriefing
   alias: "Morning Briefing Z"
-  initial_state: 'on'
+  initial_state: true
   trigger:
     platform: time
     at: '07:00'
@@ -508,25 +587,15 @@
   action:
     - service: notify.hass
       data_template:
+        title: Today is {{ now().strftime( '%A %d %B ')}}
         message: >
-                  Today is {{ now().strftime( '%a %B %d') }}{{ "\n" }}
-                  {{ "\n" }}
-                  Outside feels like {{states('sensor.dark_sky_apparent_temperature') | round}}°, high is {{states('sensor.dark_sky_daytime_high_apparent_temperature')| round}}° with a low of {{states('sensor.dark_sky_overnight_low_apparent_temperature') | round}}°, {{states('sensor.dark_sky_template')|lower}} skies.{{ "\n" }}
-                  Forecast is {{states('sensor.dark_sky_hourly_summary')[:-1]|lower}}{{ "\n" }}
-                  {{ "\n" }}
-                  {{states('sensor.zalendar')}}{{ "\n" }}
-                  {{ "\n" }}
-                  {{states('sensor.sensor')}}{{ "\n" }}
-                  {{ "\n" }}
-                  {%- if states.sensor.quote_of_the_day == 'unknown' -%}
-                  Do or do not. There is no Try.
-                  {%- else -%}
-                  {{states.sensor.quote_of_the_day.state}}
-                  {%- endif %}
+           Outside feels like {{states('sensor.dark_sky_apparent_temperature') | round}}°{{ "\n" }}High is {{states('sensor.dark_sky_daytime_high_apparent_temperature_0')| round}}° {{ "\n" }}Low is {{states('sensor.dark_sky_overnight_low_apparent_temperature_0') | round}}°{{ "\n" }}Forecast is {{states('sensor.dark_sky_summary_0')[:-1]|lower}}{{ "\n" }}
+           {{ "\n" }}Storj: {{states.sensor.storj.state}}{{ "\n" }}{{states('sensor.zalendar')}}{{ "\n" }}
+           {{ "\n" }}{{states.sensor.quote_of_the_day.state}}
 
 - id: rriefing
   alias: "Morning Briefing R"
-  initial_state: 'off'
+  initial_state: false
   trigger:
     platform: time
     at: '07:00'
@@ -537,12 +606,12 @@
     - service: notify.hass
       data_template:
         target:
-          - !secret she_mail     
+          - !secret she_mail
         message: >
                   Today is {{ now().strftime( '%a %B %d') }}{{ "\n" }}
                   {{ "\n" }}
-                  Outside feels like {{states('sensor.dark_sky_apparent_temperature') | round}}°, high is {{states('sensor.dark_sky_daytime_high_apparent_temperature')| round}}° with a low of {{states('sensor.dark_sky_overnight_low_apparent_temperature') | round}}°, {{states('sensor.dark_sky_template')|lower}} skies.{{ "\n" }}
-                  Forecast is {{states('sensor.dark_sky_hourly_summary')[:-1]|lower}}{{ "\n" }}
+                  Outside feels like {{states('sensor.dark_sky_apparent_temperature') | round}}°, high is {{states('sensor.dark_sky_daytime_high_apparent_temperature_0')| round}}° with a low of {{states('sensor.dark_sky_overnight_low_apparent_temperature_0') | round}}°{{ "\n" }}
+                  Forecast is {{states('sensor.dark_sky_summary_0')[:-1]|lower}}{{ "\n" }}
                   {{ "\n" }}
                   {{states('sensor.ralendar')}}{{ "\n" }}
                   {{ "\n" }}
@@ -551,17 +620,6 @@
                   {%- else -%} 
                   {{states.sensor.quote_of_the_day.state}}
                   {%- endif %}
-
-
-- id: restart_firetv
-  alias: 'Restart FireTv'
-  initial_state: True
-  trigger:
-     - platform: state
-       entity_id: sensor.firetv
-  action:
-      - service: shell_command.restart_firetv
-      - delay: '00:00:20'
 
 - id: theme
   alias: 'Theme'
@@ -616,7 +674,7 @@
         entity_id: input_boolean.z
         state: 'on'
       - condition: numeric_state
-        entity_id: sensor.illumination_kitchen
+        entity_id: sensor.illumination_living
         below: 30
       - condition: state
         entity_id: sensor.couch
@@ -633,15 +691,20 @@
      - service: light.turn_on
        entity_id: light.kitchen_strip
 
-- id: Monkey
+- id: Monkey 
   alias: 'Monkey'
   initial_state: True
   trigger:
-    platform: event
-    event_type: click
-    event_data:
-      entity_id: binary_sensor.switch_monkey
-      click_type: long_click_press
+   - platform: event
+     event_type: xiaomi_aqara.click
+     event_data:
+       entity_id: binary_sensor.switch_monkey
+       click_type: double
+   - platform: event
+     event_type: xiaomi_aqara.click
+     event_data:
+       entity_id: binary_sensor.switch_monkey
+       event_type: single
   action:
     - service: input_boolean.turn_on
       data:
@@ -652,21 +715,23 @@
         ringtone_id: 10002
         ringtone_vol: 50
         
-- id: button
-  alias: Button
+- id: bedroom_toggle
+  alias: 'Bedroom Toggle'
   initial_state: true
   trigger:
    - platform: event
-     event_type: click
+     event_type: xiaomi_aqara.click
      event_data:
-       entity_id: binary_sensor.switch_living
-       event_type: click
+       entity_id: binary_sensor.switch_bedroom
+       event_type: double
+   - platform: event
+     event_type: xiaomi_aqara.click
+     event_data:
+       entity_id: binary_sensor.switch_bedroom
+       event_type: single
   action:
-    - service: xiaomi_aqara.play_ringtone
-      data_template:
-        gw_mac: !secret xg_mac
-        ringtone_vol: 10
-        ringtone_id: '{{ (range(10000, 10003)|random) }}'
+    - service: light.toggle
+      entity_id: light.bedroom
         
 - id: unavailable
   alias: 'unavailable'
@@ -697,7 +762,7 @@
       to: 'ON'
     #table
     - platform: state
-      entity_id: sensor.table_pir
+      entity_id: sensor.table_pir,sensor.bar_pir
       to: 'ON'
     #entrance
     - platform: state
@@ -705,7 +770,7 @@
       to: 'Motion'
     #kitchen, WC, Living, Hallway, couch
     - platform: state
-      entity_id: binary_sensor.motion_kitchen, binary_sensor.motion_wc, binary_sensor.motion_living, binary_sensor.motion_hallway, binary_sensor.couch, binary_sensor.door_lightroom, binary_sensor.door_darkroom, binary_sensor.door_bedroom
+      entity_id: binary_sensor.motion_wc, binary_sensor.motion_living, binary_sensor.motion_hallway, binary_sensor.couch, binary_sensor.door_lightroom, binary_sensor.door_darkroom, binary_sensor.door_bedroom
       to: 'on'
       for:
         seconds: 0.1
@@ -719,7 +784,7 @@
            {% elif trigger.entity_id == "binary_sensor.couch" %} Couch
            {% elif trigger.entity_id == "sensor.entrance" %} Entrance
            {% elif trigger.entity_id == "binary_sensor.motion_bedroom" %} Bedroom
-           {% elif trigger.entity_id == "binary_sensor.motion_kitchen" %} Kitchen
+           {% elif trigger.entity_id == "sensor.bar_pir" %} Kitchen
            {% elif trigger.entity_id == "binary_sensor.motion_wc" %} WC
            {% elif trigger.entity_id == "binary_sensor.motion_living" %} Living
            {% elif trigger.entity_id == "binary_sensor.motion_hallway" %} Hallway
@@ -729,7 +794,7 @@
            {% endif %}
 
 - id: Lazy_ON
-  alias: Lazy ON
+  alias: 'Lazy ON'
   initial_state: True
   trigger:
     - platform: state
@@ -753,14 +818,14 @@
     - service: automation.turn_off
       entity_id: automation.dota_table_on, automation.kitchen_on, automation.hallway_on
     - service: light.turn_off
-      entity_id: light.wc,light.kitchen,light.bedroom,light.kitchen_strip,light.table,light.Hallway1,light.Hallway2,light.Hallway3
+      entity_id: light.wc,light.kitchen,light.bedroom,light.kitchen_strip,light.bar,light.table,light.Hallway1,light.Hallway2,light.Hallway3
     - service: input_select.select_option
       data:
         entity_id: input_select.location
         option: Couch
 
 - id: Lazy_OFF
-  alias: Lazy OFF
+  alias: 'Lazy OFF'
   initial_state: True
   trigger:
     - platform: state
@@ -780,8 +845,8 @@
   initial_state: True
   trigger:
   - platform: state
-    entity_id: binary_sensor.motion_kitchen
-    to: 'on'
+    entity_id: sensor.bar_pir
+    to: 'ON'
     for:
       seconds: 0.1
   condition:
@@ -826,7 +891,7 @@
       data:
         target:
           - !secret she_mail
-          - !secret he_mail        
+          - !secret he_mail
         message: "Someone is snooping around the bedroom"
 
 - id: got_home
@@ -843,6 +908,12 @@
       entity_id: automation.hallway_on
     # - service: automation.turn_off
       # entity_id: automation.door_unlock
+    - service: automation.turn_on
+      data_template:
+        entity_id: >
+          {%- for state in states.automation if 'ON' in state.name -%}
+          {{- ", " if not loop.first-}}{{ state.entity_id }}{{-endif-}}
+          {%- endfor -%}
 
 - id: door
   alias: 'Door opened'
@@ -854,9 +925,8 @@
     for:
       seconds: 0.1
   condition:
-    - condition: state
-      entity_id: device_tracker.z
-      state: 'not_home'
+    - condition: template
+      value_template: "{% if states.device_tracker.z_phone.state != 'home' %}true{% endif %}"
   action:
     - service: notify.hass
       data:
@@ -867,7 +937,7 @@
         message: "Door opened"
 
 - id: Home_Alone
-  alias:  'Home Alone'
+  alias: 'Home Alone'
   initial_state: True
   trigger:
   - platform: state
@@ -889,10 +959,10 @@
         state: 'Detected'
   action:
     - service: light.turn_off
-      entity_id: light.kitchen, light.kitchen_strip, light.table, light.wc, light.hallway1, light.hallway2, light.hallway3
+      entity_id: light.kitchen, light.kitchen_strip, light.bar, light.table, light.wc, light.hallway1, light.hallway2, light.hallway3
 
 - id: Gateway_ON
-  alias:  Gateway light ON
+  alias: 'Gateway light ON'
   initial_state: True
   trigger:
   - platform: state
@@ -913,12 +983,17 @@
       entity_id: scene.gateway
 
 - id: Gateway_OFF
-  alias:  Gateway light OFF
+  alias: 'Gateway light OFF'
   initial_state: True
   trigger:
-    platform: state
+  - platform: state
     entity_id: binary_sensor.motion_hallway
     to: 'off'
+    for:
+      minutes: 5
+  - platform: state
+    entity_id: sensor.entrance
+    to: 'Still'
     for:
       minutes: 5
   action:
@@ -926,7 +1001,7 @@
       entity_id: light.gateway
 
 - id: Bedroom_ON
-  alias:  'Bedroom ON'
+  alias: 'Bedroom ON'
   initial_state: True
   trigger:
   - platform: state
@@ -939,52 +1014,27 @@
     conditions:
       - condition: template
         value_template: "{% if states.media_player.firetv.state != 'playing' %}true{% endif %}"
-      # - condition: template
-        # value_template: "{% if states.sensor.house.state != 'Z' %}true{% endif %}"
   action:
     - service: light.yeelight_set_mode
-      entity_id: light.bedroom
       data_template:
+        entity_id: light.bedroom
         mode: >
-         {% if now().strftime('%H')|int >= 22 or now().strftime('%H')|int <= 9 %} moonlight
-         {% else %}normal
-         {% endif %}        
-    - service: scene.turn_on
-      data_template:
-        entity_id: >
-         {% if now().strftime('%H')|int >= 22 or now().strftime('%H')|int <= 9 %}
-           scene.bedroom_morning
+         {% if now().strftime('%H')|int >= 22 or (now().strftime('%H')|int <= 7 and now().strftime('%M')|int <= 50) %}
+           moonlight
          {% else %}
-           scene.bedroom_night
+           normal
          {% endif %}
-
-- id: BedroomZ_on
-  alias:  'BedroomZ ON'
-  initial_state: True
-  trigger:
-  - platform: state
-    entity_id: binary_sensor.motion_bedroom
-    to: 'on'
-  condition:
-    condition: and
-    conditions:
-      - condition: state
-        entity_id: sensor.house
-        state: 'Z'
-      - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.binary_sensor.motion_kitchen.last_changed) | int < 600 }}"
-  action:
     - service: scene.turn_on
       data_template:
         entity_id: >
-         {% if now().strftime('%H')|int >= 22 or now().strftime('%H')|int <= 9 %}
-           scene.bedroom_morning
-         {% else %}
+         {% if now().strftime('%H')|int >= 22 or (now().strftime('%H')|int <= 7 and now().strftime('%M')|int <= 50) %}
            scene.bedroom_night
+         {% else %}
+           scene.bedroom_day
          {% endif %}
 
 - id: Bedroom_OFF
-  alias:  'Bedroom OFF'
+  alias: 'Bedroom OFF'
   initial_state: True
   trigger:
   - platform: state
@@ -1001,43 +1051,54 @@
       entity_id: light.bedroom
 
 - id: Kitchen_ON
-  alias:  'Kitchen ON'
+  alias: 'Kitchen ON'
   initial_state: True
   trigger:
   - platform: state
-    entity_id: binary_sensor.motion_kitchen
-    to: 'on'
+    entity_id: sensor.bar_pir
+    to: 'ON'
     # for:
       # seconds: 0.1
   condition:
       - condition: numeric_state
-        entity_id: sensor.illumination_kitchen
+        entity_id: sensor.illumination_living
         below: 30
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: light.kitchen
+          state: 'off'
+        - condition: state
+          entity_id: light.kitchen_strip
+          state: 'off'
+        - condition: state
+          entity_id: light.bar
+          state: 'off'
   action:
       - service: scene.turn_on
         data_template:
           entity_id: >
-            {% if now().strftime('%H')|int >= 0 and now().strftime('%H')|int <= 9 %}
-              scene.kitchen_morning
-            {% else %}
+            {% if now().strftime('%H')|int >= 0 and (now().strftime('%H')|int <= 7 and now().strftime('%M')|int < 50) %}
               scene.kitchen_night
+            {% else %}
+              scene.kitchen_day
             {% endif %}
 
 - id: Kitchen_OFF
-  alias:  'Kitchen OFF'
+  alias: 'Kitchen OFF'
   initial_state: True
   trigger:
   - platform: state
-    entity_id: binary_sensor.motion_kitchen
-    to: 'off'
+    entity_id: sensor.bar_pir
+    to: 'OFF'
     for:
        minutes: 5
   action:
       service: light.turn_off
-      entity_id: light.kitchen, light.kitchen_strip
+      entity_id: light.kitchen, light.kitchen_strip, light.bar
 
 - id: Dota_ON
-  alias:  'Dota Table ON'
+  alias: 'Dota Table ON'
   initial_state: True
   trigger:
   - platform: state
@@ -1050,14 +1111,14 @@
         entity_id: light.table
         state: 'off'
       - condition: numeric_state
-        entity_id: sensor.illumination_kitchen
+        entity_id: sensor.illumination_living
         below: 35
   action:
       service: light.turn_on
       entity_id: light.table
 
 - id: Dota_OFF
-  alias:  'Dota Table OFF'
+  alias: 'Dota Table OFF'
   initial_state: True
   trigger:
   - platform: state
@@ -1070,7 +1131,7 @@
       entity_id: light.table
 
 - id: Bob_ON
-  alias:  'Bob ON'
+  alias: 'Bob ON'
   initial_state: True
   trigger:
   - platform: state
@@ -1082,6 +1143,9 @@
       - condition: state
         entity_id: input_boolean.mmode
         state: 'on'
+      - condition: state
+        entity_id: light.bob
+        state: 'off'
       - condition: template
         value_template: "{% if states.sensor.house.state != 'Away' or states.sensor.house.state != 'Vacation' %}true{% endif %}"
       - condition: sun
@@ -1092,7 +1156,7 @@
       entity_id: light.bob
 
 - id: Bob_OFF
-  alias:  'Bob OFF'
+  alias: 'Bob OFF'
   initial_state: True
   trigger:
     platform: state
@@ -1100,46 +1164,69 @@
     to: 'OFF'
     for:
       minutes: 15
+  condition:
+    condition: state
+    entity_id: binary_sensor.motion_living
+    state: 'off'
+    for:
+      minutes: 15
   action:
       service: light.turn_off
       entity_id: light.bob, light.spot
 #, switch.projector
 
-- id: Hallway_ON
-  alias:  'Hallway ON'
+- id: Bob_auto_on
+  alias: 'Bob Auto on'
   initial_state: True
   trigger:
-  - platform: state     
+    platform: state
+    entity_id: sensor.bob
+    to: 'OFF'
+    for:
+      minutes: 15
+  condition:
+    condition: state
+    entity_id: input_boolean.mmode
+    state: 'off'
+  action:
+    - service: input_boolean.turn_on
+      entity_id: input_boolean.mmode
+
+- id: Hallway_ON
+  alias: 'Hallway ON'
+  initial_state: True
+  trigger:
+  - platform: state
     entity_id: sensor.entrance
     to: 'Motion'
-  - platform: state     
+  - platform: state
     entity_id: binary_sensor.motion_hallway
     to: 'on'
     for:
       seconds: 0.1
   - platform: state
-    entity_id: binary_sensor.door_bedroom, binary_sensor.door_lightroom, binary_sensor.door_darkroom
+    entity_id: binary_sensor.door_bedroom, binary_sensor.door_lightroom, binary_sensor.door_darkroom, binary_sensor.door_bathroom
     to: 'on'
   condition:
     condition: and
     conditions:
       - condition: numeric_state
         entity_id: sensor.illumination_hallway
-        below: 45
+        below: 50
       - condition: template
         value_template: "{% if states.sensor.house.state != 'Away' or states.sensor.house.state != 'Vacation' %}true{% endif %}"
   action:
     - service: scene.turn_on
       data_template:
         entity_id: >
-          {% if now().strftime('%H')|int >= 0 and now().strftime('%H')|int <= 9 %}
-            scene.hallway_morning
-          {% else %}
+          {% if now().strftime('%H')|int >= 0 and (now().strftime('%H')|int <= 7 and now().strftime('%M')|int <= 50) %}
             scene.hallway_night
+          {% else %}
+            scene.hallway_day
           {% endif %}
 
 - id: Hallway_OFF
-  alias:  'Hallway OFF'
+  alias: 'Hallway OFF'
   initial_state: True
   trigger:
   - platform: state
@@ -1169,7 +1256,7 @@
   alias: 'WC ON'
   initial_state: True
   trigger:
-  - platform: state     
+  - platform: state
     entity_id: binary_sensor.motion_wc
     to: 'on'
   condition:
@@ -1182,30 +1269,75 @@
     - service: scene.turn_on
       data_template:
         entity_id: >
-          {% if now().strftime('%H')|int >= 02 and now().strftime('%H')|int <= 09 %}scene.wc_morning
-          {% else %}scene.wc_night
+          {% if now().strftime('%H')|int >= 02 and (now().strftime('%H')|int <= 7 and now().strftime('%M')|int <= 50) %}scene.wc_night
+          {% else %}scene.wc_day
+          {% endif %}
+    - delay: '00:00:02'
+    - service: scene.turn_on
+      data_template:
+        entity_id: >
+          {% if now().strftime('%H')|int >= 02 and (now().strftime('%H')|int <= 7 and now().strftime('%M')|int <= 50) %}scene.wc_night
+          {% else %}scene.wc_day
           {% endif %}
 
 - id: WC_OFF
-  alias:  'WC OFF'
+  alias: 'WC OFF'
   initial_state: True
   trigger:
   - platform: state
     entity_id: binary_sensor.motion_wc
     to: 'off'
     for:
-      seconds: 10
+      seconds: 30
   action:
       service: light.turn_off
       entity_id: light.WC
 
+- id: Bathroom_ON
+  alias: 'Bathroom ON'
+  initial_state: True
+  trigger:
+  - platform: state
+    entity_id: sensor.bathroom_pir
+    to: 'ON'
+  action:
+    - service: light.turn_on
+      entity_id: light.bathroom
+
+- id: Bathroom_OFF
+  alias: 'Bathroom OFF'
+  initial_state: True
+  trigger:
+  - platform: state
+    entity_id: sensor.bathroom_pir
+    to: 'OFF'
+    for:
+      minutes: 5
+  - platform: state
+    entity_id: binary_sensor.door_bathroom
+    to: 'on'
+    for:
+     seconds: 30
+  condition:
+  - condition: state
+    entity_id: binary_sensor.door_bathroom
+    state: 'on'
+  - condition: state
+    entity_id: sensor.bathroom_pir
+    state: 'OFF'
+    for:
+      minutes: 1
+  action:
+      service: light.turn_off
+      entity_id: light.bathroom
+
 - id: Riki
-  alias:  'Feed ze animal 8&14&18'
+  alias: 'Feed ze animal 7:20&14&18'
   initial_state: True
   trigger: 
   - platform: time
-    hours: 08
-    minutes: 0
+    hours: 07
+    minutes: 20
     seconds: 0
   - platform: time
     hours: 14
@@ -1217,18 +1349,15 @@
     seconds: 0
   action:
       - service: switch.turn_on
-        entity_id: switch.rikis_food
-      # - delay: '00:00:07'
-      # - service: switch.turn_on
-        # entity_id: switch.rikis_food
+        entity_id: switch.riki_s_food
 
 ####Cube####
 - id: cube_rotate
-  alias: Cube rotate
+  alias: 'Cube rotate'
   initial_state: True
   trigger:
     platform: event
-    event_type: cube_action
+    event_type: xiaomi_aqara.cube_action
     event_data:
       entity_id: binary_sensor.cube
       action_type: rotate
@@ -1237,11 +1366,11 @@
       entity_id: group.guster
 
 - id: tap_twice
-  alias: Cube tap
+  alias: 'Cube tap'
   initial_state: True
   trigger:
     platform: event
-    event_type: cube_action
+    event_type: xiaomi_aqara.cube_action
     event_data:
       entity_id: binary_sensor.cube
       action_type: tap_twice
@@ -1249,27 +1378,27 @@
     - service: input_boolean.turn_off
       entity_id: input_boolean.mmode
     - service: light.turn_off
-      entity_id: light.kitchen, light.kitchen_strip, light.table, light.bob
+      entity_id: light.kitchen, light.kitchen_strip, light.table, light.bob, light.bar
 
 - id: flip90
-  alias: Cube flip90
+  alias: 'Cube flip90'
   initial_state: True
   trigger:
     platform: event
-    event_type: cube_action
+    event_type: xiaomi_aqara.cube_action
     event_data:
       entity_id: binary_sensor.cube
       action_type: flip90
   action:
     - service: light.toggle
-      entity_id: light.kitchen,light.kitchen_strip
+      entity_id: light.kitchen,light.kitchen_strip,light.bar
 
 - id: flip180
-  alias: Cube flip180
+  alias: 'Cube flip180'
   initial_state: True
   trigger:
     platform: event
-    event_type: cube_action
+    event_type: xiaomi_aqara.cube_action
     event_data:
       entity_id: binary_sensor.cube
       action_type: flip180
@@ -1278,11 +1407,11 @@
       entity_id: light.table 
 
 - id: free_fall
-  alias: Cube toggle
+  alias: 'Cube toggle'
   initial_state: True
   trigger:
     platform: event
-    event_type: cube_action
+    event_type: xiaomi_aqara.cube_action
     event_data:
       entity_id: binary_sensor.cube
       action_type: free_fall
@@ -1296,11 +1425,11 @@
       entity_id: light.bob
 
 - id: shake_air
-  alias: Cube shake
+  alias: 'Cube shake'
   initial_state: True
   trigger:
     platform: event
-    event_type: cube_action
+    event_type: xiaomi_aqara.cube_action
     event_data:
       entity_id: binary_sensor.cube
       action_type: shake_air
@@ -1309,11 +1438,11 @@
       entity_id: light.spot
 
 - id: shake_air_bob
-  alias: Cube shake bob 
+  alias: 'Cube shake bob'
   initial_state: True
   trigger:
     platform: event
-    event_type: cube_action
+    event_type: xiaomi_aqara.cube_action
     event_data:
       entity_id: binary_sensor.cube
       action_type: shake_air
@@ -1324,12 +1453,12 @@
       entity_id: input_boolean.mmode
 
 - id: move
-  alias: Cube move
+  alias: 'Cube move'
   initial_state: False
   hide_entity: True
   trigger:
     platform: event
-    event_type: cube_action
+    event_type: xiaomi_aqara.cube_action
     event_data:
       entity_id: binary_sensor.cube
       action_type: move
@@ -1349,26 +1478,22 @@
   hide_entity: True
   trigger:
     platform: event
-    event_type: cube_action
+    event_type: xiaomi_aqara.cube_action
     event_data:
       entity_id: binary_sensor.cube
       action_type: alert
   action:
-    - service: notify.hass        
+    - service: notify.hass
       data_template:
         title: test
-        message: >
-                  Today is {{ now().strftime( '%a %d-%B') }}{{ "\n" }}
-                  {{ "\n" }}
-                  Outside feels like {{states('sensor.dark_sky_apparent_temperature') | round}}°, high is {{states('sensor.dark_sky_daytime_high_apparent_temperature')| round}}° with a low of {{states('sensor.dark_sky_overnight_low_apparent_temperature') | round}}°, {{states('sensor.dark_sky_template')|lower}} skies.{{ "\n" }}
-                  Tonight's forecast is  {{states('sensor.dark_sky_hourly_summary')[:-1]|lower}}{{ "\n" }}
+        message: "{{now().strftime('%H')}}"
 
 - id: swing
   alias: 'Cube Swing'
   initial_state: True
   trigger:
     platform: event
-    event_type: cube_action
+    event_type: xiaomi_aqara.cube_action
     event_data:
       entity_id: binary_sensor.cube
       action_type: swing
@@ -1418,11 +1543,14 @@
     - service: input_boolean.turn_on
       entity_id: input_boolean.mmode
 
-- id: space_x_launch_notify
+- id: launch_notify
+  initial_state: True
   alias: Launch Notify
   trigger:
     - platform: template
       value_template: '{{ (now().strftime("%s") | int + 600) == (states.sensor.spacex.state | int) }}'
+    - platform: template
+      value_template: '{{ (now().strftime("%s") | int + 600) == (as_timestamp(states.sensor.launch.attributes.launch_time) | int) }}'
   action:
     - service: script.spacex
 
@@ -1432,4 +1560,3 @@
   initial_state: false
   trigger:
   action:
-

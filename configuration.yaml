@@ -14,6 +14,8 @@ homeassistant:
   customize: !include customizes.yaml
   packages: !include_dir_named packages/
   
+map:
+
 #logger:
 #  default: debug
 influxdb:
@@ -22,14 +24,19 @@ influxdb:
        - sensor.bob
        - sensor.table_pir
        - sensor.entrance
+       - sensor.bar_pir
+       - sensor.time
+       - sun.sun
 
 recorder:
   db_url: !secret db_url
+  purge_interval: 1
+  purge_keep_days: 1
 
 panel_iframe:
   editor:
-    title: Editor
-    icon: mdi:creation
+    title: IDE
+    icon: mdi:code-braces
     url: !secret url
 
 # Enables the frontend
@@ -107,7 +114,7 @@ logbook:
   exclude:
     entities:
       - automation.last_movement
-
+      - sensor.bar_pir
 # Enables a map showing the location of tracked devices
 #map:
 
@@ -131,11 +138,9 @@ media_player:
     # use_episode_art: true
 
   - platform: firetv
-    device: default
     name: FireTV
     host: !secret firetv_host
-    port: !secret firetv_port
-    
+    adbkey: "/config/adb/adbkey"
 
 device_tracker:
   # - platform: snmp
@@ -149,6 +154,8 @@ device_tracker:
       - !secret nmap_hosts
     home_interval: 5
     interval_seconds: 20
+#  - platform: googlehome
+#    host: !secret ghome
 
 notify: !include notify.yaml
 
@@ -160,8 +167,6 @@ input_boolean: !include input_boolean.yaml
 
 cloud: !include cloud.yaml
 
-alert: !include alert.yaml
-  
 scene: !include scenes.yaml
 
 automation: !include automation.yaml
@@ -182,26 +187,31 @@ input_select: !include input_select.yaml
 
 shell_command: !include shell_command.yaml
 
-calendar:
-  - platform: caldav
-    username: !secret n_user
-    password: !secret n_pass
-    url: !secret n_url
-    custom_calendars:
-      - name: 'Birthday'
-        calendar: 'Android'
-        search: '.*Birthday.*'
+zone: !include zone.yaml
+# calendar:
+  # - platform: caldav
+    # username: !secret n_user
+    # password: !secret n_pass
+    # url: !secret n_url
+    # custom_calendars:
+      # - name: 'Birthday'
+        # calendar: 'Android'
+        # search: '.*Birthday.*'
 
 input_datetime:
-  both_date_and_time:
-    name: Input with both date and time
-    has_date: true
-    has_time: true
-  only_date:
-    name: Input with only date
-    has_date: true
-    has_time: false
-  only_time:
-    name: Input with only time
-    has_date: false
-    has_time: true
+  # both_date_and_time:
+    # name: Input with both date and time
+    # has_date: true
+    # has_time: true
+  # only_date:
+    # name: Input with only date
+    # has_date: true
+    # has_time: false
+ morning:
+   name: Morning
+   has_date: false
+   has_time: true
+ night:
+   name: Night
+   has_date: false
+   has_time: true

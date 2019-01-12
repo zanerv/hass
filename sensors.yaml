@@ -1,25 +1,23 @@
+- platform: launch_library
+  name: Launch
+
+- platform: time_date
+  display_options:
+  - 'time'
+      
 - platform: command_line
   name: Door
-  command: /bin/bash -c "/config/adb/adb.sh shell cat /storage/sdcard0/Android/data/com.xiaomi.smarthome/files/SherlockLog/$(date +%Y%m%d.log)|grep mOperateCommandType|tail -1| grep -oP '(?<=mOperateCommandType:).*?(?=\r)'||echo unknown"
-
-# - platform: command_line
-  # name: UPC
-  # command:  /bin/bash -c "/config/upc.sh"
-  # scan_interval: 1200
+  command: /bin/bash -c "adb shell cat /storage/sdcard0/Android/data/com.xiaomi.smarthome/files/SherlockLog/$(date +%Y%m%d.log)|grep mOperateCommandType|tail -1| grep -oP '(?<=mOperateCommandType:).*?(?=\r)'||echo unknown"
 
 - platform: command_line
   name: storj
   command: /bin/bash -c "/config/storj_sensor.sh"
   scan_interval: 9000
 
-- platform: command_line
-  hidden: true
-  name: firetv
-  command: "egrep 'rror while setting up platform firetv|Update for media_player.firetv fails' /config/home-assistant.log | wc -l"
-
 - platform: template
   sensors:
     battery:
+      entity_id: binary_sensor.door_bedroom
       icon_template: >
         {% if states.sensor.battery.state != '' %}mdi:battery-alert
         {% else %}mdi:battery
@@ -56,34 +54,6 @@
     cube_last:
       friendly_name: "Cube"
       value_template: '{{ states.binary_sensor.cube.attributes.last_action }}'
-    dark_sky_template:
-      value_template: "{{ states('sensor.dark_sky_summary') }}"
-      icon_template: >
-        {% if is_state('sensor.dark_sky_icon', 'clear-day') %}
-          mdi:weather-sunny
-        {% elif is_state('sensor.dark_sky_icon', 'clear-night') %}
-          mdi:weather-night
-        {% elif is_state('sensor.dark_sky_icon', 'rain') %}
-          mdi:weather-rainy
-        {% elif is_state('sensor.dark_sky_icon', 'snow') %}
-          mdi:weather-snowy
-        {% elif is_state('sensor.dark_sky_icon', 'sleet') %}
-          mdi:weather-snowy-rainy
-        {% elif is_state('sensor.dark_sky_icon', 'wind') %}
-          mdi:weather-windy-variant
-        {% elif is_state('sensor.dark_sky_icon', 'fog') %}
-          mdi:weather-fog
-        {% elif is_state('sensor.dark_sky_icon', 'cloudy') %}
-          mdi:weather-cloudy
-        {% elif is_state('sensor.dark_sky_icon', 'partly-cloudy-day') or is_state('sensor.dark_sky_icon', 'partly-cloudy-night') %}
-          mdi:weather-partlycloudy
-        {% elif is_state('sensor.dark_sky_icon', 'hail') %}
-          mdi:weather-hail
-        {% elif is_state('sensor.dark_sky_icon', 'thunderstorm') %}
-          mdi:weather-lightning
-        {% else %}
-          mdi:help-circle
-        {% endif %}
     couch:
       value_template: "{% if is_state('binary_sensor.couch', 'off') %}Detected{% else %}Clear{% endif %}"
     projector_status:
@@ -106,18 +76,29 @@
             # {% endif %}
         # {% endfor %}
     
-#- platform: waze_travel_time
-#  name: "Travel Time"
-#  origin: !secret waze_origin
-#  destination: !secret waze_destination
-#  origin: !secret waze_origin_gps
-#  destination: !secret waze_destination_gps
-#  region: 'EU'
-- platform: mqtt
+- platform: waze_travel_time
+  name: "Travel Time"
+  origin: !secret waze_origin
+  destination: !secret waze_destination
+  # origin: !secret waze_origin_gps
+  # destination: !secret waze_destination_gps
+  region: 'EU'
+  
+- platform: tautulli
   name: "Tautulli"
-  state_topic: "plex/player/"
-  value_template: "{{ value_json.body }}"
+  host: !secret tau_host
+  port: 80
+  api_key: !secret tau_api
+  monitored_users: zanerv
 
+- platform: mqtt
+  name: "bar pir"
+  state_topic: "cmnd/bar/PIR/POWER2"
+  
+- platform: mqtt
+  name: "bathroom pir"
+  state_topic: "cmnd/bathroom/PIR/POWER1"
+  
 - platform: mqtt
   name: "table pir"
   state_topic: "table/PIR/cmnd/POWER1"
@@ -196,10 +177,6 @@
   name: entrance
   state_topic: "home/niggers/hallway1"
 
-- platform: plex
-  host: !secret plex_host
-  token: !secret plex_token
-
 - platform: systemmonitor
   resources:
      - type: disk_use_percent
@@ -217,25 +194,16 @@
   unit_of_measurement: "°C"
   value_template: '{{ (value | multiply(0.001)) | round(1) }}'
 
-- platform: yr
-  forecast: 24
-  monitored_conditions:
-     - temperature
-     - symbol
-     - precipitation
-     - windSpeed
-     - cloudiness
-
 - platform: darksky
   api_key: !secret darksky_api
+  forecast:
+   - 0
   monitored_conditions:
-      - summary
-      - icon
       - apparent_temperature
-      - cloud_cover
-      - hourly_summary
       - apparent_temperature_high
       - apparent_temperature_low
+      - summary
+      - hourly_summary
       - precip_probability
 
 - platform: command_line
@@ -281,3 +249,14 @@
     spacex_next_launch_site_name_long:
       friendly_name: 'Launch Site'
       value_template: '{{ states.sensor.spacex.attributes["launch_site"]["site_name_long"] }}'
+
+    launch_day:
+      friendly_name: 'Launch Day'
+      value_template: '{{ as_timestamp(states.sensor.launch.attributes.launch_time) | int | timestamp_custom("%d.%m.%Y")}}'
+    launch_time:
+      friendly_name: 'Launch Time'
+      value_template: '{{ as_timestamp(states.sensor.launch.attributes.launch_time) | int | timestamp_custom("%H:%M")}}'
+      unit_of_measurement: 'h'
+    mission_video_link:
+      friendly_name: 'Mission Video Link'
+      value_template: '{{states.sensor.launch.attributes.stream}}'

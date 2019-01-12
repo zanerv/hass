@@ -5,17 +5,14 @@ play:
   initial: off
 
 mmode:
-  initial: on
 
 vacation:
   name: Vacation
   icon: mdi:sunglasses
-  initial: off
 
 away:
   name: Away
   icon: mdi:account-off
-  initial: off  
 
 r:
   name: !secret she

@@ -30,16 +30,16 @@
       transition: 1000
       save_on_change: False
       use_music_mode: True
-    !secret Joe:
-      name: Joe
+    !secret Bathroom:
+      name: Bathroom
       transition: 1000
       save_on_change: False
       use_music_mode: True
-    !secret DarkRoom:
-      name: DarkRoom
-      transition: 1000
-      save_on_change: False
-      use_music_mode: True
+    # !secret DarkRoom:
+    #   name: DarkRoom
+    #   transition: 1000
+    #   save_on_change: False
+    #   use_music_mode: True
     !secret LightRoom:
       name: LightRoom
       transition: 1000
@@ -63,6 +63,19 @@
   payload_off: "OFF"
   payload_available: "Online"
   payload_not_available: "Offline"
+
+- platform: mqtt
+  name: "Bar"
+  state_topic: "stat/bar/RESULT"
+  state_value_template: "{{value_json.POWER}}"
+  command_topic: "cmnd/bar/POWER"
+  availability_topic: "tele/bar/LWT"
+  qos: 1
+  payload_on: "ON"
+  payload_off: "OFF"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+  retain: false
 
 - platform: mqtt
   name: "spot"

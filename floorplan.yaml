@@ -38,8 +38,10 @@
              - light.table
              - light.bedroom
              - light.wc
+             - light.bathroom
              - light.lightroom
              - light.darkroom
+             - light.bar
              - group.hallway_light
              - light.bob
           states:
@@ -56,6 +58,7 @@
             - light.entrance
             - binary_sensor.door_lightroom
             - binary_sensor.window_lightroom
+            - binary_sensor.door_bathroom
             - binary_sensor.door_darkroom
             - binary_sensor.door_bedroom
             - binary_sensor.door_entrance
@@ -76,6 +79,7 @@
           entities:
             - binary_sensor.couch
             - sensor.table_pir
+            - sensor.bar_pir
             - sensor.bob
             - binary_sensor.motion_wc
           states:
@@ -93,6 +97,18 @@
               to_state: 'off'
               duration: 10
 
+        - name: Spot
+          entities:
+            - light.spot
+          states:
+            - state: 'on'
+              class: 'couch-on'
+            - state: 'off'
+              class: 'couch-off'
+          action:
+            domain: homeassistant   # This optional parameter allows you to use other services such as homeassistant.toggle like here.
+            service: toggle
+            
         - name: Couch sensors
           entities:
             - binary_sensor.couch
@@ -110,7 +126,6 @@
         - name: Motion sensors
           entities:
             - binary_sensor.motion_living
-            - binary_sensor.motion_kitchen
             - binary_sensor.motion_hallway
             - binary_sensor.motion_bedroom
           states:
@@ -142,6 +157,21 @@
               to_state: 'Motion'
               duration: 10
 
+        - name: PIR sensors
+          entities:
+            - sensor.bar_pir
+            - sensor.bathroom_pir
+          states:
+            - state: 'OFF'
+              class: 'steps-off'
+            - state: 'ON'
+              class: 'steps-on'
+          state_transitions:
+            - name: On to off
+              from_state: 'OFF'
+              to_state: 'ON'
+              duration: 10
+
         - name: Media Player
           entities:
             - media_player.firetv
@@ -152,6 +182,9 @@
               # class: 'info-background'
               class: 'couch-off'
             - state: 'on'
+              # class: 'warning-background'
+              class: 'couch-on'
+            - state: 'playing'
               # class: 'warning-background'
               class: 'couch-on'
 #10c4e6

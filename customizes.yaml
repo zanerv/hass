@@ -1,3 +1,5 @@
+sensor.time:
+  hidden: true
 binary_sensor.floorplan:
   custom_ui_state_card: state-card-floorplan
   config: !include floorplan.yaml
@@ -26,7 +28,7 @@ binary_sensor.floorplan:
   # friendly_name: "Kitchen Strip"
   # hidden: true
 # light.yeelight_color2_7c49eb1dd7ce:
-  # friendly_name: "Joe Light"
+  # friendly_name: "Bathroom Light"
   # hidden: true
 # light.yeelight_color2_7c49ebaccfa2:
   # friendly_name: "Bob Light"
@@ -70,8 +72,8 @@ sensor.zalendar:
 sensor.ralendar:
   hidden: true
 
-binary_sensor.switch_living:
-  friendly_name: "Button"
+binary_sensor.switch_bedroom:
+  friendly_name: "Bedroom Button"
   hidden: true
 
 sensor.firetv:
@@ -124,6 +126,15 @@ sensor.spacex_next_mission_video_link:
 sensor.spacex:
   hidden: true
 
+sensor.launch_day:
+  icon: mdi:calendar
+  
+sensor.launch_time:
+  icon: mdi:clock-outline
+  
+sensor.mission_video_link:
+  icon: mdi:message-video
+  
 sensor.entrance:
   friendly_name: "Entrance"
   icon: mdi:walk
@@ -138,6 +149,14 @@ sensor.entrance:
 sensor.table_pir:
   icon: mdi:walk
   friendly_name: "Table"
+  
+sensor.bathroom_pir:
+  icon: mdi:walk
+  friendly_name: "Bathroom"
+
+sensor.bar_pir:
+  icon: mdi:walk
+  friendly_name: "Bar"
 
 light.kitchen:
   icon: mdi:ceiling-light
@@ -158,7 +177,7 @@ binary_sensor.motion_hallway:
   friendly_name: "Hallway"
 
 binary_sensor.motion_kitchen:
-  friendly_name: "Kitchen"
+  friendly_name: "Kitchen old"
 
 binary_sensor.motion_wc:
   friendly_name: "WC"
@@ -218,7 +237,7 @@ sensor.today:
   icon: mdi:gauge-empty
 sensor.yesterday:
   icon: mdi:gauge
-sensor.total_since_04feb:
+sensor.total_since_04_feb:
   icon: mdi:gauge-full
 sensor.t_voltage:
   friendly_name: "Voltage"
@@ -232,22 +251,15 @@ sensor.t_today:
 sensor.t_yesterday:
   friendly_name: "Yesterday"
   icon: mdi:gauge
-sensor.t_total_since_17mar:
+sensor.t_total_since_17_mar:
   friendly_name: "Total sience 17/Mar"
   icon: mdi:gauge-full
 
 sensor.plex:
   icon: mdi:plex
 
-sensor.tautulli:
-  hidden: true
-
 sensor.cpu_temperature:
   icon: mdi:temperature-celsius
-
-sensor.yr_cloudiness:
-  friendly_name: Cloud Level
-  icon: mdi:cloud
 
 group.all_scripts:
   control: hidden
@@ -279,7 +291,7 @@ group.all_devices:
   hidden: false
   friendly_name: "Devices"
 
-switch.rikis_food:
+switch.riki_s_food:
   icon: mdi:cat
 
 switch.bob:
@@ -296,44 +308,8 @@ cover.bob:
   assumed_state: true
   icon: mdi:sofa
   
-sensor.yr_precipitation:
-  friendly_name: "Precipitation"
-  icon: mdi:weather-rainy
-sensor.yr_symbol:
-  friendly_name: "Sky"
-  hidden: true
-sensor.yr_temperature:
-  friendly_name: "Temperature"
-sensor.yr_wind_speed:
-  friendly_name: "Wind"
-  icon: mdi:weather-windy-variant
 sensor.standby:
   icon: mdi:power-settings
-
-sensor.dark_sky_apparent_temperature:
-  friendly_name: "Feels like"
-sensor.dark_sky_daytime_high_apparent_temperature:
-  friendly_name: 'Daily High'
-  icon: mdi:thermometer
-sensor.dark_sky_overnight_low_temperature:
-  friendly_name: 'Daily Low'
-  icon: mdi:thermometer
-sensor.dark_sky_humidity:
-  friendly_name: 'Current Humidity'
-sensor.dark_sky_temperature:
-  friendly_name: 'Current Temperature'
-sensor.dark_sky_daily_summary:
-  friendly_name: 'Daily Summary'
-sensor.dark_sky_cloud_coverage:
-  friendly_name: 'Cloud Coverage'
-sensor.dark_sky_overnight_low_apparent_temperature:
-  friendly_name: 'Overnight Low'
-sensor.dark_sky_precip_probability:
-  friendly_name: 'Precip Probability'
-sensor.dark_sky_hourly_summary:
-  friendly_name: 'Hourly Summary'
-sensor.dark_sky_minutely_summary:
-  friendly_name: 'Summary'
 
 switch.coffee_machine:
   icon: mdi:power-settings
@@ -341,23 +317,6 @@ switch.espresso:
   icon: mdi:coffee
 switch.coffee:
   icon: mdi:coffee-outline
-
-sensor.dark_sky_template:
-  friendly_name: "Sky"
-sensor.dark_sky_icon:
-  hidden: true
-sensor.cup:
-  hidden: true
-sensor.dark_sky_summary:
-  hidden: true
-sensor.cup_template:
-  friendly_name: "Cup"
-switch.fortys:
-  icon: mdi:pizza
-switch.caruso:
-  icon: mdi:pizza
-switch.holiday:
-  icon: mdi:food
 
 input_boolean.z_tasker:
   hidden: true
@@ -371,3 +330,19 @@ sensor.location:
 sensor.house:
   icon: mdi:home-assistant
   friendly_name: "Status"
+sensor.dark_sky_apparent_temperature:
+  friendly_name: "Feels like"
+sensor.dark_sky_daytime_high_apparent_temperature_0:
+  friendly_name: 'High is'
+sensor.dark_sky_overnight_low_apparent_temperature_0:
+  friendly_name: 'Low is'
+sensor.dark_sky_hourly_summary:
+  hidden: true
+sensor.dark_sky_summary:
+  hidden: true
+sensor.dark_sky_precip_probability:
+  hidden: true
+sensor.dark_sky_summary_0:
+  friendly_name: 'Summary'
+sensor.dark_sky_precip_probability_0:
+  friendly_name: 'Precip'
