@@ -60,8 +60,8 @@
   entities:
     light.wc:
       state: on
-      brightness_pct: 100
-      rgb_color: [255,200,155]
+      brightness: 255
+      rgb_color: [255,244,233]
 
 - name: Gateway
   entities:

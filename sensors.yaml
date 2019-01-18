@@ -8,7 +8,8 @@
 - platform: command_line
   name: Door
   command: /bin/bash -c "adb shell cat /storage/sdcard0/Android/data/com.xiaomi.smarthome/files/SherlockLog/$(date +%Y%m%d.log)|grep mOperateCommandType|tail -1| grep -oP '(?<=mOperateCommandType:).*?(?=\r)'||echo unknown"
-
+  scan_interval: 900
+  
 - platform: command_line
   name: storj
   command: /bin/bash -c "/config/storj_sensor.sh"
@@ -90,6 +91,18 @@
   port: 80
   api_key: !secret tau_api
   monitored_users: zanerv
+
+
+- platform: mqtt
+  name: "Bed Occupancy"
+  state_topic: "/room/bedroom/bed/load"
+  icon: mdi:hotel
+
+- platform: mqtt
+  name: "Bed Mass"
+  state_topic: "/room/bedroom/bed/mass"
+  unit_of_measurement: "kg"
+  icon: mdi:scale
 
 - platform: mqtt
   name: "bar pir"
@@ -193,6 +206,7 @@
   command: "cat /sys/class/thermal/thermal_zone0/temp"
   unit_of_measurement: "°C"
   value_template: '{{ (value | multiply(0.001)) | round(1) }}'
+  scan_interval: 600
 
 - platform: darksky
   api_key: !secret darksky_api

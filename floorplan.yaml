@@ -161,6 +161,7 @@
           entities:
             - sensor.bar_pir
             - sensor.bathroom_pir
+            - sensor.bed_occupancy
           states:
             - state: 'OFF'
               class: 'steps-off'

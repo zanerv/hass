@@ -14,25 +14,6 @@ homeassistant:
   customize: !include customizes.yaml
   packages: !include_dir_named packages/
   
-map:
-
-#logger:
-#  default: debug
-influxdb:
-  exclude:
-    entities:
-       - sensor.bob
-       - sensor.table_pir
-       - sensor.entrance
-       - sensor.bar_pir
-       - sensor.time
-       - sun.sun
-
-recorder:
-  db_url: !secret db_url
-  purge_interval: 1
-  purge_keep_days: 1
-
 panel_iframe:
   editor:
     title: IDE
@@ -114,9 +95,32 @@ logbook:
   exclude:
     entities:
       - automation.last_movement
+      - automation.bed_set
+      - automation.bed_clear
+      - sensor.bed_mass
       - sensor.bar_pir
+
+logger:
+  default: debug
+
+influxdb:
+  exclude:
+    entities:
+       - sensor.bob
+       - sensor.table_pir
+       - sensor.entrance
+       - sensor.bar_pir
+       - sensor.time
+       - sun.sun
+       - sensor.bed_mass
+
+recorder:
+  db_url: !secret db_url
+  purge_interval: 1
+  purge_keep_days: 1
+
 # Enables a map showing the location of tracked devices
-#map:
+map:
 
 # Track the sun
 sun:

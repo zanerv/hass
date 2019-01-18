@@ -29,3 +29,8 @@ z_tasker:
 guest:
   name: Guest
   icon: mdi:account-box
+
+# in_bed:
+#   name: Bed Occupancy
+#   initial: off
+#   icon: mdi:hotel

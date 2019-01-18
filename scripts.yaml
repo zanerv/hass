@@ -158,7 +158,7 @@ door_lock:
 door_unlock:
   alias: Door Unlock
   sequence:
-    # - service: shell_command.unlock
+    - service: shell_command.unlock
     - service: notify.hass
       data:
         title: "{{now().strftime('%H:%M:%S')}}"
@@ -279,4 +279,12 @@ launch:
         message: >
           Location: {{ states.sensor.launch.state }}
             ├─ Start Time: {{ states.sensor.launch_time.state }}
-            └─ Link:   {{ states.sensor.mission_video_link }}
+            └─ Link:  {{ states.sensor.mission_video_link.state }}
+
+zero_bed:
+  alias: Tare Bed
+  sequence:
+    - service: mqtt.publish
+      data_template:
+        topic: "/room/bedroom/bed/tare"
+        payload: '0'
