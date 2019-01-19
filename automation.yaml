@@ -38,7 +38,6 @@
     state: 'off'
   - condition: template
     value_template: "{{ states.sensor.bed_occupancy.state == 'ON' and states.binary_sensor.couch.state == 'off' }}"
-
   action:
     - service:  automation.turn_off
       data_template:
@@ -47,29 +46,32 @@
           {{- ", " if not loop.first-}}{{ state.entity_id }}{{-endif-}}
           {%- endfor -%}
     
-- alias: Bed Occupied Tasks
+- id: 'in_bed'
+  alias: In bed
+  initial_state: True
   trigger:
     - platform: state
       entity_id: sensor.bed_occupancy
       to: 'ON'
-    - platform: time
-      hours: 00
-      minutes: 0
-      seconds: 0
   condition:
-  - condition: time
-    after: '23:00:00'
-    before: '06:00:00'
   - condition: state
     entity_id: input_boolean.guest
     state: 'off'
+  - condition: state
+    entity_id: group.lights
+    state: 'on'
+  - condition: numeric_state
+    entity_id: sensor.bed_mass
+    above: 30
   action:
     - service: light.turn_off
       entity_id: group.lights
       data:
         transition: 10
 
-- alias: start spotify
+- id: 'start_spotify'
+  alias: start spotify
+  initial_state: True
   trigger:
     - platform: state
       entity_id: input_boolean.away
@@ -1059,6 +1061,8 @@
       data_template:
         entity_id: >
          {% if now().strftime('%H')|int >= 22 or (now().strftime('%H')|int <= 7 and now().strftime('%M')|int <= 50) %}
+           scene.bedroom_night
+         {% elif trigger.entity_id == 'sensor.bed_occupancy' and (as_timestamp(now()) - as_timestamp(states.light.bedroom.last_changed) | int > 7200) %}
            scene.bedroom_night
          {% else %}
            scene.bedroom_day
