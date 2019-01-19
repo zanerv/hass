@@ -1103,15 +1103,15 @@
         below: 30
       - condition: or
         conditions:
-        - condition: state
-          entity_id: light.kitchen
-          state: 'off'
-        - condition: state
-          entity_id: light.kitchen_strip
-          state: 'off'
-        - condition: state
-          entity_id: light.bar
-          state: 'off'
+         - condition: state
+           entity_id: light.kitchen
+           state: 'off'
+         - condition: state
+           entity_id: light.kitchen_strip
+           state: 'off'
+         - condition: state
+           entity_id: light.bar
+           state: 'off'
   action:
       - service: scene.turn_on
         data_template:
