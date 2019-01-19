@@ -43,17 +43,16 @@ night_mode:
           state.entity_id != 'switch.trantor_power'-%}
           {{- "," if not loop.first-}}{{ state.entity_id }}{{-endif-}}
           {%- endfor -%}
+    - service: media_player.turn_on
+      data_template:
+        entity_id: >
+          {% if states.media_player.firetv.state == 'off' and states.sensor.bed_occupancy.state == 'OFF' %} media_player.firetv
+          {% endif %}
     - delay: "00:01:00"
     - service: input_boolean.turn_on
       entity_id: input_boolean.mmode
     - service: light.turn_off
       entity_id: light.kitchen
-    
-    # - service: media_player.play_media
-      # data:
-        # entity_id: media_player.living_room_speaker
-        # media_content_id: !secret good_night_wav
-        # media_content_type: music
 
 projector_off:
   alias: Turn Projector OFF
