@@ -30,7 +30,6 @@ guest:
   name: Guest
   icon: mdi:account-box
 
-# in_bed:
-#   name: Bed Occupancy
-#   initial: off
-#   icon: mdi:hotel
+sleep:
+  name: Sleep
+  icon: mdi:hotel

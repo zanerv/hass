@@ -92,6 +92,9 @@
   api_key: !secret tau_api
   monitored_users: zanerv
 
+- platform: min_max
+  entity_ids:
+  - sensor.bed_mass
 
 - platform: mqtt
   name: "Bed Occupancy"

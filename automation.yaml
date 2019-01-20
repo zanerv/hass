@@ -1,5 +1,47 @@
+#{{ distance('device_tracker.r_phone', 'device_tracker.z_phone') }}
+- id: Sleep
+  alias: 'Sleep'
+  initial_state: true
+  trigger:
+    - platform: template
+      value_template: '{{ (as_timestamp(now()) - as_timestamp(states.light.bedroom.last_changed) | int > 10800) and states.sensor.bed_occupancy == "ON" }}'
+  condition:
+    - condition: state
+      entity_id: input_boolean.sleep
+      state: 'off'
+  action:
+    - service: input_boolean.turn_on
+      data:
+        entity_id: input_boolean.sleep
+    - service: notify.hass
+      data_template:
+        message: 'sleeping much'
+
+- id: Good_morning
+  alias: 'Good morning'
+  initial_state: true
+  trigger:
+    - platform: state
+      entity_id: sensor.bed_occupancy
+      to: 'OFF'
+      for:
+        seconds: 5
+  condition:
+    - condition: state
+      entity_id: input_boolean.sleep
+      state: 'on'
+  action:
+    - service: input_boolean.turn_off
+      data:
+        entity_id: input_boolean.sleep
+    - service: switch.turn_on
+      entity_id: switch.coffee_machine
+    - service: notify.hass
+      data_template:
+        message: 'good morning'
+    
 - id: automations_on
-  alias: "automations on"
+  alias: 'automations on'
   initial_state: true
   trigger:
     - platform: state
@@ -11,19 +53,19 @@
       for:
         seconds: 5
   condition:
-  - condition: state
-    entity_id: input_boolean.guest
-    state: 'off'
+    - condition: state
+      entity_id: input_boolean.guest
+      state: 'off'
   action:
-    - service:  automation.turn_on
+    - service: automation.turn_on
       data_template:
         entity_id: >
           {%- for state in states.automation if 'ON' in state.name -%}
           {{- ", " if not loop.first-}}{{ state.entity_id }}{{-endif-}}
           {%- endfor -%}
-    
+
 - id: automations_off
-  alias: "automations off"
+  alias: 'automations off'
   initial_state: true
   trigger:
     - platform: state
@@ -33,61 +75,71 @@
       entity_id: binary_sensor.couch
       to: 'off'
   condition:
-  - condition: state
-    entity_id: input_boolean.guest
-    state: 'off'
-  - condition: template
-    value_template: "{{ states.sensor.bed_occupancy.state == 'ON' and states.binary_sensor.couch.state == 'off' }}"
+    - condition: state
+      entity_id: sensor.bed_occupancy
+      state: 'ON'
+    - condition: state
+      entity_id: binary_sensor.couch
+      state: 'off'
+    - condition: state
+      entity_id: input_boolean.guest
+      state: 'off'
   action:
-    - service:  automation.turn_off
+    - service: automation.turn_off
       data_template:
         entity_id: >
           {%- for state in states.automation if 'ON' in state.name -%}
           {{- ", " if not loop.first-}}{{ state.entity_id }}{{-endif-}}
           {%- endfor -%}
-    
-- id: 'in_bed'
-  alias: In bed
-  initial_state: True
+    - service: light.turn_off
+      data_template:
+        entity_id: >
+          {%- for state in states.light if state.entity_id != 'light.spot' and state.entity_id != 'light.bedroom' -%} 
+          {{- "," if not loop.first-}}{{ state.entity_id }}{{-endif-}}
+          {%- endfor -%}
+
+- id: in_bed
+  alias: 'In bed'
+  initial_state: true
   trigger:
     - platform: state
       entity_id: sensor.bed_occupancy
       to: 'ON'
   condition:
-  - condition: state
-    entity_id: input_boolean.guest
-    state: 'off'
-  - condition: state
-    entity_id: group.lights
-    state: 'on'
-  - condition: numeric_state
-    entity_id: sensor.bed_mass
-    above: 30
+    - condition: state
+      entity_id: input_boolean.guest
+      state: 'off'
+    - condition: state
+      entity_id: group.lights
+      state: 'on'
+    - condition: numeric_state
+      entity_id: sensor.bed_mass
+      above: 30
   action:
     - service: light.turn_off
       entity_id: group.lights
       data:
         transition: 10
 
-- id: 'start_spotify'
-  alias: start spotify
-  initial_state: True
+- id: start_spotify
+  alias: 'start spotify'
+  initial_state: true
   trigger:
     - platform: state
       entity_id: input_boolean.away
       to: 'off'
   condition:
-      - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.binary_sensor.door_entrance.last_changed) | int < 1800 }}"
+    - condition: template
+      value_template: '{{ as_timestamp(now()) - as_timestamp(states.binary_sensor.door_entrance.last_changed) | int < 1800 }}'
   action:
-  - service: tts.google_say
-    entity_id: media_player.audio_funk
-    data:
-      message: 'Hey Hey google.... music'
+    - service: tts.google_say
+      entity_id: media_player.audio_funk
+      data:
+        message: 'Hey Hey google.... music'
 
 - id: shiny
   alias: 'shiny'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: numeric_state
       entity_id: sensor.temperature_shiny
@@ -95,12 +147,12 @@
   action:
     - service: notify.hass
       data_template:
-        message: "shiny temp above 30"
+        message: 'shiny temp above 30'
 
 - id: onboot
   alias: 'on boot'
-  initial_state: True
-  hide_entity: True
+  initial_state: true
+  hide_entity: true
   trigger:
     - platform: homeassistant
       event: start
@@ -110,7 +162,7 @@
 
 - id: hammock
   alias: 'hammock'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: state
       entity_id: binary_sensor.motion_living
@@ -125,19 +177,19 @@
         seconds: 60
     - condition: or
       conditions:
-      - condition: state
-        entity_id: light.kitchen
-        state: 'on'
-      - condition: state
-        entity_id: light.kitchen_strip
-        state: 'on'
+        - condition: state
+          entity_id: light.kitchen
+          state: 'on'
+        - condition: state
+          entity_id: light.kitchen_strip
+          state: 'on'
   action:
     - service: light.turn_off
       entity_id: light.kitchen, light.kitchen_strip, light.bar
 
 - id: dota_auto
   alias: 'Dota Auto'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: state
       entity_id: binary_sensor.motion_living
@@ -146,17 +198,17 @@
         seconds: 30
   condition:
     - condition: template
-      value_template: "{{ as_timestamp(now()) - as_timestamp(states.sensor.table_pir.last_changed) | int > 30 }}"
+      value_template: '{{ as_timestamp(now()) - as_timestamp(states.sensor.table_pir.last_changed) | int > 30 }}'
     - condition: state
       entity_id: light.table
       state: 'on'
   action:
     - service: light.turn_off
       entity_id: light.table
-      
+
 - id: cast
-  alias: Cast
-  initial_state: True
+  alias: 'Cast'
+  initial_state: true
   trigger:
     - platform: state
       entity_id: media_player.audio_funk
@@ -175,12 +227,12 @@
 
 - id: spotify_ads
   alias: 'Spotify ads'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: template
-      value_template: "{{ states.media_player.audio_funk.attributes['media_title'] == 'Spotify' }}"
+      value_template: '{{ states.media_player.audio_funk.attributes["media_title"] == "Spotify" }}'
     - platform: template
-      value_template: "{{ states.media_player.audio_funk.attributes['media_title'] == 'Vice Informaci' }}"
+      value_template: '{{ states.media_player.audio_funk.attributes["media_title"] == "Vice Informaci" }}'
   action:
     - service: media_player.volume_mute
       data:
@@ -198,10 +250,10 @@
       data:
         entity_id: media_player.audio_funk
         is_volume_muted: 'no'
-      
+
 - id: led_strip
   alias: 'Led Stip Off'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: state
       entity_id: light.kitchen
@@ -216,7 +268,7 @@
 
 - id: projector_on
   alias: 'Projector on'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: state
       entity_id: sensor.projector_status
@@ -229,7 +281,7 @@
 
 - id: projector_off
   alias: 'Projector off'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: state
       entity_id: sensor.bob
@@ -244,7 +296,7 @@
       entity_id: binary_sensor.motion_living
       state: 'off'
     - condition: template
-      value_template: "{{ as_timestamp(now()) - as_timestamp(states.binary_sensor.motion_living.last_changed) | int > 1200 }}"
+      value_template: '{{ as_timestamp(now()) - as_timestamp(states.binary_sensor.motion_living.last_changed) | int > 1200 }}'
   action:
     - service: switch.turn_off
       entity_id: switch.projector
@@ -261,7 +313,7 @@
 
 - id: going_to_bed
   alias: 'Going to bed'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: state
       entity_id: sensor.projector_status
@@ -273,7 +325,7 @@
   action:
     - service: light.turn_on
       entity_id: light.spot
-    - wait_template: "{{ states.binary_sensor.motion_living.state == 'on' }}"
+    - wait_template: '{{ states.binary_sensor.motion_living.state == "on" }}'
       timeout: '00:00:20'
       continue_on_timeout: false
     - service: light.turn_off
@@ -281,7 +333,7 @@
 
 - id: at_wc
   alias: 'at WC'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: state
       entity_id: binary_sensor.motion_wc
@@ -313,7 +365,7 @@
 
 - id: got_brighter
   alias: 'Got brighter'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: numeric_state
       entity_id: sensor.illumination_living
@@ -328,7 +380,7 @@
 
 - id: lightroom_light
   alias: 'Lightroom Light'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: state
       entity_id: binary_sensor.door_lightroom
@@ -346,10 +398,10 @@
         {% if trigger.to_state.state == 'on' and states.sensor.illumination_living.state|int <= 50 %} light.turn_on
         {% else %} light.turn_off{% endif %}
       entity_id: light.lightroom
-    
+
 - id: darkroom_light
   alias: 'Darkroom Light'
-  initial_state: False
+  initial_state: false
   trigger:
     - platform: state
       entity_id: binary_sensor.door_darkroom
@@ -368,9 +420,10 @@
         {% endif %}
       entity_id: light.darkroom
 
+
 - id: bedroom_doors
   alias: 'Bedroom doors'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: state
       entity_id: binary_sensor.door_lightroom, binary_sensor.door_darkroom
@@ -390,7 +443,7 @@
 
 - id: bedroom_doors_thanks
   alias: 'Bedroom doors closed'
-  hide_entity: True
+  hide_entity: true
   trigger:
     - platform: state
       entity_id: binary_sensor.door_lightroom, binary_sensor.door_darkroom
@@ -399,11 +452,7 @@
         seconds: 1
   condition:
     - condition: template
-      value_template: >-
-        {%- if states.automation.bedroom_doors.attributes.last_triggered -%}
-        {{ as_timestamp(now()) - as_timestamp(states.automation.bedroom_doors.attributes.last_triggered) | int < 100 }}
-        {%- else -%} False
-        {%- endif -%}
+      value_template: '{%- if states.automation.bedroom_doors.attributes.last_triggered -%} {{ as_timestamp(now()) - as_timestamp(states.automation.bedroom_doors.attributes.last_triggered) | int < 100 }} {%- else -%} False {%- endif -%}'
   action:
     - service: media_player.volume_set
       data:
@@ -414,18 +463,18 @@
         entity_id: media_player.living_room_speaker
         media_content_id: !secret door_thanks
         media_content_type: music
-    - delay: "00:00:05"
+    - delay: '00:00:05'
     - service: media_player.volume_set
       data:
         entity_id: media_player.living_room_speaker
         volume_level: 0.3
 
 - id: movie_time
-  alias: "Movie"
+  alias: 'Movie'
   initial_state: true
   trigger:
     - platform: template
-      value_template: "{{ states.sensor.tautulli.attributes['zanerv']['Activity'] == 'playing' }}"
+      value_template: '{{ states.sensor.tautulli.attributes["zanerv"]["Activity"] == "playing" }}'
   condition:
     condition: and
     conditions:
@@ -448,14 +497,14 @@
       entity_id: light.spot
 
 - id: house_mode_us
-  alias: "House mode us"
+  alias: 'House mode us'
   initial_state: true
   trigger:
     - platform: state
       entity_id: device_tracker.z_phone, device_tracker.r, device_tracker.rdell, device_tracker.rpc
   condition:
-      - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.binary_sensor.door_entrance.last_changed) | int < 1800 }}"
+    - condition: template
+      value_template: '{{ as_timestamp(now()) - as_timestamp(states.binary_sensor.door_entrance.last_changed) | int < 1800 }}'
   action:
     - service_template: >
         {% if trigger.to_state.state == 'home' %} homeassistant.turn_on
@@ -469,7 +518,7 @@
           {% endif %}
 
 - id: house_mode_Z
-  alias: "House mode Z"
+  alias: 'House mode Z'
   initial_state: true
   trigger:
     - platform: state
@@ -478,15 +527,15 @@
       for:
         minutes: 3
   condition:
-      - condition: state
-        entity_id: input_boolean.z
-        state: 'off'
+    - condition: state
+      entity_id: input_boolean.z
+      state: 'off'
   action:
     - service: homeassistant.turn_on
       entity_id: input_boolean.z
 
 - id: house_mode_R
-  alias: "House mode R"
+  alias: 'House mode R'
   initial_state: true
   trigger:
     - platform: state
@@ -495,15 +544,15 @@
       for:
         minutes: 3
   condition:
-      - condition: state
-        entity_id: input_boolean.r
-        state: 'off'
+    - condition: state
+      entity_id: input_boolean.r
+      state: 'off'
   action:
     - service: homeassistant.turn_on
       entity_id: input_boolean.r
 
 - id: house_mode_guest
-  alias: "House mode guest"
+  alias: 'House mode guest'
   initial_state: true
   trigger:
     - platform: state
@@ -524,7 +573,7 @@
       entity_id: input_boolean.guest
 
 - id: house_mode_away
-  alias: "House mode Away"
+  alias: 'House mode Away'
   initial_state: true
   trigger:
     - platform: state
@@ -533,9 +582,9 @@
     condition: or
     conditions:
       - condition: template
-        value_template: "{{ states.input_boolean.z.state == 'off' and states.input_boolean.r.state == 'off' and states.input_boolean.guest.state == 'off' }}"
+        value_template: '{{ states.input_boolean.z.state == "off" and states.input_boolean.r.state == "off" and states.input_boolean.guest.state == "off" }}'
       - condition: template
-        value_template: "{{ trigger.to_state.state == 'on' }}"
+        value_template: '{{ trigger.to_state.state == "on" }}'
   action:
     - service_template: >
         {% if trigger.to_state.state == 'off' %} input_boolean.turn_on
@@ -548,7 +597,7 @@
         {% endif %}
 
 - id: house_mode_vacation
-  alias: "House mode Vacation"
+  alias: 'House mode Vacation'
   initial_state: true
   trigger:
     - platform: state
@@ -565,9 +614,9 @@
         {% else %} homeassistant.turn_off
         {% endif %}
       entity_id: input_boolean.vacation
-  
+
 - id: Unknown
-  alias: "Home Unknown state"
+  alias: 'Home Unknown state'
   initial_state: true
   trigger:
     - platform: state
@@ -578,10 +627,10 @@
   action:
     - service: notify.hass
       data_template:
-        message:  "vacation: {{states.input_boolean.vacation.state}}, away: {{states.input_boolean.away.state}}, guest: {{states.input_boolean.guest.state}}, z: {{states.input_boolean.z.state}}, r: {{states.input_boolean.r.state}}"
+        message: 'vacation: {{states.input_boolean.vacation.state}}, away: {{states.input_boolean.away.state}}, guest: {{states.input_boolean.guest.state}}, z: {{states.input_boolean.z.state}}, r: {{states.input_boolean.r.state}}'
 
 - id: Notify_House_Mode
-  alias: "Notify House Mode"
+  alias: 'Notify House Mode'
   initial_state: true
   trigger:
     - platform: state
@@ -597,7 +646,7 @@
           {% endif %}
 
 - id: Door_lock
-  alias: "Door Lock"
+  alias: 'Door Lock'
   initial_state: true
   trigger:
     - platform: state
@@ -613,9 +662,9 @@
           {%- for state in states.automation if 'ON' in state.name -%}
           {{- ", " if not loop.first-}}{{ state.entity_id }}{{-endif-}}
           {%- endfor -%}
-    
+
 - id: Door_unlock
-  alias: "Door Unlock"
+  alias: 'Door Unlock'
   initial_state: true
   trigger:
     - platform: state
@@ -627,24 +676,25 @@
     condition: and
     conditions:
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.binary_sensor.door_entrance.last_changed) | int > 300 }}"
+        value_template: '{{ as_timestamp(now()) - as_timestamp(states.binary_sensor.door_entrance.last_changed) | int > 300 }}'
       - condition: template
-        value_template: "{{ states.input_boolean.z == 'on' or states.input_boolean.r == 'on' or states.input_boolean.guest == 'on' }}"
+        value_template: '{{ states.input_boolean.z == "on" or states.input_boolean.r == "on" or states.input_boolean.guest == "on" }}'
       - condition: state
         entity_id: sensor.door
         state: 'Lock'
   action:
     - service: script.door_unlock
-       
+
 - id: zriefing
-  alias: "Morning Briefing Z"
+  alias: 'Morning Briefing Z'
   initial_state: true
   trigger:
     - platform: time
       at: '07:00'
   condition:
-      condition: template
-      value_template: "{{ states.input_boolean.z.state == 'on' }}"
+    condition: state
+    entity_id: input_boolean.z
+    state: 'on'
   action:
     - service: notify.hass
       data_template:
@@ -655,14 +705,14 @@
            {{ "\n" }}{{states.sensor.quote_of_the_day.state}}
 
 - id: rriefing
-  alias: "Morning Briefing R"
+  alias: 'Morning Briefing R'
   initial_state: false
   trigger:
     - platform: time
       at: '07:00'
   condition:
-      condition: template
-      value_template: "{{ states.input_boolean.z == 'on' }}"
+    condition: template
+    value_template: '{{ states.input_boolean.z == "on" }}'
   action:
     - service: notify.hass
       data_template:
@@ -682,9 +732,10 @@
                   {{states.sensor.quote_of_the_day.state}}
                   {%- endif %}
 
+
 - id: theme
   alias: 'Theme'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: homeassistant
       event: start
@@ -703,34 +754,34 @@
           {% endif %}
 
 - id: kitchen_to_couch
-  alias: from kitchen to couch
-  initial_state: True
+  alias: 'from kitchen to couch'
+  initial_state: true
   trigger:
     - platform: state
       entity_id: sensor.couch
       to: 'Detected'
   condition:
-     condition: and
-     conditions:
+    condition: and
+    conditions:
       - condition: state
         entity_id: light.kitchen
         state: 'on'
       - condition: template
         value_template: '{{ as_timestamp(now()) - as_timestamp(states.light.kitchen.last_changed) | int < 30 }}'
   action:
-     - service: light.turn_off
-       entity_id: light.kitchen
+    - service: light.turn_off
+      entity_id: light.kitchen
 
 - id: couch_to_kitchen
-  alias: from couch to kitchen
-  initial_state: True
+  alias: 'from couch to kitchen'
+  initial_state: true
   trigger:
     - platform: state
       entity_id: binary_sensor.motion_living
       to: 'on'
   condition:
-     condition: and
-     conditions:
+    condition: and
+    conditions:
       - condition: state
         entity_id: input_boolean.z
         state: 'on'
@@ -747,14 +798,12 @@
         entity_id: sensor.bob
         state: 'ON'
   action:
-    # - wait_template: "{{ states.binary_sensor.motion_living.state == 'on' }}"
-      # timeout: '00:00:20'
-     - service: light.turn_on
-       entity_id: light.kitchen_strip
+    - service: light.turn_on
+      entity_id: light.kitchen_strip
 
-- id: Monkey 
+- id: Monkey
   alias: 'Monkey'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: event
       event_type: xiaomi_aqara.click
@@ -775,7 +824,7 @@
         gw_mac: !secret xg_mac
         ringtone_id: 10002
         ringtone_vol: 50
-        
+
 - id: bedroom_button_single
   alias: 'Bedroom Button single'
   initial_state: true
@@ -784,15 +833,17 @@
       event_type: xiaomi_aqara.click
       event_data:
         entity_id: binary_sensor.switch_bedroom
-        event_type: single
+        click_type: single
   action:
     - service: automation.trigger
       data_template:
         entity_id: >
-          {% if states.light.bedroom.state == 'on' %} automation.bedroom_off
-          {% else %} automation.bedroom_on
+          {% if states.light.bedroom.state == 'on' %}
+          automation.bedroom_off
+          {% else %}
+          automation.bedroom_on
           {% endif %}
-        
+
 - id: bedroom_button_double
   alias: 'Bedroom button double'
   initial_state: true
@@ -801,48 +852,40 @@
       event_type: xiaomi_aqara.click
       event_data:
         entity_id: binary_sensor.switch_bedroom
-        event_type: double
+        click_type: double
   action:
-    - service: ligh.yeelight_set_mode
-      data_template:
+    - service: light.yeelight_set_mode
+      data:
         entity_id: light.bedroom
         mode: normal
     - service: light.toggle
-      entity_id:  light.bedroom
+      entity_id: light.bedroom
       data:
         transition: 5
-        
+
 - id: location
   alias: 'Last Movement'
-  initial_state: True
+  initial_state: true
   trigger:
-    #bob
     - platform: state
       entity_id: sensor.bob
       to: 'ON'
-    #table
     - platform: state
-      entity_id: sensor.table_pir,sensor.bar_pir
+      entity_id: sensor.table_pir, sensor.bar_pir, sensor.bed_occupancy
       to: 'ON'
-    #entrance
     - platform: state
       entity_id: sensor.entrance
       to: 'Motion'
-    #kitchen, WC, Living, Hallway, couch
     - platform: state
       entity_id: binary_sensor.motion_wc, binary_sensor.motion_living, binary_sensor.motion_hallway, binary_sensor.couch, binary_sensor.door_lightroom, binary_sensor.door_darkroom, binary_sensor.door_bedroom
       to: 'on'
       for:
         seconds: 0.1
-     #bed
-    - platform: state
-      entity_id: sensor.bed_occupancy
-      to: 'OFF'
   action:
-      - service: input_select.select_option
-        data_template:
-         entity_id: input_select.location
-         option: >
+    - service: input_select.select_option
+      data_template:
+        entity_id: input_select.location
+        option: >
            {% if trigger.entity_id == "sensor.bob" %} Bob
            {% elif trigger.entity_id == "sensor.table_pir" %} Table
            {% elif trigger.entity_id == "binary_sensor.couch" %} Couch
@@ -860,7 +903,7 @@
 
 - id: WC_Auto_OFF
   alias: 'WC Auto OFF'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: state
       entity_id: sensor.bar_pir
@@ -880,12 +923,12 @@
         entity_id: light.WC
         state: 'on'
   action:
-      service: light.turn_off
-      entity_id: light.WC
+    service: light.turn_off
+    entity_id: light.WC
 
 - id: snoop
   alias: 'snooping'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: state
       entity_id: binary_sensor.motion_bedroom
@@ -910,11 +953,11 @@
         target:
           - !secret she_mail
           - !secret he_mail
-        message: "Someone is snooping around the bedroom"
+        message: 'Someone is snooping around the bedroom'
 
 - id: got_home
   alias: 'Arrived Home'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: state
       entity_id: binary_sensor.door_entrance
@@ -924,8 +967,6 @@
   action:
     - service: automation.trigger
       entity_id: automation.hallway_on
-    # - service: automation.turn_off
-      # entity_id: automation.door_unlock
     - service: automation.turn_on
       data_template:
         entity_id: >
@@ -935,7 +976,7 @@
 
 - id: door
   alias: 'Door opened'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: state
       entity_id: binary_sensor.door_entrance
@@ -944,19 +985,19 @@
         seconds: 0.1
   condition:
     - condition: template
-      value_template: "{% if states.device_tracker.z.state != 'home' %}true{% endif %}"
+      value_template: '{% if states.device_tracker.z.state != "home" %}true{% endif %}'
   action:
     - service: notify.hass
       data:
         target:
           - !secret she_mail
           - !secret he_mail
-        title: "{{now().strftime('%H:%M:%S')}}"
-        message: "Door opened"
+        title: '{{now().strftime("%H:%M:%S")}}'
+        message: 'Door opened'
 
 - id: Home_Alone
   alias: 'Home Alone'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: state
       entity_id: group.lights
@@ -972,23 +1013,19 @@
       - condition: state
         entity_id: sun.sun
         state: 'below_horizon'
-      - condition: state
-        entity_id: sensor.couch
-        state: 'Detected'
+      - condition: template
+        value_template: "{{states.sensor.couch.state == 'Detected' or states.binary_sensor.bed_occupancy.state == 'ON'}}"
       - condition: state
         entity_id: input_boolean.guest
         state: 'off'
   action:
     - service: light.turn_off
       data_template:
-        entity_id: >
-          {%- for state in states.light if state.entity_id != 'light.spot' -%}
-          {{- "," if not loop.first-}}{{ state.entity_id }}{{-endif-}}
-          {%- endfor -%}
+        entity_id: "{%- for state in states.light if state.entity_id != 'light.spot' -%} {{- \",\" if not loop.first-}}{{ state.entity_id }}{{-endif-}} {%- endfor -%}\n"
 
 - id: Gateway_ON
   alias: 'Gateway light ON'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: state
       entity_id: binary_sensor.motion_hallway
@@ -1009,7 +1046,7 @@
 
 - id: Gateway_OFF
   alias: 'Gateway light OFF'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: state
       entity_id: binary_sensor.motion_hallway
@@ -1027,7 +1064,7 @@
 
 - id: Bedroom_ON
   alias: 'Bedroom ON'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: state
       entity_id: binary_sensor.motion_bedroom
@@ -1043,7 +1080,7 @@
     condition: and
     conditions:
       - condition: template
-        value_template: "{% if states.media_player.firetv.state != 'playing' %}true{% endif %}"
+        value_template: '{% if states.media_player.firetv.state != "playing" %}true{% endif %}'
       - condition: state
         entity_id: sensor.bed_occupancy
         state: 'OFF'
@@ -1070,7 +1107,7 @@
 
 - id: Bedroom_OFF
   alias: 'Bedroom OFF'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: state
       entity_id: binary_sensor.motion_bedroom
@@ -1085,16 +1122,16 @@
       entity_id: media_player.firetv
       to: 'playing'
   condition:
-      - condition: state
-        entity_id: light.bedroom
-        state: 'on'
-  action:
-      service: light.turn_off
+    - condition: state
       entity_id: light.bedroom
+      state: 'on'
+  action:
+    service: light.turn_off
+    entity_id: light.bedroom
 
 - id: Kitchen_ON
   alias: 'Kitchen ON'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: state
       entity_id: sensor.bar_pir
@@ -1102,32 +1139,33 @@
       for:
         seconds: 0.1
   condition:
-      - condition: numeric_state
-        entity_id: sensor.illumination_living
-        below: 30
-      - condition: or
-        conditions:
-         - condition: state
-           entity_id: light.kitchen
-           state: 'off'
-         - condition: state
-           entity_id: light.kitchen_strip
-           state: 'off'
-         - condition: state
-           entity_id: light.bar
-           state: 'off'
+    - condition: numeric_state
+      entity_id: sensor.illumination_living
+      below: 30
+    - condition: or
+      conditions:
+        - condition: state
+          entity_id: light.kitchen
+          state: 'off'
+        - condition: state
+          entity_id: light.kitchen_strip
+          state: 'off'
+        - condition: state
+          entity_id: light.bar
+          state: 'off'
   action:
-      - service: scene.turn_on
-        data_template:
-          entity_id: >
+    - service: scene.turn_on
+      data_template:
+        entity_id: >
             {% if now().strftime('%H')|int >= 0 and (now().strftime('%H')|int <= 7 and now().strftime('%M')|int < 50) %}
               scene.kitchen_night
             {% else %}
               scene.kitchen_day
-            {% endif %}
+            {% endif %}"
+
 - id: Kitchen_OFF
   alias: 'Kitchen OFF'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: state
       entity_id: sensor.bar_pir
@@ -1135,12 +1173,12 @@
       for:
         minutes: 5
   action:
-      service: light.turn_off
-      entity_id: light.kitchen, light.kitchen_strip, light.bar
+    service: light.turn_off
+    entity_id: light.kitchen, light.kitchen_strip, light.bar
 
 - id: Dota_ON
   alias: 'Dota Table ON'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: state
       entity_id: sensor.table_pir
@@ -1155,12 +1193,12 @@
         entity_id: sensor.illumination_living
         below: 35
   action:
-      service: light.turn_on
-      entity_id: light.table
+    service: light.turn_on
+    entity_id: light.table
 
 - id: Dota_OFF
   alias: 'Dota Table OFF'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: state
       entity_id: sensor.table_pir
@@ -1168,12 +1206,12 @@
       for:
         minutes: 7
   action:
-      service: light.turn_off
-      entity_id: light.table
+    service: light.turn_off
+    entity_id: light.table
 
 - id: Bob_ON
   alias: 'Bob ON'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: state
       entity_id: sensor.bob
@@ -1188,22 +1226,22 @@
         entity_id: light.bob
         state: 'off'
       - condition: template
-        value_template: "{% if states.sensor.house.state != 'Away' or states.sensor.house.state != 'Vacation' %}true{% endif %}"
+        value_template: '{% if states.sensor.house.state != "Away" or states.sensor.house.state != "Vacation" %}true{% endif %}'
       - condition: sun
         after: sunset
-        after_offset: "-00:15:00"
+        after_offset: '-00:15:00'
   action:
-      - service: light.turn_on
-        entity_id: light.bob
-        data_template:
-          brightness: >
+    - service: light.turn_on
+      entity_id: light.bob
+      data_template:
+        brightness: >
             {% if now().strftime('%H')|int >= 0 and (now().strftime('%H')|int <= 7 and now().strftime('%M')|int < 50) %}26
             {% else %}255
             {% endif %}
 
 - id: Bob_OFF
   alias: 'Bob OFF'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: state
       entity_id: sensor.bob
@@ -1211,19 +1249,18 @@
       for:
         minutes: 15
   condition:
-      condition: state
-      entity_id: binary_sensor.motion_living
-      state: 'off'
-      for:
-        minutes: 15
+    condition: state
+    entity_id: binary_sensor.motion_living
+    state: 'off'
+    for:
+      minutes: 15
   action:
-      service: light.turn_off
-      entity_id: light.bob, light.spot
-#, switch.projector
+    service: light.turn_off
+    entity_id: light.bob, light.spot
 
 - id: Bob_auto_on
   alias: 'Bob Auto on'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: state
       entity_id: sensor.bob
@@ -1240,7 +1277,7 @@
 
 - id: Hallway_ON
   alias: 'Hallway ON'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: state
       entity_id: sensor.entrance
@@ -1260,7 +1297,7 @@
         entity_id: sensor.illumination_hallway
         below: 50
       - condition: template
-        value_template: "{% if states.sensor.house.state != 'Away' or states.sensor.house.state != 'Vacation' %}true{% endif %}"
+        value_template: '{% if states.sensor.house.state != "Away" or states.sensor.house.state != "Vacation" %}true{% endif %}'
   action:
     - service: scene.turn_on
       data_template:
@@ -1273,7 +1310,7 @@
 
 - id: Hallway_OFF
   alias: 'Hallway OFF'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: state
       entity_id: sensor.entrance
@@ -1292,15 +1329,15 @@
       - condition: state
         entity_id: sensor.entrance
         state: 'Still'
-        for: 
+        for:
           seconds: 30
   action:
-      service: light.turn_off
-      entity_id: light.Hallway1,light.Hallway2,light.Hallway3
+    service: light.turn_off
+    entity_id: light.Hallway1,light.Hallway2,light.Hallway3
 
 - id: WC_ON
   alias: 'WC ON'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: state
       entity_id: binary_sensor.motion_wc
@@ -1321,7 +1358,7 @@
 
 - id: WC_OFF
   alias: 'WC OFF'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: state
       entity_id: binary_sensor.motion_wc
@@ -1329,12 +1366,12 @@
       for:
         seconds: 30
   action:
-      service: light.turn_off
-      entity_id: light.WC
+    service: light.turn_off
+    entity_id: light.WC
 
 - id: Bathroom_ON
   alias: 'Bathroom ON'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: state
       entity_id: sensor.bathroom_pir
@@ -1345,7 +1382,7 @@
 
 - id: Bathroom_OFF
   alias: 'Bathroom OFF'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: state
       entity_id: sensor.bathroom_pir
@@ -1358,24 +1395,24 @@
       for:
         seconds: 30
   condition:
-  - condition: state
-    entity_id: binary_sensor.door_bathroom
-    state: 'on'
-  - condition: state
-    entity_id: sensor.bathroom_pir
-    state: 'OFF'
-    for:
-      minutes: 1
+    - condition: state
+      entity_id: binary_sensor.door_bathroom
+      state: 'on'
+    - condition: state
+      entity_id: sensor.bathroom_pir
+      state: 'OFF'
+      for:
+        minutes: 1
   action:
-      service: light.turn_off
-      entity_id: light.bathroom
+    service: light.turn_off
+    entity_id: light.bathroom
 
 - id: Riki
   alias: 'Feed ze animal 7:20&14&18'
-  initial_state: True
-  trigger: 
+  initial_state: true
+  trigger:
     - platform: time
-      hours: 07
+      hours: 7
       minutes: 20
       seconds: 0
     - platform: time
@@ -1387,13 +1424,12 @@
       minutes: 0
       seconds: 0
   action:
-      - service: switch.turn_on
-        entity_id: switch.riki_s_food
+    - service: switch.turn_on
+      entity_id: switch.riki_s_food
 
-####Monitor devices####
 - id: new_device
   alias: 'Notify for new devices'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: event
       event_type: device_tracker_new_device
@@ -1403,12 +1439,12 @@
         message: >
          New entity ID {{ trigger.event.data.entity_id }} and hostname {{ trigger.event.data.host_name }}
     - service: shell_command.echo_groups
-      data_template: 
-        arg: "{{ trigger.event.data.entity_id }}"
+      data_template:
+        arg: '{{ trigger.event.data.entity_id }}'
     - service: group.reload
 
-- id: 2c0e3de5e904
-  hide_entity: True
+- id: unknown_mac
+  hide_entity: true
   alias: 'Unknown MACs'
   initial_state: true
   trigger:
@@ -1417,11 +1453,11 @@
   action:
     - service: notify.hass
       data_template:
-        message: "One of the tracked devices has connected {{ trigger.entity_id }} and hostname {{ trigger.host_name }}"
+        message: 'One of the tracked devices has connected {{ trigger.entity_id }} and hostname {{ trigger.host_name }}'
 
-- id: 'Sunset'
+- id: Sunset
   alias: 'Sunset'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: sun
       event: sunset
@@ -1431,8 +1467,8 @@
       entity_id: input_boolean.mmode
 
 - id: launch_notify
-  initial_state: True
-  alias: Launch Notify
+  initial_state: true
+  alias: 'Launch Notify'
   trigger:
     - platform: template
       value_template: '{{ (now().strftime("%s") | int + 600) == (states.sensor.spacex.state | int) }}'
@@ -1441,10 +1477,9 @@
   action:
     - service: script.spacex
 
-####Cube####
 - id: cube_rotate
   alias: 'Cube rotate'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: event
       event_type: xiaomi_aqara.cube_action
@@ -1457,7 +1492,7 @@
 
 - id: tap_twice
   alias: 'Cube tap'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: event
       event_type: xiaomi_aqara.cube_action
@@ -1472,7 +1507,7 @@
 
 - id: flip90
   alias: 'Cube flip90'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: event
       event_type: xiaomi_aqara.cube_action
@@ -1485,7 +1520,7 @@
 
 - id: flip180
   alias: 'Cube flip180'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: event
       event_type: xiaomi_aqara.cube_action
@@ -1494,11 +1529,11 @@
         action_type: flip180
   action:
     - service: light.toggle
-      entity_id: light.table 
+      entity_id: light.table
 
 - id: free_fall
   alias: 'Cube toggle'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: event
       event_type: xiaomi_aqara.cube_action
@@ -1516,7 +1551,7 @@
 
 - id: shake_air
   alias: 'Cube shake'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: event
       event_type: xiaomi_aqara.cube_action
@@ -1524,12 +1559,12 @@
         entity_id: binary_sensor.cube
         action_type: shake_air
   action:
-    - service: light.toggle  
+    - service: light.toggle
       entity_id: light.spot
 
 - id: shake_air_bob
   alias: 'Cube shake bob'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: event
       event_type: xiaomi_aqara.cube_action
@@ -1537,15 +1572,15 @@
         entity_id: binary_sensor.cube
         action_type: shake_air
   action:
-    - service: light.turn_off  
+    - service: light.turn_off
       entity_id: light.bob
     - service: input_boolean.turn_off
       entity_id: input_boolean.mmode
 
 - id: move
   alias: 'Cube move'
-  initial_state: False
-  hide_entity: True
+  initial_state: false
+  hide_entity: true
   trigger:
     - platform: event
       event_type: xiaomi_aqara.cube_action
@@ -1556,16 +1591,16 @@
     - service: mqtt.publish
       data:
         topic: say/Z
-        payload: "Garage door triggered"
+        payload: 'Garage door triggered'
         qos: 0
     - service: notify.hass
       data:
-        message: "Hauarde"
+        message: Hauarde
 
 - id: alert
   alias: 'Cube Alert'
-  initial_state: False
-  hide_entity: True
+  initial_state: false
+  hide_entity: true
   trigger:
     - platform: event
       event_type: xiaomi_aqara.cube_action
@@ -1576,11 +1611,11 @@
     - service: notify.hass
       data_template:
         title: test
-        message: "{{now().strftime('%H')}}"
+        message: '{{now().strftime("%H")}}'
 
 - id: swing
   alias: 'Cube Swing'
-  initial_state: True
+  initial_state: true
   trigger:
     - platform: event
       event_type: xiaomi_aqara.cube_action
@@ -1591,15 +1626,15 @@
     - service: notify.hass
       data:
         title: Swing
-        message: Cube swing
+        message: 'Cube swing'
 
 - id: lights_refresh
-  alias: 'lights_refresh'
-  initial_state: False
+  alias: 'lights refresh'
+  initial_state: false
   trigger:
     - platform: time
-      minutes: '/60'
-      seconds: 00
+      minutes: /60
+      seconds: 0
   action:
     - service: light.turn_off
       data_template:
@@ -1616,7 +1651,7 @@
 
 - id: unavailable
   alias: 'unavailable'
-  initial_state: False
+  initial_state: false
   trigger:
     - platform: state
       entity_id: light.bob, light.wc, light.kitchen, light.Hallway1, light.table
@@ -1633,19 +1668,9 @@
       data_template:
         message: '{{ states[trigger.entity_id.split(".")[0]][ trigger.entity_id.split(".")[1]].name }}'
 
-- id: purge
-  alias: 'purge'
-  initial_state: True
-  trigger:
-  action:
-     - service: recorder.purge
-       data:
-         keep_days: 1
-         repack: true
-
 - id: nothing
   alias: 'nothing'
-  hide_entity: True
+  hide_entity: true
   initial_state: false
-  trigger:
-  action:
+  trigger: 
+  action: 
