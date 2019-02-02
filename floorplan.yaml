@@ -78,18 +78,18 @@
         - name: Blue sensors
           entities:
             - binary_sensor.couch
-            - sensor.table_pir
-            - sensor.bar_pir
-            - sensor.bob
+            - binary_sensor.motion_table
+            - binary_sensor.motion_bar
+            - binary_sensor.motion_bob
             - binary_sensor.motion_wc
           states:
             - state: 'off'
               class: 'couch-off'
-            - state: 'OFF'
+            - state: 'off'
               class: 'couch-off'
             - state: 'on'
               class: 'couch-on'
-            - state: 'ON'
+            - state: 'on'
               class: 'couch-on'
           state_transitions:
             - name: On to off
@@ -159,18 +159,18 @@
 
         - name: PIR sensors
           entities:
-            - sensor.bar_pir
-            - sensor.bathroom_pir
+            - binary_sensor.motion_bar
+            - binary_sensor.motion_bathroom
             - sensor.bed_occupancy
           states:
-            - state: 'OFF'
+            - state: 'off'
               class: 'steps-off'
-            - state: 'ON'
+            - state: 'on'
               class: 'steps-on'
           state_transitions:
             - name: On to off
-              from_state: 'OFF'
-              to_state: 'ON'
+              from_state: 'off'
+              to_state: 'on'
               duration: 10
 
         - name: Media Player

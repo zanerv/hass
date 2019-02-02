@@ -7,6 +7,7 @@ default:
   - group.guster
   - group.lights
   - group.prezenta
+  - group.all_lightss
 
 Automation:
   name: Automation
@@ -133,7 +134,7 @@ prezenta:
  entities:
   - input_boolean.r
   - input_boolean.z
-  - sensor.travel_time
+  # - sensor.travel_time
   - sensor.location
   - sensor.house
 
@@ -148,7 +149,7 @@ Table:
  control: hidden
  entities:
  - light.table
- - sensor.table_pir
+ - binary_sensor.motion_table
  - vacuum.harry_potter
  - binary_sensor.floorplan
 
@@ -167,7 +168,7 @@ Bathroom:
  control: hidden
  entities:
  - light.bathroom
- - sensor.bathroom_pir
+ - binary_sensor.motion_bathroom
  - binary_sensor.door_bathroom
 
 Lightroom:
@@ -193,8 +194,7 @@ Bedroom:
  - sensor.illumination_bedroom
  - binary_sensor.door_bedroom
  - sensor.bed_occupancy
- - sensor.bed_mass
- - sensor.max_sensor
+ - sensor.bed
  - media_player.firetv
 
 Living:
@@ -206,12 +206,11 @@ Living:
  - light.bob
  - light.spot
  - switch.socket
- - sensor.bob
+ - binary_sensor.motion_bob
  - binary_sensor.cube
  - sensor.cube_last
  - binary_sensor.motion_living
  - sensor.illumination_living
- - sensor.couch
  - binary_sensor.switch_bedroom
 
 Kitchen:
@@ -224,7 +223,7 @@ Kitchen:
  - switch.coffee_machine
  - switch.espresso
  - switch.coffee
- - sensor.bar_pir
+ - binary_sensor.motion_bar
  - sensor.illumination_kitchen
  - switch.riki_s_food
 
@@ -352,3 +351,4 @@ guests:
  - device_tracker.40a3ccefea7f
  - device_tracker.2c598a57e84a
  - device_tracker.64899a0bbf63
+ - device_tracker.00_0a_f5_3e_59_5c

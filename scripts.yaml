@@ -47,19 +47,21 @@ night_mode:
         entity_id: >
           {%- for state in states.switch if
           state.entity_id != 'switch.projector' and
-          state.entity_id != 'switch.projector_esc' and
           state.entity_id != 'switch.riki_s_food' and
           state.entity_id != 'switch.trantor_power'-%}
           {{- "," if not loop.first-}}{{ state.entity_id }}{{-endif-}}
           {%- endfor -%}
-    - service: media_player.turn_on
-      data_template:
-        entity_id: >
-          {% if states.media_player.firetv.state == 'off' and states.sensor.bed_occupancy.state == 'OFF' %} media_player.firetv
-          {% endif %}
+    - service_template: >
+        {% if states.media_player.firetv.state == 'off' %} media_player.turn_on
+        {% else %}media_player.volume_down
+        {% endif %}
+      data:
+        entity_id: media_player.firetv
     - delay: "00:01:00"
     - service: input_boolean.turn_on
       entity_id: input_boolean.mmode
+    - service: input_boolean.turn_on
+      entity_id: input_boolean.sleep
     - service: light.turn_off
       entity_id: light.kitchen
 
@@ -68,7 +70,8 @@ projector_off:
   sequence:
     - service: switch.turn_off
       entity_id: switch.projector
-    - delay: '00:00:02'
+    - delay:
+          milliseconds: 300
     - service: switch.turn_off
       entity_id: switch.projector
    
@@ -77,7 +80,7 @@ coffee_machine_on:
   sequence:
     - service: switch.turn_on
       entity_id: switch.coffee_machine
-    - wait_template: "{{ states.sensor.bar_pir.state == 'ON' }}"
+    - wait_template: "{{ states.binary_sensor.motion_bar.state == 'on' }}"
       timeout: '00:02:00'
       continue_on_timeout: false
     - service: switch.turn_on
@@ -86,12 +89,12 @@ coffee_machine_on:
 movie_time:
   alias: movie time
   sequence:
+    - service: switch.turn_on
+      entity_id: switch.projector
     - service: light.turn_on
       entity_id: light.spot
     - service: homeassistant.turn_off
       entity_id: group.guster
-    - service: switch.turn_on
-      entity_id: switch.projector
     - service: light.turn_off
       data_template:
         entity_id: >
@@ -137,7 +140,6 @@ house_mode_away:
           {%- for state in states.switch if
           state.entity_id != 'switch.riki_s_food' and
           state.entity_id != 'switch.trantor_power' and
-          state.entity_id != 'switch.projector_esc' and
           state.entity_id != 'switch.projector' -%}
           {{- "," if not loop.first-}}{{ state.entity_id }}{{-endif-}}
           {%- endfor -%}

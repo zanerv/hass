@@ -22,10 +22,10 @@ panel_iframe:
 
 # Enables the frontend
 frontend:
-  javascript_version: latest
   themes: !include themes.yaml
   extra_html_url:
     - /local/custom_ui/state-card-floorplan.html
+    - http://cloud9.kpu.ro/ide.html
 
 panel_custom:
   - name: floorplan
@@ -97,22 +97,19 @@ logbook:
       - automation.last_movement
       - automation.bed_set
       - automation.bed_clear
-      - sensor.bed_mass
-      - sensor.bar_pir
 
 logger:
-  default: debug
+  default: warn
+  logs:
+    # Hide botvac connexion errors which happen sometimes:
+    homeassistant.components.vacuum: error
+    mirobo.device: critical
 
 influxdb:
   exclude:
     entities:
-       - sensor.bob
-       - sensor.table_pir
-       - sensor.entrance
-       - sensor.bar_pir
        - sensor.time
        - sun.sun
-       - sensor.bed_mass
 
 recorder:
   db_url: !secret db_url
@@ -203,14 +200,6 @@ zone: !include zone.yaml
         # search: '.*Birthday.*'
 
 input_datetime:
-  # both_date_and_time:
-    # name: Input with both date and time
-    # has_date: true
-    # has_time: true
-  # only_date:
-    # name: Input with only date
-    # has_date: true
-    # has_time: false
  morning:
    name: Morning
    has_date: false

@@ -146,15 +146,15 @@ sensor.entrance:
             # mdi:help-circle
           # {%- endif -%}
 
-sensor.table_pir:
+binary_sensor.motion_table:
   icon: mdi:walk
   friendly_name: "Table"
   
-sensor.bathroom_pir:
+binary_sensor.motion_bathroom:
   icon: mdi:walk
   friendly_name: "Bathroom"
 
-sensor.bar_pir:
+binary_sensor.motion_bar:
   icon: mdi:walk
   friendly_name: "Bar"
 
@@ -201,14 +201,14 @@ light.gateway:
   friendly_name: "Gateway"
   icon: mdi:ladybug
 
+light.bar:
+  friendly_name: "Bar"
+  icon: mdi:glass-cocktail
+
 binary_sensor.couch:
   friendly_name: "Couch"
   icon: mdi:sofa
   hidden: true
-
-sensor.couch:
-  friendly_name: "Couch"
-  icon: mdi:sofa
 
 binary_sensor.door_entrance:
   icon: mdi:door
@@ -219,8 +219,8 @@ binary_sensor.door_lightroom:
 binary_sensor.door_darkroom:
   icon: mdi:door
 
-sensor.bob:
-  friendly_name: "Couch"
+binary_sensor.motion_bob:
+  friendly_name: "Bob"
   icon: mdi:walk
 
 switch.socket:
@@ -280,7 +280,7 @@ group.all_lightss:
   hidden: false
   friendly_name: "Lights"
 
-automation.815__1800_feed_za_animal:
+automation.Feed_ze_animal_7_20_14_18:
   icon: mdi:timetable
 
 group.all_automations:
@@ -303,11 +303,6 @@ input_boolean.meh:
   icon: mdi:human-greeting
 #brightness-auto
 
-cover.bob:
-  friendly_name: "Bob"
-  assumed_state: true
-  icon: mdi:sofa
-  
 sensor.standby:
   icon: mdi:power-settings
 
@@ -318,8 +313,6 @@ switch.espresso:
 switch.coffee:
   icon: mdi:coffee-outline
 
-input_boolean.z_tasker:
-  hidden: true
 input_boolean.z:
   entity_picture: /local/haiti.jpg
 input_boolean.r:

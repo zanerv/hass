@@ -1,5 +1,5 @@
 #!/bin/bash
-playlist=7516 #Get playlist id: curl -s  http://plex:32400/playlists/all
+playlist=7708 #Get playlist id: curl -s  http://plex:32400/playlists/all
 
 song=$(curl -s http://${IP}:32400/playlists/$playlist/items \
  |grep "parts"|awk -F '"' '{print "http://'${IP}':32400" $4}'|shuf |head -1)
