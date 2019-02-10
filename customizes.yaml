@@ -48,9 +48,6 @@ sensor.storj:
   friendly_name: "Storj increase"
   icon: mdi:nas
 
-sensor.projector_status:
-  hidden: true
-
 binary_sensor.workday_sensor:
   hidden: true
 

@@ -13,3 +13,35 @@
       - Darkroom
       - Bedroom
       - Bed
+
+  z_status:
+    name: Z status
+    options:
+      - Couch
+      - Kitchen
+      - Bob
+      - Entrance
+      - WC
+      - Living
+      - Hallway
+      - Table
+      - Lightroom
+      - Darkroom
+      - Bedroom
+      - Bed
+
+  r_status:
+    name: R status
+    options:
+      - Couch
+      - Kitchen
+      - Bob
+      - Entrance
+      - WC
+      - Living
+      - Hallway
+      - Table
+      - Lightroom
+      - Darkroom
+      - Bedroom
+      - Bed

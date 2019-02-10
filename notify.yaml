@@ -1,4 +1,8 @@
 - platform: pushbullet
-  name: hass
+  name: push
   api_key: !secret pushbullet_api
+
+- name: hass
+  platform: telegram
+  chat_id: !secret chat_id
 

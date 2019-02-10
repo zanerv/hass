@@ -97,7 +97,8 @@ logbook:
       - automation.last_movement
       - automation.bed_set
       - automation.bed_clear
-
+      - binary_sensor.motion_bob
+      - binary_sensor.motion_table
 logger:
   default: warn
   logs:
@@ -115,6 +116,8 @@ recorder:
   db_url: !secret db_url
   purge_interval: 1
   purge_keep_days: 1
+
+system_health:
 
 # Enables a map showing the location of tracked devices
 map:
@@ -157,6 +160,12 @@ device_tracker:
     interval_seconds: 20
 #  - platform: googlehome
 #    host: !secret ghome
+
+telegram_bot:
+  - platform: polling
+    api_key: !secret telegram
+    allowed_chat_ids:
+      - !secret chat_id
 
 notify: !include notify.yaml
 

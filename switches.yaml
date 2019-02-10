@@ -1,3 +1,19 @@
+- platform: template
+  switches:
+    projector:
+      value_template: "{{ states.sensor.t_power.state|int > 200 }}"
+      turn_on:
+        service: switch.turn_on
+        data:
+          entity_id: switch.projector_ir
+      turn_off:
+      - service: switch.turn_off
+        entity_id: switch.projector_ir
+      - service: switch.turn_off
+        entity_id: switch.projector_ir
+      - service: switch.turn_off
+        entity_id: switch.projector_ir
+
 - platform: mqtt
   name: "Socket"
   state_topic: "stat/socket/POWER"
@@ -27,7 +43,7 @@
   mac: !secret broadlink_mac
   timeout: 15
   switches:
-    projector:
+    projector_ir:
       friendly_name: "Projector"
       command_on: 'JgBYAAABJ5cQFRE5ERUQFRE5EToRFBEUEToRFBE5EToRFBEUEToROREVEDoRFBEVEBURFBEUERQROhITEjkQOhE6EDoROhA6EQAFDQABKEwQAAxUAAEnTBEADQU='
       command_off: 'JgBYAAABKJYQFRE5ERUQFRE5EToRFBEUEToQFRE5EToSExEUEToRORIUEDoROhA6ERUQOhAVERQROhAVERQRFRA6EhMROhA6EQAFDQABKEsRAAxTAAEoSxEADQU='

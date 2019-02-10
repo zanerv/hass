@@ -34,10 +34,10 @@
       name: Hallway2
       transition: 1000
       save_on_change: False
-    !secret Hallway3:
-      name: Hallway3
-      transition: 1000
-      save_on_change: False
+    # !secret Hallway3:
+    #   name: Hallway3
+    #   transition: 1000
+    #   save_on_change: False
     !secret WC:
       name: WC
       transition: 1000

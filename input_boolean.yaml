@@ -1,10 +1,14 @@
 song:
   initial: off
+  icon: mdi:playlist-music
 
 play:
   initial: off
+  icon: mdi:play
 
 mmode:
+ name: Bob Auto
+ icon: mdi:brightness-auto
 
 vacation:
   name: Vacation
@@ -29,3 +33,36 @@ guest:
 sleep:
   name: Sleep
   icon: mdi:hotel
+
+block:
+  name: Manual
+  icon: mdi:cancel
+  initial: off
+  
+living:
+  initial: off
+
+table:
+  initial: off
+
+kitchen:
+  initial: off
+
+hallway:
+  initial: off
+
+wc:
+  initial: off
+
+bedroom:
+  initial: off
+
+lightroom:
+  initial: off
+  
+bathroom:
+  initial: off
+  
+darkroom:
+  initial: off
+

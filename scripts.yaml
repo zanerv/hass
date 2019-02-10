@@ -28,12 +28,6 @@ media_extractor_test:
 night_mode:
   alias: Good night
   sequence:
-    - service: script.turn_on
-      data_template:
-        entity_id: >
-          {% if states.sensor.projector_status.state == 'on' %} script.projector_off
-          {% else %} script.nothing
-          {% endif %}
     - service: light.turn_off
       data_template:
         entity_id: >
@@ -41,13 +35,11 @@ night_mode:
           {{- "," if not loop.first-}}{{ state.entity_id }}{{-endif-}}
           {%- endfor -%}
     - service: light.turn_on
-      entity_id: light.kitchen
+      entity_id: light.kitchen, light.spot
     - service: switch.turn_off
       data_template:
         entity_id: >
           {%- for state in states.switch if
-          state.entity_id != 'switch.projector' and
-          state.entity_id != 'switch.riki_s_food' and
           state.entity_id != 'switch.trantor_power'-%}
           {{- "," if not loop.first-}}{{ state.entity_id }}{{-endif-}}
           {%- endfor -%}
@@ -63,17 +55,19 @@ night_mode:
     - service: input_boolean.turn_on
       entity_id: input_boolean.sleep
     - service: light.turn_off
-      entity_id: light.kitchen
+      entity_id: light.kitchen, light.spot
 
 projector_off:
   alias: Turn Projector OFF
   sequence:
     - service: switch.turn_off
-      entity_id: switch.projector
+      entity_id: switch.projector_ir
+    - service: switch.turn_off
+      entity_id: switch.projector_ir
     - delay:
           milliseconds: 300
     - service: switch.turn_off
-      entity_id: switch.projector
+      entity_id: switch.projector_ir
    
 coffee_machine_on:
   alias: Make coffee
@@ -93,15 +87,14 @@ movie_time:
       entity_id: switch.projector
     - service: light.turn_on
       entity_id: light.spot
+    - delay: '00:00:20'
     - service: homeassistant.turn_off
       entity_id: group.guster
     - service: light.turn_off
       data_template:
         entity_id: >
-          {%- for state in states.light if state.entity_id != 'light.spot' and
-          state.entity_id != 'light.entrance' and
-          state.entity_id != 'light.kitchen' -%}
-          {{- "," if not loop.first-}}{{ state.entity_id }}{{-endif-}}
+          {%- for x in states.light if x.state == 'on' and (as_timestamp(now()) - as_timestamp(x.last_changed) | int < 60)  -%} 
+          {{- "," if not loop.first-}}{{ x.entity_id }}{{-endif-}}
           {%- endfor -%}
     - service: media_player.turn_off
       data:
@@ -139,8 +132,7 @@ house_mode_away:
         entity_id: >
           {%- for state in states.switch if
           state.entity_id != 'switch.riki_s_food' and
-          state.entity_id != 'switch.trantor_power' and
-          state.entity_id != 'switch.projector' -%}
+          state.entity_id != 'switch.trantor_power' -%}
           {{- "," if not loop.first-}}{{ state.entity_id }}{{-endif-}}
           {%- endfor -%}
     - service: media_player.turn_off
