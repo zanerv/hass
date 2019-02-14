@@ -14,11 +14,15 @@
   entities:
     light.kitchen_night:
       state: on
+    light.kitchen_day:
+      state: off
 
 - name: Kitchen Day
   entities:
     light.kitchen_day:
       state: on
+    light.kitchen_night:
+      state: off
 
 - name: Bedroom Night
   entities:

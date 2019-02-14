@@ -171,7 +171,7 @@ notify: !include notify.yaml
 
 media_extractor:
 
-#input_text: !include input_text.yaml
+input_datetime: !include input_datetime.yaml
 
 input_boolean: !include input_boolean.yaml
 
@@ -198,22 +198,3 @@ input_select: !include input_select.yaml
 shell_command: !include shell_command.yaml
 
 zone: !include zone.yaml
-# calendar:
-  # - platform: caldav
-    # username: !secret n_user
-    # password: !secret n_pass
-    # url: !secret n_url
-    # custom_calendars:
-      # - name: 'Birthday'
-        # calendar: 'Android'
-        # search: '.*Birthday.*'
-
-input_datetime:
- morning:
-   name: Morning
-   has_date: false
-   has_time: true
- night:
-   name: Night
-   has_date: false
-   has_time: true

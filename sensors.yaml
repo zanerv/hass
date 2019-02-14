@@ -109,11 +109,10 @@
   state_topic: "/room/bedroom/bed/status"
   icon: mdi:hotel
 
-# - platform: mqtt
-#   name: "Bed Mass"
-#   state_topic: "/room/bedroom/bed/mass"
-#   unit_of_measurement: "kg"
-#   icon: mdi:scale
+- platform: mqtt
+  name: "Laptop"
+  state_topic: "/home/laptop/title"
+  icon: mdi:laptop
 
 - platform: mqtt
   state_topic: !secret bt_z

@@ -28,6 +28,10 @@ media_extractor_test:
 night_mode:
   alias: Good night
   sequence:
+    - service: mqtt.publish
+      data_template:
+        topic: /home/laptop
+        payload: standby
     - service: light.turn_off
       data_template:
         entity_id: >
@@ -93,7 +97,7 @@ movie_time:
     - service: light.turn_off
       data_template:
         entity_id: >
-          {%- for x in states.light if x.state == 'on' and (as_timestamp(now()) - as_timestamp(x.last_changed) | int < 60)  -%} 
+          {%- for x in states.light if x.state == 'on' and state.entity_id != 'light.spot' and (as_timestamp(now()) - as_timestamp(x.last_changed) | int < 60)  -%} 
           {{- "," if not loop.first-}}{{ x.entity_id }}{{-endif-}}
           {%- endfor -%}
     - service: media_player.turn_off

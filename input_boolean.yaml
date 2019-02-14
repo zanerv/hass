@@ -1,3 +1,7 @@
+night:
+  name: Night
+  icon: mdi:theme-light-dark
+ 
 song:
   initial: off
   icon: mdi:playlist-music
@@ -7,8 +11,8 @@ play:
   icon: mdi:play
 
 mmode:
- name: Bob Auto
- icon: mdi:brightness-auto
+  name: Bob Auto
+  icon: mdi:brightness-auto
 
 vacation:
   name: Vacation
@@ -65,4 +69,3 @@ bathroom:
   
 darkroom:
   initial: off
-

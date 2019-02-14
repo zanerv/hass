@@ -65,6 +65,7 @@
          {% elif trigger.event.data.command == "/trigger" %}trigger{% endif %}
 
 - alias: 'Reload automations'
+  initial_state: true
   trigger:
     - platform: event
       event_type: telegram_command
@@ -77,6 +78,37 @@
         target: '{{ trigger.event.data.user_id }}'
         disable_notification: true
         message: 'reloaded'
+
+# - id: night_mode
+#   alias: 'Night Mode'
+#   initial_state: true
+#   trigger:
+#     - platform: state
+#       entity_id: input_datetime.morning, input_datetime.night
+#   action:
+#     - service_template: >
+#       {% if states.input_datetime.morning.attributes.timestamp >= as_timestamp(now()) <= states.input_datetime.night.attributes.timestamp %}
+#         input_boolean.turn_on
+#       {% else %}
+#         input_boolean.turn_off
+#       {% endif %}
+#       entity_id: input_boolean.night
+
+- id: wakeup_lights
+  alias: 'Wakeup lights'
+  initial_state: true
+  trigger:
+    - platform: state
+      entity_id: input_datetime.sleep
+      to: 'off'
+  action:
+    - service: light.turn_on
+      data_template:
+        brightness: 10
+        entity_id: >
+          {%- for x in states.light if x.state == 'on' and (x.entity_id != 'light.spot' and x.entity_id != 'light.masa' and x.entity_id != 'light.bathroom' and x.entity_id != 'light.hallway') -%} 
+          {{- "," if not loop.first-}}{{ x.entity_id }}{{-endif-}}
+          {%- endfor -%}
 
 - id: in_bed
   alias: 'In bed'
@@ -179,16 +211,17 @@
       state: 'off'
   action:
     - service: input_boolean.turn_on
-      entity_id: input_boolean.bedroom
+      entity_id: input_boolean.bedroom, input_boolean.sleep
+    # - service: notify.hass
+    #   data_template:
+    #     message: 'sleeping much'
+    # - service: input_datetime.set_datetime
+    #   entity_id: input_datetime.night
+    #   data_template:
+    #     time: "{{now().strftime('%H:%M')}}"
+    #     date: '{{ now().timestamp() | timestamp_custom("%Y-%m-%d", true) }}'
     - service: input_boolean.turn_on
-      entity_id: input_boolean.sleep
-    - service: notify.hass
-      data_template:
-        message: 'sleeping much'
-    - service: input_datetime.set_datetime
-      entity_id: input_datetime.night
-      data_template:
-        time: "{{now().strftime('%H:%M')}}"
+      entity_id: input_boolean.night
 
 - id: Good_morning
   alias: 'Good morning'
@@ -210,19 +243,24 @@
       value_template: '{{ as_timestamp(now()) - as_timestamp(states.input_boolean.sleep.last_changed) | int > 3600 }}'
   action:
     - service: input_boolean.turn_off
-      entity_id: input_boolean.bedroom
-    - service: input_boolean.turn_off
-      entity_id: input_boolean.sleep
+      entity_id: input_boolean.bedroom, input_boolean.sleep
     - service: switch.turn_on
       entity_id: switch.coffee_machine
-    - service: notify.hass
-      data_template:
-        message: 'good morning'
+    # - service: notify.hass
+    #   data_template:
+    #     message: 'good morning'
+    # - service: input_datetime.set_datetime
+    #   entity_id: input_datetime.night
+    #   data_template:
+    #     date: '{{ now().timestamp() | timestamp_custom("%Y-%m-%d", true) }}'
+    # - service: input_datetime.set_datetime
+    #   entity_id: input_datetime.morning
+    #   data_template:
+    #     time: '{{(as_timestamp(now()) + (15 * 60)) | timestamp_custom("%H:%M", true)}}'
+    #     date: '{{ now().timestamp() | timestamp_custom("%Y-%m-%d", true) }}'
     - delay: '00:15:00'
-    - service: input_datetime.set_datetime
-      entity_id: input_datetime.morning
-      data_template:
-        time: '{{as_timestamp(now()) | timestamp_custom("%H:%M", true)}}'
+    - service: input_boolean.turn_off
+      entity_id: input_boolean.night
 
 - id: auto_mode
   alias: 'Auto mode'
@@ -259,7 +297,7 @@
       entity_id: sensor.bed_occupancy
       to: 'double'
       for:
-        seconds: 5
+        seconds: 30
     - platform: state
       entity_id: binary_sensor.couch
       to: 'off'
@@ -397,17 +435,22 @@
       value_template: '{{ states.media_player.audio_funk.attributes["media_title"] == "Spotify" }}'
     - platform: template
       value_template: '{{ states.media_player.audio_funk.attributes["media_title"] == "Vice Informaci" }}'
+    - platform: template
+      value_template: '{{ states.media_player.audio_funk.attributes["media_title"] == "Advertisement" }}'
   action:
     - service: media_player.volume_mute
       data:
         entity_id: media_player.audio_funk
         is_volume_muted: 'yes'
-    - wait_template: >
-        {% if states.media_player.audio_funk.attributes['media_title'] != 'Spotify' %} True {% endif %}
+    - wait_template: '{{ states.media_player.audio_funk.attributes["media_title"] != "Spotify" }}'
       timeout: '00:00:60'
       continue_on_timeout: true
     - wait_template: >
         {% if states.media_player.audio_funk.attributes['media_title'] != 'Vice Informaci' %} True {% endif %}
+      timeout: '00:00:60'
+      continue_on_timeout: true
+    - wait_template: >
+        {% if states.media_player.audio_funk.attributes['media_title'] != 'Advertisement' %} True {% endif %}
       timeout: '00:00:60'
       continue_on_timeout: true
     - service: media_player.volume_mute
@@ -431,7 +474,8 @@
       entity_id: binary_sensor.motion_living
       state: 'off'
     - condition: template
-      value_template: '{{ as_timestamp(now()) - as_timestamp(states.binary_sensor.motion_living.last_changed) | int > 1200 }}'
+      # value_template: '{{ as_timestamp(now()) - as_timestamp(states.binary_sensor.motion_living.last_changed) | int > 1200 }}'
+      value_template: '{{ (as_timestamp(now()) - (20 * 60)) >= as_timestamp(states.binary_sensor.motion_living.last_changed) }}'
   action:
     - service: switch.turn_off
       entity_id: switch.projector_ir
@@ -501,7 +545,7 @@
       state: 'off'
   action:
     - wait_template: >
-        {% if trigger.to_state.state == 'on' or (now().hour|int >= 0 and now().hour|int <= 21) %} True {% endif %}
+        {% if trigger.to_state.state == 'on' or (now().hour >= 0 and now().hour <= 21) %} True {% endif %}
       timeout: '00:00:10'
       continue_on_timeout: true
     - service_template: >
@@ -524,8 +568,11 @@
       for:
         seconds: 300
   condition:
-    - condition: template
-      value_template: '{{ now().hour|int >= (states.input_datetime.morning.attributes.hour) }}'
+    - condition: state
+      entity_id: input_boolean.night
+      state: 'off'
+    # - condition: template
+    #   value_template: '{{ as_timestamp(now()) >= states.input_datetime.morning.attributes.timestamp }}'
   action:
     - service: media_player.volume_set
       data:
@@ -689,7 +736,8 @@
   initial_state: true
   trigger:
     - platform: state
-      entity_id: input_boolean.vacation, input_boolean.guest, input_boolean.away
+      entity_id: input_boolean.vacation, input_boolean.guest
+      #,input_boolean.away
   action:
     - service: notify.hass
       data_template:
@@ -751,7 +799,7 @@
       data_template:
         title: Today is {{ now().strftime( '%A %d %B ')}}
         message: >
-           Outside feels like {{states('sensor.dark_sky_apparent_temperature') | round}}°{{ "\n" }}High is {{states('sensor.dark_sky_daytime_high_apparent_temperature_0')| round}}° {{ "\n" }}Low is {{states('sensor.dark_sky_overnight_low_apparent_temperature_0') | round}}°{{ "\n" }}Forecast is {{states('sensor.dark_sky_summary_0')[:-1]|lower}}{{ "\n" }}
+           Outside feels like {{states('sensor.dark_sky_apparent_temperature') | round}}°{{ "\n" }}Forecast is {{states('sensor.dark_sky_summary_0')[:-1]|lower}}, {{states('sensor.dark_sky_daytime_high_apparent_temperature_0')| round}}°/{{states('sensor.dark_sky_overnight_low_apparent_temperature_0') | round}}°
            {{ "\n" }}Storj: {{states.sensor.storj.state}}{{ "\n" }}{{states('sensor.zalendar')}}{{ "\n" }}
            {{ "\n" }}{{states.sensor.quote_of_the_day.state}}
 
@@ -1078,7 +1126,7 @@
       data_template:
         entity_id: light.bedroom
         mode: >
-         {% if now().hour|int >= 22 or (now().hour|int <= (states.input_datetime.morning.attributes.hour) and now().minute|int <= (states.input_datetime.morning.attributes.minute)) %}
+         {% if states.input_boolean.night.state == 'on' %}
            moonlight
          {% else %}
            normal
@@ -1086,7 +1134,7 @@
     - service: scene.turn_on
       data_template:
         entity_id: >
-         {% if now().hour|int >= 22 or (now().hour|int <= (states.input_datetime.morning.attributes.hour) and now().minute|int <= (states.input_datetime.morning.attributes.minute)) %}
+         {% if states.input_boolean.night.state == 'on' %}
            scene.bedroom_night
          {% elif trigger.entity_id == 'sensor.bed_occupancy' and (as_timestamp(now()) - as_timestamp(states.light.bedroom.last_changed) | int > 7200) %}
            scene.bedroom_night
@@ -1145,7 +1193,7 @@
     - service: scene.turn_on
       data_template:
         entity_id: >
-            {% if now().hour|int >= (states.input_datetime.night.attributes.hour) and (now().hour|int <= (states.input_datetime.morning.attributes.hour) and now().minute|int < (states.input_datetime.morning.attributes.minute)) %}
+            {% if states.input_boolean.night.state == 'on' %}
               scene.kitchen_night
             {% else %}
               scene.kitchen_day
@@ -1253,7 +1301,7 @@
       entity_id: light.bob
       data_template:
         brightness: >
-            {% if now().hour|int >= (states.input_datetime.night.attributes.hour) and (now().hour|int <= (states.input_datetime.morning.attributes.hour) and now().minute|int < (states.input_datetime.morning.attributes.minute)) %}26
+            {% if states.input_boolean.night.state == 'on' %}26
             {% else %}255
             {% endif %}
 
@@ -1335,7 +1383,7 @@
     - service: scene.turn_on
       data_template:
         entity_id: >
-          {% if now().hour|int >= (states.input_datetime.night.attributes.hour) and (now().hour|int <= (states.input_datetime.morning.attributes.hour) and now().minute|int <= (states.input_datetime.morning.attributes.minute)) %}
+          {% if states.input_boolean.night.state == 'on' %}
             scene.hallway_night
           {% else %}
             scene.hallway_day
@@ -1395,14 +1443,14 @@
     - service: scene.turn_on
       data_template:
         entity_id: >
-          {% if now().hour|int >= (states.input_datetime.night.attributes.hour) and (now().hour|int <= (states.input_datetime.morning.attributes.hour) and now().minute|int <= (states.input_datetime.morning.attributes.minute)) %}scene.wc_night
+          {% if states.input_boolean.night.state == 'on' %}scene.wc_night
           {% else %}scene.wc_day
           {% endif %}
     - delay: '00:00:01'
     - service: scene.turn_on
       data_template:
         entity_id: >
-          {% if now().hour|int >= (states.input_datetime.night.attributes.hour) and (now().hour|int <= (states.input_datetime.morning.attributes.hour) and now().minute|int <= (states.input_datetime.morning.attributes.minute)) %}scene.wc_night
+          {% if states.input_boolean.night.state == 'on' %}scene.wc_night
           {% else %}scene.wc_day
           {% endif %}
 

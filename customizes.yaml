@@ -36,10 +36,6 @@ binary_sensor.floorplan:
 light.entrance:
   hidden: true
 
-sensor.upc:
-  friendly_name: "UPC"
-  icon: mdi:ethernet-cable
-
 sensor.door:
   friendly_name: "Door"
   icon: mdi:door
@@ -47,55 +43,6 @@ sensor.door:
 sensor.storj:
   friendly_name: "Storj increase"
   icon: mdi:nas
-
-binary_sensor.workday_sensor:
-  hidden: true
-
-sensor.quote_of_the_day:
-  hidden: true
-
-light.Hallway1:
-  hidden: true
-
-light.Hallway2:
-  hidden: true
-
-light.Hallway3:
-  hidden: true
-
-sensor.zalendar:
-  hidden: true
-
-sensor.ralendar:
-  hidden: true
-
-binary_sensor.switch_bedroom:
-  friendly_name: "Bedroom Button"
-  hidden: true
-
-sensor.firetv:
-  hidden: true
-
-binary_sensor.switch_monkey:
-  hidden: true
-
-sensor.Temperature_bedroom:
-  friendly_name: "Temperature"
-
-sensor.Humidity_bedroom:
-  friendly_name: "Humidity"
-
-sensor.Pressure_bedroom:
-  friendly_name: "Pressure"
-
-sensor.Temperature_living:
-  friendly_name: "Temperature"
-
-sensor.Humidity_living:
-  friendly_name: "Humidity"
-
-sensor.Pressure_living:
-  friendly_name: "Pressure"
 
 light.table:
   icon: mdi:ceiling-light
@@ -120,9 +67,6 @@ sensor.spacex_next_launch_site_name_long:
 sensor.spacex_next_mission_video_link:
   icon: mdi:message-video
   
-sensor.spacex:
-  hidden: true
-
 sensor.launch_day:
   icon: mdi:calendar
   
@@ -135,13 +79,6 @@ sensor.mission_video_link:
 sensor.entrance:
   friendly_name: "Entrance"
   icon: mdi:walk
-  # value_template: '{{ states.sensor.entrance }}'
-  # icon_template: >
-          # {%- if sensor.entrance, Clear -%}
-            # mdi:walk
-          # {%- else -%}
-            # mdi:help-circle
-          # {%- endif -%}
 
 binary_sensor.motion_table:
   icon: mdi:walk
@@ -162,37 +99,9 @@ light.kitchen:
 binary_sensor.cube:
   icon: mdi:cube-outline
   friendly_name: "Cube"
-  hidden: true
 
 sensor.cube_last:
   icon: mdi:cube
-
-binary_sensor.motion_living:
-  friendly_name: "Living"
-
-binary_sensor.motion_hallway:
-  friendly_name: "Hallway"
-
-binary_sensor.motion_kitchen:
-  friendly_name: "Kitchen old"
-
-binary_sensor.motion_wc:
-  friendly_name: "WC"
-
-sensor.illumination_living:
-  friendly_name: "Light"
-
-sensor.illumination_hallway:
-  friendly_name: "Light"
-
-sensor.illumination_kitchen:
-  friendly_name: "Light"
-
-sensor.illumination_wc:
-  friendly_name: "Light"
-
-sensor.illumination_gateway:
-  friendly_name: "Light"
 
 light.gateway:
   friendly_name: "Gateway"
@@ -258,50 +167,11 @@ sensor.plex:
 sensor.cpu_temperature:
   icon: mdi:temperature-celsius
 
-group.all_scripts:
-  control: hidden
-  hidden: false
-  friendly_name: "Scripts"
-
-group.all_sensors:
-  control: hidden
-  hidden: false
-  friendly_name: "Sensors"
-
-group.all_switches:
-  control: hidden
-  hidden: false
-  friendly_name: "Switches"
-
-group.all_lightss:
-  hidden: false
-  friendly_name: "Lights"
-
 automation.Feed_ze_animal_7_20_14_18:
   icon: mdi:timetable
 
-group.all_automations:
-  hidden: false
-  friendly_name: "Automation"
-
-group.all_devices:
-  hidden: false
-  friendly_name: "Devices"
-
 switch.riki_s_food:
   icon: mdi:cat
-
-switch.bob:
-  icon: mdi:sofa
-
-#automation.bob_night:
-input_boolean.meh:
-  friendly_name: "Manual Mode"
-  icon: mdi:human-greeting
-#brightness-auto
-
-sensor.standby:
-  icon: mdi:power-settings
 
 switch.coffee_machine:
   icon: mdi:power-settings
@@ -326,12 +196,6 @@ sensor.dark_sky_daytime_high_apparent_temperature_0:
   friendly_name: 'High is'
 sensor.dark_sky_overnight_low_apparent_temperature_0:
   friendly_name: 'Low is'
-sensor.dark_sky_hourly_summary:
-  hidden: true
-sensor.dark_sky_summary:
-  hidden: true
-sensor.dark_sky_precip_probability:
-  hidden: true
 sensor.dark_sky_summary_0:
   friendly_name: 'Summary'
 sensor.dark_sky_precip_probability_0:

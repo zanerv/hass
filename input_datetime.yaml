@@ -1,0 +1,8 @@
+morning:
+  name: Morning
+  has_time: true
+  has_date: true
+night:
+  name: Night
+  has_time: true
+  has_date: true
