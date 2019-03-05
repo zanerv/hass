@@ -1,3 +1,33 @@
+- platform: statistics
+  name: bob
+  entity_id: binary_sensor.motion_bob
+  max_age:
+    minutes: 5
+    
+- platform: statistics
+  name: table
+  entity_id: binary_sensor.motion_table
+  max_age:
+    minutes: 5
+    
+- platform: statistics
+  name: bedroom
+  entity_id: binary_sensor.motion_bedroom
+  max_age:
+    minutes: 5
+    
+- platform: statistics
+  name: kitchen
+  entity_id: binary_sensor.motion_bar
+  max_age:
+    minutes: 5
+    
+- platform: statistics
+  name: bathroom
+  entity_id: binary_sensor.motion_bathroom
+  max_age:
+    minutes: 5
+    
 - platform: uptime
   unit_of_measurement: 'minutes'
   name: hassan uptime
@@ -10,7 +40,7 @@
   - 'time'
       
 - platform: command_line
-  name: Door
+  name: Door Lock
   command: /bin/bash -c "adb shell cat /storage/sdcard0/Android/data/com.xiaomi.smarthome/files/SherlockLog/$(date +%Y%m%d.log)|grep mOperateCommandType|tail -1| grep -oP '(?<=mOperateCommandType:).*?(?=\r)'||echo unknown"
   scan_interval: 900
   
@@ -104,6 +134,12 @@
   api_key: !secret tau_api
   monitored_users: zanerv
 
+- platform: mqtt
+  name: "B_Power"
+  state_topic: "tele/bedroom/SENSOR"
+  value_template: "{{ value_json.ENERGY.Power }}"
+  unit_of_measurement: "W"
+  
 - platform: mqtt
   name: "Bed Occupancy"
   state_topic: "/room/bedroom/bed/status"
@@ -229,7 +265,7 @@
 - platform: command_line
   name: Zalendar
   command: cat /config/Z.cal
-  scan_interval: 9000
+  scan_interval: 1800
 
 - platform: command_line
   name: Ralendar
@@ -258,25 +294,25 @@
       value_template: '{{ states.sensor.spacex.attributes["rocket"]["rocket_name"] }}'
     spacex_next_launch_day:
       friendly_name: 'Launch Day'
-      value_template: '{{ states.sensor.spacex.state | int | timestamp_custom("%d.%m.%Y")}}'
+      value_template: '{{ states("sensor.spacex") | int | timestamp_custom("%d.%m.%Y")}}'
     spacex_next_launch_time:
       friendly_name: 'Launch Time'
-      value_template: '{{ states.sensor.spacex.state | int | timestamp_custom("%H:%M")}}'
+      value_template: '{{ states("sensor.spacex") | int | timestamp_custom("%H:%M")}}'
       unit_of_measurement: 'h'
     spacex_next_mission_video_link:
       friendly_name: 'Mission Video Link'
-      value_template: '{{ states.sensor.spacex.attributes.links.video_link }}'
+      value_template: '{{ state_attr("sensor.launch", "links.video_link") }}'
     spacex_next_launch_site_name_long:
       friendly_name: 'Launch Site'
       value_template: '{{ states.sensor.spacex.attributes["launch_site"]["site_name_long"] }}'
 
     launch_day:
       friendly_name: 'Launch Day'
-      value_template: '{{ as_timestamp(states.sensor.launch.attributes.launch_time) | int | timestamp_custom("%d.%m.%Y")}}'
+      value_template: '{{ as_timestamp(state_attr("sensor.launch", "launch_time")) | int | timestamp_custom("%d.%m.%Y")}}'
     launch_time:
       friendly_name: 'Launch Time'
-      value_template: '{{ as_timestamp(states.sensor.launch.attributes.launch_time) | int | timestamp_custom("%H:%M")}}'
+      value_template: '{{ as_timestamp(state_attr("sensor.launch", "launch_time")) | int | timestamp_custom("%H:%M")}}'
       unit_of_measurement: 'h'
     mission_video_link:
       friendly_name: 'Mission Video Link'
-      value_template: '{{states.sensor.launch.attributes.stream}}'
+      value_template: '{{state_attr("sensor.launch", "stream")}}'

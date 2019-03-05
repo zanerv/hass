@@ -1,4 +1,3 @@
-
 purge:
   alias: purge
   sequence:
@@ -16,20 +15,11 @@ cast:
         media_content_id: "{{states.input_boolean.song.state}}"
         media_content_type: audio/flac
 
-media_extractor_test:
-  alias: Media Extractor Test
-  sequence:
-    - service: media_extractor.play_media
-      entity_id: media_player.audio_funk
-      data:
-        media_content_id: "https://www.youtube.com/watch?v=RKcxNsaLxEM"
-        media_content_type: video/youtube
-
 night_mode:
   alias: Good night
   sequence:
     - service: mqtt.publish
-      data_template:
+      data:
         topic: /home/laptop
         payload: standby
     - service: light.turn_off
@@ -89,20 +79,24 @@ movie_time:
   sequence:
     - service: switch.turn_on
       entity_id: switch.projector
+    - delay: '00:00:02'
+    - service: switch.turn_on
+      entity_id: switch.projector
     - service: light.turn_on
       entity_id: light.spot
-    - delay: '00:00:20'
+    - delay: '00:00:40'
     - service: homeassistant.turn_off
       entity_id: group.guster
     - service: light.turn_off
       data_template:
         entity_id: >
-          {%- for x in states.light if x.state == 'on' and state.entity_id != 'light.spot' and (as_timestamp(now()) - as_timestamp(x.last_changed) | int < 60)  -%} 
+          {%- for x in states.light if x.state == 'on' and state.entity_id != 'light.spot' and (as_timestamp(now()) - as_timestamp(x.last_changed) | int < 100)  -%} 
           {{- "," if not loop.first-}}{{ x.entity_id }}{{-endif-}}
           {%- endfor -%}
-    - service: media_player.turn_off
-      data:
-        entity_id: media_player.audio_funk
+    # - delay: '00:00:20'
+    # - service: media_player.turn_off
+    #   data:
+    #     entity_id: media_player.audio_funk
 
 storj_information:
   alias: storj information

@@ -36,9 +36,9 @@ binary_sensor.floorplan:
 light.entrance:
   hidden: true
 
-sensor.door:
-  friendly_name: "Door"
-  icon: mdi:door
+sensor.door_lock:
+  friendly_name: "Door Lock"
+  icon: mdi:lock-smart
 
 sensor.storj:
   friendly_name: "Storj increase"

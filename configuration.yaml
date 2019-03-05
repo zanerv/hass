@@ -105,7 +105,7 @@ logger:
     # Hide botvac connexion errors which happen sometimes:
     homeassistant.components.vacuum: error
     mirobo.device: critical
-
+    sensor.laptop: warning
 influxdb:
   exclude:
     entities:
@@ -118,6 +118,31 @@ recorder:
   purge_keep_days: 1
 
 system_health:
+
+default_config:
+
+alert:
+  motion_battery:
+    name: Sensor Battery is Low
+    entity_id: sensor.battery
+    repeat: 10
+    notifiers:
+      - hass
+
+person:
+  - name: Z
+    id: Z
+    device_trackers:
+      - device_tracker.z
+      - device_tracker.zpc
+      - device_tracker.z_phone
+  - name: !secret she
+    id: ro
+    device_trackers:
+      - device_tracker.r
+      - device_tracker.rdell
+      - device_tracker.rpc
+      - device_tracker.r_phone
 
 # Enables a map showing the location of tracked devices
 map:
@@ -137,7 +162,6 @@ media_player:
     # entity_namespace: 'plex'
     # include_non_clients: true
     scan_interval: 5
-    show_all_controls: true
     # use_custom_entity_ids: true
     # use_episode_art: true
 
@@ -164,6 +188,7 @@ device_tracker:
 telegram_bot:
   - platform: polling
     api_key: !secret telegram
+    parse_mode: html
     allowed_chat_ids:
       - !secret chat_id
 

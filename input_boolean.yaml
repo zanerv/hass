@@ -41,8 +41,12 @@ sleep:
 block:
   name: Manual
   icon: mdi:cancel
+
+zigbee_permit_join:
+  name: Allow devices to join
   initial: off
-  
+  icon: mdi:cellphone-wireless
+    
 living:
   initial: off
 

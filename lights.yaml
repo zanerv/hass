@@ -3,11 +3,11 @@
   entities:
     - light.hallway1
     - light.hallway2
+    - light.hallway3
 
 - platform: group
   name: Kitchen Day
   entities:
-    - light.bar
     - light.kitchen
 
 - platform: group
@@ -26,14 +26,14 @@
       name: Kitchen Strip
       transition: 1000
       save_on_change: False
-    !secret Hallway1:
-      name: Hallway1
-      transition: 1000
-      save_on_change: False
-    !secret Hallway2:
-      name: Hallway2
-      transition: 1000
-      save_on_change: False
+    # !secret Hallway1:
+    #   name: Hallway1
+    #   transition: 1000
+    #   save_on_change: False
+    # !secret Hallway2:
+    #   name: Hallway2
+    #   transition: 1000
+    #   save_on_change: False
     # !secret Hallway3:
     #   name: Hallway3
     #   transition: 1000
@@ -52,11 +52,11 @@
       transition: 1000
       save_on_change: False
       use_music_mode: True
-    # !secret DarkRoom:
-    #   name: DarkRoom
-    #   transition: 1000
-    #   save_on_change: False
-    #   use_music_mode: True
+    !secret DarkRoom:
+      name: DarkRoom
+      transition: 1000
+      save_on_change: False
+      use_music_mode: True
     !secret LightRoom:
       name: LightRoom
       transition: 1000
@@ -66,6 +66,33 @@
       name: Bedroom
       transition: 1000
       save_on_change: False
+    
+- platform: mqtt
+  name: "Hallway1"
+  state_topic: "zigbee2mqtt/Hallway1"
+  command_topic: "zigbee2mqtt/Hallway1/set"
+  availability_topic: "zigbee2mqtt/bridge/state"
+  brightness: true
+  color_temp: true
+  schema: "json"
+
+- platform: mqtt
+  name: "Hallway2"
+  state_topic: "zigbee2mqtt/Hallway2"
+  command_topic: "zigbee2mqtt/Hallway2/set"
+  availability_topic: "zigbee2mqtt/bridge/state"
+  brightness: true
+  color_temp: true
+  schema: "json"
+
+- platform: mqtt
+  name: "Hallway3"
+  state_topic: "zigbee2mqtt/Hallway3"
+  command_topic: "zigbee2mqtt/Hallway3/set"
+  availability_topic: "zigbee2mqtt/bridge/state"
+  brightness: true
+  color_temp: true
+  schema: "json"
 
 - platform: mqtt
   name: "Table"

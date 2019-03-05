@@ -3,12 +3,14 @@
     light.Hallway:
       state: on
       brightness: 10
+      color_temp: 228
   
 - name: Hallway Day
   entities:
     light.Hallway:
       state: on
       brightness: 255
+      color_temp: 228
   
 - name: Kitchen Night
   entities:
@@ -21,6 +23,7 @@
   entities:
     light.kitchen_day:
       state: on
+      brightness: 255
     light.kitchen_night:
       state: off
 
