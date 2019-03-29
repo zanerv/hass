@@ -38,7 +38,7 @@ sleep:
   name: Sleep
   icon: mdi:hotel
 
-block:
+manual:
   name: Manual
   icon: mdi:cancel
 
@@ -46,30 +46,3 @@ zigbee_permit_join:
   name: Allow devices to join
   initial: off
   icon: mdi:cellphone-wireless
-    
-living:
-  initial: off
-
-table:
-  initial: off
-
-kitchen:
-  initial: off
-
-hallway:
-  initial: off
-
-wc:
-  initial: off
-
-bedroom:
-  initial: off
-
-lightroom:
-  initial: off
-  
-bathroom:
-  initial: off
-  
-darkroom:
-  initial: off

@@ -206,7 +206,7 @@ Living:
  - light.bob
  - light.spot
  - switch.socket
- - binary_sensor.motion_bob
+ - binary_sensor.motion_spot
  - binary_sensor.cube
  - sensor.cube_last
  - binary_sensor.motion_living

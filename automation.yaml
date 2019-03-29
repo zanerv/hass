@@ -134,22 +134,22 @@
           {{- "," if not loop.first-}}{{ x.entity_id }}{{-endif-}}
           {%- endfor -%}
 
-- id: in_bed
-  alias: 'In bed'
-  initial_state: true
-  trigger:
-    - platform: numeric_state
-      entity_id: sensor.bed
-      above: 0
-      for:
-        seconds: 2
-  condition:
-    - condition: state
-      entity_id: input_boolean.bedroom
-      state: 'off'
-  action:
-    - service: input_boolean.turn_on
-      entity_id: input_boolean.bedroom
+# - id: in_bed
+#   alias: 'In bed'
+#   initial_state: true
+#   trigger:
+#     - platform: numeric_state
+#       entity_id: sensor.bed
+#       above: 0
+#       for:
+#         seconds: 2
+#   condition:
+#     - condition: state
+#       entity_id: input_boolean.bedroom
+#       state: 'off'
+#   action:
+#     - service: input_boolean.turn_on
+#       entity_id: input_boolean.bedroom
 
 - id: couch_kitchen_beb
   alias: 'Couch Kitchen Bed'
@@ -208,9 +208,6 @@
     - platform: state
       entity_id: binary_sensor.door_entrance
       to: 'off'
-    - platform: state
-      entity_id: input_boolean.away
-      to: 'off'
   condition:
     - condition: template
       value_template: '{{states.vacuum.harry_potter.state != "docked"}}'
@@ -246,7 +243,7 @@
       state: 'off'
   action:
     - service: input_boolean.turn_on
-      entity_id: input_boolean.bedroom, input_boolean.sleep
+      entity_id: input_boolean.sleep
     # - service: notify.hass
     #   data_template:
     #     message: 'sleeping much'
@@ -277,7 +274,7 @@
       value_template: '{{ as_timestamp(now()) - as_timestamp(states.input_boolean.sleep.last_changed) | int > 3600 }}'
   action:
     - service: input_boolean.turn_off
-      entity_id: input_boolean.bedroom, input_boolean.sleep
+      entity_id: input_boolean.sleep
     - service: switch.turn_on
       entity_id: switch.coffee_machine
     # - service: notify.hass
@@ -317,11 +314,11 @@
       entity_id: input_boolean.guest
       state: 'off'
     - condition: state
-      entity_id: input_boolean.block
+      entity_id: input_boolean.manual
       state: 'on'
   action:
     - service: input_boolean.turn_off
-      entity_id: input_boolean.block
+      entity_id: input_boolean.manual
 
 - id: manual_mode
   alias: 'Manual mode'
@@ -335,9 +332,10 @@
     - platform: state
       entity_id: binary_sensor.couch
       to: 'off'
+    - platform: state
+      entity_id: input_boolean.sleep
+      to: 'on'
   condition:
-    - condition: template
-      value_template: '{{ states.sensor.bed_occupancy.state != "off" or states.input_boolean.r.state == "off" }}'
     - condition: template
       value_template: '{{ states.media_player.firetv.state != "off" or states.sensor.bed_occupancy.state != "off"  or states.input_boolean.r.state == "off" }}'
     - condition: state
@@ -347,15 +345,15 @@
       entity_id: device_tracker.rdell
       state: 'not_home'
     - condition: state
-      entity_id: input_boolean.block
+      entity_id: input_boolean.manual
       state: 'off'
   action:
     - service: input_boolean.turn_on
-      entity_id: input_boolean.block
+      entity_id: input_boolean.manual
     - service: light.turn_off
       data_template:
         entity_id: >
-          {%- for state in states.light if state.entity_id != 'light.spot' and state.entity_id != 'light.bedroom' and state.entity_id != 'light.bathroom' -%} 
+          {%- for state in states.light if state.entity_id != 'light.spot' and state.entity_id != 'light.bedroom' -%} 
           {{- "," if not loop.first-}}{{ state.entity_id }}{{-endif-}}
           {%- endfor -%}
 
@@ -379,6 +377,10 @@
   action:
     - service: input_boolean.turn_on
       entity_id: input_boolean.play
+    - service: media_player.volume_set
+      data:
+        entity_id: media_player.audio_funk
+        volume_level: 0.4
     - service_template: >
         {% if trigger.entity_id == "binary_sensor.door_entrance" %} notify.hass
         {% else %}script.nothing
@@ -509,13 +511,13 @@
         entity_id: media_player.audio_funk
         is_volume_muted: 'yes'
     - wait_template: '{{ state_attr("media_player.audio_funk", "media_title") != "Spotify" }}'
-      timeout: '00:00:60'
+      timeout: '00:00:80'
       continue_on_timeout: true
     - wait_template: '{{ state_attr("media_player.audio_funk", "media_title") != "Vice Informaci" }}'
-      timeout: '00:00:60'
+      timeout: '00:00:80'
       continue_on_timeout: true
     - wait_template:  '{{state_attr("media_player.audio_funk", "media_title") != "Advertisement" }}'
-      timeout: '00:00:60'
+      timeout: '00:00:80'
       continue_on_timeout: true
     - service: media_player.volume_mute
       data:
@@ -527,7 +529,7 @@
   initial_state: true
   trigger:
     - platform: state
-      entity_id: binary_sensor.motion_bob
+      entity_id: binary_sensor.motion_spot
       to: 'off'
       for:
         minutes: 20
@@ -545,11 +547,11 @@
       entity_id: switch.projector_ir
     - delay: "00:00:03"
     - wait_template: >
-        {% if as_timestamp(now()) - as_timestamp(states.binary_sensor.motion_bob.last_changed) | int > 20 %} True {% endif %}
+        {% if as_timestamp(now()) - as_timestamp(states.binary_sensor.motion_spot.last_changed) | int > 20 %} True {% endif %}
       timeout: '00:00:10'
       continue_on_timeout: false
     - service_template: >
-        {% if as_timestamp(now()) - as_timestamp(states.binary_sensor.motion_bob.last_changed) | int < 20 %} switch.turn_on
+        {% if as_timestamp(now()) - as_timestamp(states.binary_sensor.motion_spot.last_changed) | int < 20 %} switch.turn_on
         {% else %}switch.turn_off
         {% endif %}
       entity_id: switch.projector_ir
@@ -592,10 +594,6 @@
         {% if trigger.to_state.state == 'on' and states.sensor.illumination_living.state|int <= 50 %} light.turn_on
         {% else %} light.turn_off{% endif %}
       entity_id: light.lightroom
-    - service_template: >
-        {% if trigger.to_state.state == 'on' %} input_boolean.turn_on
-        {% else %} input_boolean.turn_off{% endif %}
-      entity_id: input_boolean.lightroom
 
 - id: darkroom_light
   alias: 'Darkroom Light'
@@ -617,10 +615,6 @@
         {% else %}light.turn_off
         {% endif %}
       entity_id: light.darkroom
-    - service_template: >
-        {% if trigger.to_state.state == 'on' %} input_boolean.turn_on
-        {% else %} input_boolean.turn_off{% endif %}
-      entity_id: input_boolean.darkroom
 
 - id: bedroom_doors
   alias: 'Bedroom doors'
@@ -721,7 +715,7 @@
       value_template: '{{ as_timestamp(now()) - as_timestamp(states.binary_sensor.door_entrance.last_changed) | int < 1800 or trigger.entity_id == "device_tracker.z_phone" }}'
   action:
     - service_template: >
-        {% if trigger.to_state.state == 'home' %} input_boolean.turn_on
+        {% if trigger.to_state.state == 'home' %} homeassistant.turn_on
         {% elif (states.device_tracker.rdell.state == states.device_tracker.r.state == states.device_tracker.rpc.state) or trigger.entity_id == 'device_tracker.z' %} input_boolean.turn_off
         {% else %} script.nothing
         {% endif %}
@@ -729,7 +723,7 @@
         entity_id: >
           {% if trigger.entity_id == 'device_tracker.z' or trigger.entity_id == 'device_tracker.z_phone' %} input_boolean.z
           {% elif trigger.entity_id == 'device_tracker.r' or trigger.entity_id == 'device_tracker.rdell' or trigger.entity_id == 'device_tracker.rpc' %} input_boolean.r
-          {% else %} input_boolean.living
+          {% else %} script.nothing
           {% endif %}
 
 - id: house_mode_guest
@@ -826,7 +820,7 @@
   action:
     - service: script.door_lock
     - service: input_boolean.turn_on
-      entity_id: input_boolean.block
+      entity_id: input_boolean.manual
 
 - id: Door_unlock
   alias: 'Door Unlock'
@@ -909,7 +903,7 @@
     condition: and
     conditions:
       - condition: state
-        entity_id: input_boolean.block
+        entity_id: input_boolean.manual
         state: 'off'
       - condition: numeric_state
         entity_id: sensor.illumination_living
@@ -921,7 +915,7 @@
         entity_id: light.kitchen
         state: 'off'
       - condition: state
-        entity_id: binary_sensor.motion_bob
+        entity_id: binary_sensor.motion_spot
         state: 'on'
   action:
     - service: automation.trigger
@@ -994,7 +988,7 @@
   initial_state: true
   trigger:
     - platform: state
-      entity_id: binary_sensor.motion_bob
+      entity_id: binary_sensor.motion_spot
       to: 'on'
     - platform: state
       entity_id: binary_sensor.motion_table, binary_sensor.motion_bar
@@ -1014,7 +1008,7 @@
       data_template:
         entity_id: input_select.location
         option: >
-           {% if trigger.entity_id == "binary_sensor.motion_bob" %} Bob
+           {% if trigger.entity_id == "binary_sensor.motion_spot" %} Spot
            {% elif trigger.entity_id == "binary_sensor.motion_table" %} Table
            {% elif trigger.entity_id == "binary_sensor.couch" %} Couch
            {% elif trigger.entity_id == "sensor.entrance" %} Entrance
@@ -1157,7 +1151,7 @@
     condition: and
     conditions:
       - condition: state
-        entity_id: input_boolean.block
+        entity_id: input_boolean.manual
         state: 'off'
       - condition: state
         entity_id: input_boolean.sleep
@@ -1168,8 +1162,6 @@
         entity_id: sensor.bed_occupancy
         state: 'off'
   action:
-    - service: input_boolean.turn_on
-      entity_id: input_boolean.bedroom
     - service: light.yeelight_set_mode
       data_template:
         entity_id: light.bedroom
@@ -1213,8 +1205,6 @@
     # - condition: template
     #   value_template: '{{ (as_timestamp(now()) - as_timestamp(states.binary_sensor.switch_bedroom.last_changed) | int > 900) or states.sensor.uptime.state|int < 15 }}'
   action:
-    - service: input_boolean.turn_off
-      entity_id: input_boolean.bedroom
     - service: light.turn_off
       entity_id: light.bedroom
 
@@ -1229,7 +1219,7 @@
         seconds: 0.1
   condition:
     - condition: state
-      entity_id: input_boolean.block
+      entity_id: input_boolean.manual
       state: 'off'
     - condition: numeric_state
       entity_id: sensor.illumination_living
@@ -1237,8 +1227,6 @@
     - condition: template
       value_template: '{{ states.light.kitchen.state == "off" or states.light.kitchen_strip.state == "off" or states.light.bar.state == "off" }}'
   action:
-    - service: input_boolean.turn_on
-      entity_id: input_boolean.kitchen
     - service: scene.turn_on
       data_template:
         entity_id: >
@@ -1270,8 +1258,6 @@
           entity_id: light.bar
           state: 'on'
   action:
-    - service: input_boolean.turn_off
-      entity_id: input_boolean.kitchen
     - service: light.turn_off
       entity_id: light.kitchen, light.kitchen_strip, light.bar
 
@@ -1286,7 +1272,7 @@
     condition: and
     conditions:
       - condition: state
-        entity_id: input_boolean.block
+        entity_id: input_boolean.manual
         state: 'off'
       - condition: state
         entity_id: light.table
@@ -1295,8 +1281,6 @@
         entity_id: sensor.illumination_living
         below: 35
   action:
-    - service: input_boolean.turn_on
-      entity_id: input_boolean.table
     - service: light.turn_on
       entity_id: light.table
 
@@ -1314,8 +1298,6 @@
       entity_id: light.table
       state: 'on'
   action:
-    - service: input_boolean.turn_off
-      entity_id: input_boolean.table
     - service: light.turn_off
       entity_id: light.table
 
@@ -1324,13 +1306,13 @@
   initial_state: true
   trigger:
     - platform: state
-      entity_id: binary_sensor.motion_bob
+      entity_id: binary_sensor.motion_spot
       to: 'on'
   condition:
     condition: and
     conditions:
       - condition: state
-        entity_id: input_boolean.block
+        entity_id: input_boolean.manual
         state: 'off'
       - condition: state
         entity_id: input_boolean.mmode
@@ -1344,8 +1326,6 @@
         after: sunset
         after_offset: '-00:15:00'
   action:
-    - service: input_boolean.turn_on
-      entity_id: input_boolean.living
     - service: light.turn_on
       entity_id: light.bob
       data_template:
@@ -1359,7 +1339,7 @@
   initial_state: true
   trigger:
     - platform: state
-      entity_id: binary_sensor.motion_bob
+      entity_id: binary_sensor.motion_spot
       to: 'off'
       for:
         minutes: 15
@@ -1378,8 +1358,6 @@
           entity_id: light.spot
           state: 'on'
   action:
-    - service: input_boolean.turn_off
-      entity_id: input_boolean.living
     - service: light.turn_off
       entity_id: light.bob, light.spot
 
@@ -1388,7 +1366,7 @@
   initial_state: true
   trigger:
     - platform: state
-      entity_id: binary_sensor.motion_bob
+      entity_id: binary_sensor.motion_spot
       to: 'off'
       for:
         minutes: 20
@@ -1419,7 +1397,7 @@
     condition: and
     conditions:
       - condition: state
-        entity_id: input_boolean.block
+        entity_id: input_boolean.manual
         state: 'off'
       - condition: numeric_state
         entity_id: sensor.illumination_hallway
@@ -1427,9 +1405,7 @@
       - condition: template
         value_template: '{{ states.sensor.house.state != "Away" or states.sensor.house.state != "Vacation" }}'
   action:
-    - service: input_boolean.turn_on
-      entity_id: input_boolean.hallway
-    - service: scene.turn_on
+    - service: homeassistant.turn_on
       data_template:
         entity_id: >
           {% if states.input_boolean.night.state == 'on' %}
@@ -1465,8 +1441,6 @@
         for:
           seconds: 30
   action:
-    - service: input_boolean.turn_off
-      entity_id: input_boolean.hallway
     - service: light.turn_off
       entity_id: light.hallway
 
@@ -1481,14 +1455,12 @@
     condition: and
     conditions:
       - condition: state
-        entity_id: input_boolean.block
+        entity_id: input_boolean.manual
         state: 'off'
       - condition: numeric_state
         entity_id: sensor.illumination_wc
         below: 20
   action:
-    - service: input_boolean.turn_on
-      entity_id: input_boolean.wc
     - service: scene.turn_on
       data_template:
         entity_id: >
@@ -1517,8 +1489,6 @@
       entity_id: light.WC
       state: 'on'
   action:
-    - service: input_boolean.turn_off
-      entity_id: input_boolean.wc
     - service: light.turn_off
       entity_id: light.WC
 
@@ -1531,11 +1501,12 @@
       to: 'on'
   condition:
     - condition: state
-      entity_id: input_boolean.block
+      entity_id: input_boolean.manual
       state: 'off'
+    - condition: numeric_state
+      entity_id: sensor.illumination_living
+      below: 30
   action:
-    - service: input_boolean.turn_on
-      entity_id: input_boolean.bathroom
     - service: light.turn_on
       entity_id: light.bathroom
 
@@ -1561,8 +1532,6 @@
       entity_id: binary_sensor.door_bathroom
       state: 'on'
   action:
-    - service: input_boolean.turn_off
-      entity_id: input_boolean.bathroom
     - service: light.turn_off
       entity_id: light.bathroom
 

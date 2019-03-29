@@ -1,4 +1,10 @@
 homeassistant:
+  auth_providers:
+    - type: homeassistant
+    - type: trusted_networks
+      trusted_networks:
+      - 192.168.0.0/24
+      - 172.19.0.0/24
   # Name of the location where Home Assistant is running
   name: Home
   # Location required to calculate the time the sun rises and sets
@@ -58,16 +64,16 @@ mqtt:
 config:
 
 http:
-  trusted_networks:
-    - 127.0.0.1
-    - 192.168.0.0/24
-    - 172.19.0.0/24
+#   trusted_networks:
+#     - 127.0.0.1
+#     - 192.168.0.0/24
+#     - 172.19.0.0/24
   #ssl_certificate: !secret ssl_certificate
   #ssl_key: !secret ssl_key
   # Secrets are defined in the file secrets.yaml
   # api_password: !secret http_password
   # Uncomment this if you are using SSL/TLS, running in Docker container, etc.
-  # base_url: !secret base_url
+  base_url: !secret base_url
 
 # Checks for available updates
 # Note: This component will send some information about your system to
@@ -97,15 +103,21 @@ logbook:
       - automation.last_movement
       - automation.bed_set
       - automation.bed_clear
-      - binary_sensor.motion_bob
+      - binary_sensor.motion_spot
       - binary_sensor.motion_table
+      - light.hallway1
+      - light.hallway2
+      - light.hallway3
+
 logger:
   default: warn
   logs:
     # Hide botvac connexion errors which happen sometimes:
     homeassistant.components.vacuum: error
-    mirobo.device: critical
+    mirobo.device: fatal
     sensor.laptop: warning
+    pychromecast.socket_client: fatal
+
 influxdb:
   exclude:
     entities:
@@ -117,7 +129,7 @@ recorder:
   purge_interval: 1
   purge_keep_days: 1
 
-system_health:
+#system_health:
 
 default_config:
 
@@ -158,6 +170,9 @@ shopping_list:
 
 # Plex
 media_player:
+  - platform: spotify
+    client_id: !secret client_id
+    client_secret: !secret client_secret
   - platform: plex
     # entity_namespace: 'plex'
     # include_non_clients: true
@@ -165,10 +180,13 @@ media_player:
     # use_custom_entity_ids: true
     # use_episode_art: true
 
-  - platform: firetv
+  - platform: androidtv
     name: FireTV
     host: !secret firetv_host
     adbkey: "/config/adb/adbkey"
+    apps:
+      com.amazon.tv.launcher: "Fire TV"
+      com.plexapp.android: "Plex"
 
 device_tracker:
   # - platform: snmp

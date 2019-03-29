@@ -66,7 +66,7 @@
       name: Bedroom
       transition: 1000
       save_on_change: False
-    
+
 - platform: mqtt
   name: "Hallway1"
   state_topic: "zigbee2mqtt/Hallway1"
@@ -123,9 +123,10 @@
 
 - platform: mqtt
   name: "spot"
-  state_topic: "bob/cmnd/POWER"
-  command_topic: "bob/cmnd/POWER"
-  availability_topic: "bob/tele/LWT"
+  state_topic: "stat/spot/RESULT"
+  state_value_template: "{{value_json.POWER}}"
+  command_topic: "cmnd/spot/POWER"
+  availability_topic: "tele/spot/LWT"
   qos: 0
   payload_on: "ON"
   payload_off: "OFF"

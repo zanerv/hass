@@ -80,7 +80,7 @@
             - binary_sensor.couch
             - binary_sensor.motion_table
             - binary_sensor.motion_bar
-            - binary_sensor.motion_bob
+            - binary_sensor.motion_spot
             - binary_sensor.motion_wc
           states:
             - state: 'off'

@@ -13,8 +13,8 @@
   device_class: motion
   
 - platform: mqtt
-  name: "motion_bob"
-  state_topic: "bob/PIR/cmnd/POWER1"
+  name: "motion_spot"
+  state_topic: "PIR/spot"
   device_class: motion
 
 - platform: mqtt

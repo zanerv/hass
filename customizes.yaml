@@ -125,8 +125,8 @@ binary_sensor.door_lightroom:
 binary_sensor.door_darkroom:
   icon: mdi:door
 
-binary_sensor.motion_bob:
-  friendly_name: "Bob"
+binary_sensor.motion_spot:
+  friendly_name: "Spot"
   icon: mdi:walk
 
 switch.socket:
