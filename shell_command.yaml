@@ -1,3 +1,4 @@
+start: /bin/bash -c "export PATH=$PATH:/config:/config/adb&& export LD_LIBRARY_PATH=/config/adb&& export IP=`ip route get 8.8.8.8 | tr -s ' ' | cut -d' ' -f7`&&export test=!secret plex_host"
 song: /bin/bash -c "/config/song.sh"
 storj: /bin/bash -c "/config/storj_sensor.sh"
 tts_storj: /bin/bash -c "/config/storj_inc.sh '{{ arg }}'"
