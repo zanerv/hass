@@ -12,6 +12,7 @@
       - Lightroom
       - Darkroom
       - Bedroom
+      - Bathroom
       - Bed
 
   z_status:
@@ -28,6 +29,7 @@
       - Lightroom
       - Darkroom
       - Bedroom
+      - Bathroom
       - Bed
 
   r_status:
@@ -44,4 +46,5 @@
       - Lightroom
       - Darkroom
       - Bedroom
+      - Bathroom
       - Bed

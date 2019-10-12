@@ -1,32 +1,38 @@
-- platform: statistics
-  name: bob
-  entity_id: binary_sensor.motion_spot
-  max_age:
-    minutes: 5
+- platform: mqtt
+  name: 'vibration'
+  state_topic: 'zigbee2mqtt/vibration'
+  json_attributes_topic: 'zigbee2mqtt/vibration'
+  availability_topic: 'zigbee2mqtt/bridge/state'
+  icon: mdi:gesture-double-tap
+  value_template: '{{ value_json.action }}'
     
+# - platform: sql
+#   scan_interval: 86400
+#   queries:
+#     - name: storj yesterday
+#       query: "SELECT MAX(state)-MIN(state) AS value FROM states WHERE entity_id='sensor.storj_today' AND state!='unknown' AND datetime(last_changed) BETWEEN datetime(date('now', '-1 days')) AND datetime(date('now'));"
+#       column: 'value'
+#       unit_of_measurement: 'Gb'
 - platform: statistics
-  name: table
-  entity_id: binary_sensor.motion_table
-  max_age:
-    minutes: 5
+  entity_id: sensor.storj
+
+- platform: history_stats
+  name: Sleep
+  entity_id: input_boolean.sleep
+  state: 'on'
+  type: time
+  start: '{{ now().replace(hour=0).replace(minute=0).replace(second=0) }}'
+  duration:
+    days: 1
     
-- platform: statistics
-  name: bedroom
-  entity_id: binary_sensor.motion_bedroom
-  max_age:
-    minutes: 5
-    
-- platform: statistics
-  name: kitchen
-  entity_id: binary_sensor.motion_bar
-  max_age:
-    minutes: 5
-    
-- platform: statistics
-  name: bathroom
-  entity_id: binary_sensor.motion_bathroom
-  max_age:
-    minutes: 5
+- platform: history_stats
+  name: rSleep
+  entity_id: input_boolean.r_sleep
+  state: 'on'
+  type: time
+  start: '{{ now().replace(hour=0).replace(minute=0).replace(second=0) }}'
+  duration:
+    days: 1
     
 - platform: uptime
   unit_of_measurement: 'minutes'
@@ -38,19 +44,79 @@
 - platform: time_date
   display_options:
   - 'time'
-      
+
 - platform: command_line
   name: Door Lock
-  command: /bin/bash -c "adb shell cat /storage/sdcard0/Android/data/com.xiaomi.smarthome/files/SherlockLog/$(date +%Y%m%d.log)|grep mOperateCommandType|tail -1| grep -oP '(?<=mOperateCommandType:).*?(?=\r)'||echo unknown"
+  command: /bin/bash -c "adb shell cat /storage/sdcard0/Android/data/com.xiaomi.smarthome/files/SherlockLog/$(date +%Y%m%d.log)|grep mOperateCommandType|tail -1| awk -F ':' '{print $5}'||echo unknown"
   scan_interval: 900
-  
+ 
 - platform: command_line
   name: storj
-  command: /bin/bash -c "/config/storj_sensor.sh"
-  scan_interval: 9000
+  unit_of_measurement: 'Gb'
+  value_template: '{{ (value | int / 1000000000) | round }}'
+  # command: du -sm /config/storj|awk '{print $1}'
+  command: /config/storjV3.sh diskSpace
+  scan_interval: 900 
+ 
+- platform: command_line
+  name: storj bandwidth
+  unit_of_measurement: 'Gb'
+  value_template: '{{ (value | int / 1000000000) | round }}'
+  command: /config/storjV3.sh bandwidth
+  scan_interval: 900
+
+- platform: mqtt
+  name: "mk storj bandwidth"
+  state_topic: "storj/storj_bandwidth"
+  value_template: '{{ value | int }}'
+  unit_of_measurement: 'Gb'
+
+- platform: mqtt
+  name: "mk storj"
+  state_topic: "storj/storj"
+  value_template: '{{ value | int }}'
+  unit_of_measurement: 'Gb'
 
 - platform: template
   sensors:
+    rosu_rssi:
+      device_class: signal_strength
+      unit_of_measurement: "dBm"
+      value_template: >-
+        {% if is_state("device_tracker.z", "home") %}
+          {{ states.device_tracker.z.attributes.rssi }}
+        {% else %}
+          -99
+        {% endif %}
+    rosu_ap:
+      value_template: >-  
+        {% if is_state("device_tracker.z", "home") and state_attr("device_tracker.z", "ap_mac") == "fc:ec:da:96:62:ef" %}  
+          Living
+        {% elif is_state("device_tracker.z", "home") and state_attr("device_tracker.z", "ap_mac") == "fc:ec:da:89:65:05" %}
+          Hallway
+        {% else %}
+          Away
+        {% endif %}
+        
+    pink_rssi:
+      device_class: signal_strength
+      unit_of_measurement: "dBm"
+      value_template: >-
+        {% if is_state("device_tracker.r", "home") %}              
+          {{ states.device_tracker.r.attributes.rssi }}              
+        {% else %}
+          -99
+        {% endif %}
+    pink_ap:
+      value_template: >-
+        {% if is_state("device_tracker.r", "home") and state_attr("device_tracker.r", "ap_mac") == "fc:ec:da:96:62:ef" %}
+          Living
+        {% elif is_state("device_tracker.r", "home") and state_attr("device_tracker.r", "ap_mac") == "fc:ec:da:89:65:05" %}
+          Hallway
+        {% else %}
+          Away
+        {% endif %}
+
     battery:
       entity_id: binary_sensor.door_bedroom
       icon_template: >
@@ -94,9 +160,6 @@
     location:
       value_template: '{{ states.input_select.location.state }}'
       friendly_name: 'Location'
-    cube_last:
-      friendly_name: "Cube"
-      value_template: '{{ states.binary_sensor.cube.attributes.last_action }}'
     # couch:
     #   value_template: "{% if is_state('binary_sensor.couch', 'off') %}Detected{% else %}Clear{% endif %}"
     # projector_status:
@@ -135,10 +198,23 @@
   monitored_users: zanerv
 
 - platform: mqtt
-  name: "B_Power"
-  state_topic: "tele/bedroom/SENSOR"
+  name: "Socket Table"
+  state_topic: "tele/socket_table/SENSOR"
   value_template: "{{ value_json.ENERGY.Power }}"
   unit_of_measurement: "W"
+  
+- platform: mqtt
+  name: "TV"
+  state_topic: "tele/socket_tv/SENSOR"
+  value_template: "{{ value_json.ENERGY.Power }}"
+  unit_of_measurement: "W"
+  
+- platform: mqtt
+  name: "Fridge"
+  state_topic: "tele/socket_fridge/SENSOR"
+  value_template: "{{ value_json.ENERGY.Power }}"
+  unit_of_measurement: "W"
+  icon: mdi:fridge-outline
   
 - platform: mqtt
   name: "Bed Occupancy"

@@ -1,10 +1,13 @@
-homeassistant:
+homeassistant:  
+  whitelist_external_dirs:
+    - /config/storj
   auth_providers:
     - type: homeassistant
     - type: trusted_networks
       trusted_networks:
       - 192.168.0.0/24
       - 172.19.0.0/24
+      allow_bypass_login: true
   # Name of the location where Home Assistant is running
   name: Home
   # Location required to calculate the time the sun rises and sets
@@ -20,18 +23,18 @@ homeassistant:
   customize: !include customizes.yaml
   packages: !include_dir_named packages/
   
-panel_iframe:
-  editor:
-    title: IDE
-    icon: mdi:code-braces
-    url: !secret url
+# panel_iframe:
+#   editor:
+#     title: IDE
+#     icon: mdi:code-braces
+#     url: !secret url
 
 # Enables the frontend
 frontend:
   themes: !include themes.yaml
   extra_html_url:
     - /local/custom_ui/state-card-floorplan.html
-    - http://cloud9.kpu.ro/ide.html
+    # - http://cloud9.kpu.ro/ide.html
 
 panel_custom:
   - name: floorplan
@@ -59,15 +62,17 @@ mqtt:
 #  keepalive: 60
   username: !secret mqtt_user
   password: !secret mqtt_password
-
+  discovery: true
+  birth_message:
+    topic: 'hass/status'
+    payload: 'online'
+  will_message:
+    topic: 'hass/status'
+    payload: 'offline'
 # Enables configuration UI
 config:
 
 http:
-#   trusted_networks:
-#     - 127.0.0.1
-#     - 192.168.0.0/24
-#     - 172.19.0.0/24
   #ssl_certificate: !secret ssl_certificate
   #ssl_key: !secret ssl_key
   # Secrets are defined in the file secrets.yaml
@@ -83,11 +88,14 @@ http:
 updater:
   # Optional, allows Home Assistant developers to focus on popular components.
   # include_used_components: true
-hassio:
+  
+# hassio:
+
 # Discover some devices automatically
 discovery:
   ignore:
-    - roku 
+    - homekit
+#    - roku 
     - yeelight
 
 # Allows you to issue voice commands from the frontend in enabled browsers
@@ -100,21 +108,22 @@ history:
 logbook:
   exclude:
     entities:
-      - automation.last_movement
-      - automation.bed_set
-      - automation.bed_clear
+      - automation.location
+      - input_select.location
       - binary_sensor.motion_spot
       - binary_sensor.motion_table
       - light.hallway1
+      - light.hallway1_light
       - light.hallway2
+      - light.hallway2_light
       - light.hallway3
+      - light.hallway3_light
+      - group.guster
+      - automation.remote_roku
 
 logger:
-  default: warn
+  default: info
   logs:
-    # Hide botvac connexion errors which happen sometimes:
-    homeassistant.components.vacuum: error
-    mirobo.device: fatal
     sensor.laptop: warning
     pychromecast.socket_client: fatal
 
@@ -126,8 +135,7 @@ influxdb:
 
 recorder:
   db_url: !secret db_url
-  purge_interval: 1
-  purge_keep_days: 1
+  purge_keep_days: 2
 
 #system_health:
 
@@ -146,7 +154,6 @@ person:
     id: Z
     device_trackers:
       - device_tracker.z
-      - device_tracker.zpc
       - device_tracker.z_phone
   - name: !secret she
     id: ro
@@ -164,10 +171,12 @@ sun:
 
 # Text to speech
 tts:
-  - platform: google
+  - platform: google_translate
+    service_name: google_say
 
 shopping_list:
-
+roku:
+  - host: !secret roku_host
 # Plex
 media_player:
   - platform: spotify
@@ -200,8 +209,21 @@ device_tracker:
       - !secret nmap_hosts
     home_interval: 5
     interval_seconds: 20
-#  - platform: googlehome
-#    host: !secret ghome
+  - platform: unifi
+    host: unifi
+    username: !secret unifi_user
+    password: !secret unifi_pass
+    verify_ssl: false
+    interval_seconds: 30
+    monitored_conditions:
+      - rssi
+      - ap_mac
+# googlehome:
+#   devices:
+#   - host: !secret ghome
+#     rssi_threshold: -100
+#     track_devices: true
+#     device_types: 2
 
 telegram_bot:
   - platform: polling
@@ -210,11 +232,69 @@ telegram_bot:
     allowed_chat_ids:
       - !secret chat_id
 
+yeelight:
+  devices:
+    !secret Kitchen:
+      name: Kitchen
+      transition: 1000
+      save_on_change: False
+    !secret Kitchen_strip:
+      name: Kitchen Strip
+      transition: 1000
+      save_on_change: False
+    !secret WC:
+      name: WC
+      transition: 1000
+      save_on_change: False
+    !secret Bob:
+      name: Bob
+      transition: 1000
+      save_on_change: False
+    !secret Bathroom:
+      name: Bathroom
+      transition: 1000
+      save_on_change: False
+    !secret DarkRoom:
+      name: DarkRoom
+      transition: 1000
+      save_on_change: False
+    !secret LightRoom:
+      name: LightRoom
+      transition: 1000
+      save_on_change: False
+    !secret Bedroom:
+      name: Bedroom
+      transition: 1000
+      save_on_change: False
+
 notify: !include notify.yaml
 
 media_extractor:
 
 input_datetime: !include input_datetime.yaml
+
+input_text:
+  url:
+    name: URL
+    initial: URL
+
+climate:
+  - platform: generic_thermostat
+    name: Living
+    heater: switch.ac
+    target_sensor: sensor.temperature_living
+    min_temp: 24
+    max_temp: 27
+    ac_mode: true
+    target_temp: 26
+    cold_tolerance: 0.3
+    hot_tolerance: 0
+    min_cycle_duration:
+      seconds: 5
+    keep_alive:
+      minutes: 3
+    initial_hvac_mode: "off"
+    precision: 0.5
 
 input_boolean: !include input_boolean.yaml
 

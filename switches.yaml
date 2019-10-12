@@ -14,6 +14,18 @@
       - service: switch.turn_off
         entity_id: switch.projector_ir
 
+# - platform: mqtt
+#   name: "HTPC"
+#   state_topic: "stat/htpc/RESULT"
+#   command_topic: "cmnd/htpc/POWER"
+#   availability_topic: "tele/htpc/LWT"
+#   qos: 1
+#   payload_on: "ON"
+#   payload_off: "OFF"
+#   payload_available: "Online"
+#   payload_not_available: "Offline"
+#   retain: false
+
 - platform: mqtt
   name: "Socket"
   state_topic: "stat/socket/POWER"
@@ -47,10 +59,14 @@
       friendly_name: "Projector"
       command_on: 'JgBYAAABJ5cQFRE5ERUQFRE5EToRFBEUEToRFBE5EToRFBEUEToROREVEDoRFBEVEBURFBEUERQROhITEjkQOhE6EDoROhA6EQAFDQABKEwQAAxUAAEnTBEADQU='
       command_off: 'JgBYAAABKJYQFRE5ERUQFRE5EToRFBEUEToQFRE5EToSExEUEToRORIUEDoROhA6ERUQOhAVERQROhAVERQRFRA6EhMROhA6EQAFDQABKEsRAAxTAAEoSxEADQU='
-    # projector_esc:
-    #   friendly_name: "Projector ESC"
-    #   command_on: 'JgBQAAABJpUSExEUERQROREUEBUQFBEUETkROREUEhMROREUERQRFBE5ERQRORE5ETkRFBE5ERQQFRA6EBUQFBEUETkRFBE5EQAFswABJkwQAA0FAAAAAAAAAAA='
-    #   command_off: 'JgBYAAABJpURFBEUERQROREUERQQFRAUETkROhETERQROREUERQRFBE5EjgROREUERQRFBAVEDoRExEUERQRORI4ETkRORITEQAFswABJkwQAAxXAAEmTBAADQU='
+    hdmi1:
+      friendly_name: "HDMI1"
+      command_on: 'JgBYAAABKJUSFBA6EhMSExI5EjkRFBEUEToQFRE5EjkRFBEUEjkRORIUETkSOREUEjgSExIUERQSOREUERQRORIUEjgSORE5EgAFDQABJ0wSAAxTAAEnTBIADQU='
+      command_off: ''
+    hdmi2:
+      friendly_name: "HDMI2"
+      command_on: 'JgCoAAABJ5YSFBA6ERQSFBE5EToRFBITEjkRFBE5EjkSExEUEjkRORIUERQRFBITEjkSOBIUEBUROhA6EToRORITEhQRORI4EQAFDgABJ0wRAAxUAAEoSxIADFMAASdMEgAMUwABJ0wSAAxSAAEnTREADFMAASdMEgAMUwABKEsSAAxSAAEnTREADFMAASdNEQAMUwABJ0wRAAxVAAEnTBEADFQAASdMEgANBQ=='
+      command_off: ''
     ac:
       friendly_name: "AC"
       command_on: 'JgBAAAABGYgPNA4UDRQNFA41DhMOFA0UDRQOFA0UDRQNFA4UDRQNFA4UDRQNNg01DhQNNQ4UDRQNFA41DTYNNQ4ADQUAAAAAAAAAAA=='
@@ -99,3 +115,185 @@
   payload_off: ""
   value_template: '{{ value == "coffee" }}'
 
+# docker containers
+- platform: rest
+  resource: http://127.0.0.1:8126/container/couchpotato
+  name: Couchpotato
+  body_on: '{"state": "start"}'
+  body_off: '{"state": "stop"}'
+  is_on_template: '{{ value_json is not none and value_json.state == "running" }}'
+
+- platform: rest
+  resource: http://127.0.0.1:8126/container/cron
+  name: Cron
+  body_on: '{"state": "start"}'
+  body_off: '{"state": "stop"}'
+  is_on_template: '{{ value_json is not none and value_json.state == "running" }}'
+
+- platform: rest
+  resource: http://127.0.0.1:8126/container/dockermon
+  name: DockerMon
+  body_on: '{"state": "start"}'
+  body_off: '{"state": "stop"}'
+  is_on_template: '{{ value_json is not none and value_json.state == "running" }}'
+
+- platform: rest
+  resource: http://127.0.0.1:8126/container/grafana
+  name: Grafana
+  body_on: '{"state": "start"}'
+  body_off: '{"state": "stop"}'
+  is_on_template: '{{ value_json is not none and value_json.state == "running" }}'
+
+- platform: rest
+  resource: http://127.0.0.1:8126/container/hass
+  name: HASS
+  body_on: '{"state": "start"}'
+  body_off: '{"state": "stop"}'
+  is_on_template: '{{ value_json is not none and value_json.state == "running" }}'
+
+- platform: rest
+  resource: http://127.0.0.1:8126/container/influxdb
+  name: InfluxDB
+  body_on: '{"state": "start"}'
+  body_off: '{"state": "stop"}'
+  is_on_template: '{{ value_json is not none and value_json.state == "running" }}'
+
+- platform: rest
+  resource: http://127.0.0.1:8126/container/letsencrypt
+  name: Letsencrypt
+  body_on: '{"state": "start"}'
+  body_off: '{"state": "stop"}'
+  is_on_template: '{{ value_json is not none and value_json.state == "running" }}'
+
+- platform: rest
+  resource: http://127.0.0.1:8126/container/mariadb
+  name: MariaDB
+  body_on: '{"state": "start"}'
+  body_off: '{"state": "stop"}'
+  is_on_template: '{{ value_json is not none and value_json.state == "running" }}'
+
+- platform: rest
+  resource: http://127.0.0.1:8126/container/mqtt
+  name: MQTT
+  body_on: '{"state": "start"}'
+  body_off: '{"state": "stop"}'
+  is_on_template: '{{ value_json is not none and value_json.state == "running" }}'
+
+- platform: rest
+  resource: http://127.0.0.1:8126/container/nextcloud
+  name: Nextcloud
+  body_on: '{"state": "start"}'
+  body_off: '{"state": "stop"}'
+  is_on_template: '{{ value_json is not none and value_json.state == "running" }}'
+
+- platform: rest
+  resource: http://127.0.0.1:8126/container/nginx
+  name: nginx
+  body_on: '{"state": "start"}'
+  body_off: '{"state": "stop"}'
+  is_on_template: '{{ value_json is not none and value_json.state == "running" }}'
+
+- platform: rest
+  resource: http://127.0.0.1:8126/container/openvpn
+  name: OpenVpn
+  body_on: '{"state": "start"}'
+  body_off: '{"state": "stop"}'
+  is_on_template: '{{ value_json is not none and value_json.state == "running" }}'
+
+- platform: rest
+  resource: http://127.0.0.1:8126/container/plex
+  name: Plex
+  body_on: '{"state": "start"}'
+  body_off: '{"state": "stop"}'
+  is_on_template: '{{ value_json is not none and value_json.state == "running" }}'
+
+- platform: rest
+  resource: http://127.0.0.1:8126/container/portainer
+  name: Portainer
+  body_on: '{"state": "start"}'
+  body_off: '{"state": "stop"}'
+  is_on_template: '{{ value_json is not none and value_json.state == "running" }}'
+
+- platform: rest
+  resource: http://127.0.0.1:8126/container/proxy
+  name: Proxy
+  body_on: '{"state": "start"}'
+  body_off: '{"state": "stop"}'
+  is_on_template: '{{ value_json is not none and value_json.state == "running" }}'
+
+- platform: rest
+  resource: http://127.0.0.1:8126/container/redis
+  name: redis
+  body_on: '{"state": "start"}'
+  body_off: '{"state": "stop"}'
+  is_on_template: '{{ value_json is not none and value_json.state == "running" }}'
+
+- platform: rest
+  resource: http://127.0.0.1:8126/container/sickrage
+  name: Sickrage
+  body_on: '{"state": "start"}'
+  body_off: '{"state": "stop"}'
+  is_on_template: '{{ value_json is not none and value_json.state == "running" }}'
+
+- platform: rest
+  resource: http://127.0.0.1:8126/container/smokeping
+  name: Smokeping
+  body_on: '{"state": "start"}'
+  body_off: '{"state": "stop"}'
+  is_on_template: '{{ value_json is not none and value_json.state == "running" }}'
+
+- platform: rest
+  resource: http://127.0.0.1:8126/container/storagenode
+  name: Storagenode
+  body_on: '{"state": "start"}'
+  body_off: '{"state": "stop"}'
+  is_on_template: '{{ value_json is not none and value_json.state == "running" }}'
+
+- platform: rest
+  resource: http://127.0.0.1:8126/container/storj1
+  name: Storj1
+  body_on: '{"state": "start"}'
+  body_off: '{"state": "stop"}'
+  is_on_template: '{{ value_json is not none and value_json.state == "running" }}'
+
+- platform: rest
+  resource: http://127.0.0.1:8126/container/storj2
+  name: Storj2
+  body_on: '{"state": "start"}'
+  body_off: '{"state": "stop"}'
+  is_on_template: '{{ value_json is not none and value_json.state == "running" }}'
+
+- platform: rest
+  resource: http://127.0.0.1:8126/container/storj3
+  name: Storj3
+  body_on: '{"state": "start"}'
+  body_off: '{"state": "stop"}'
+  is_on_template: '{{ value_json is not none and value_json.state == "running" }}'
+
+- platform: rest
+  resource: http://127.0.0.1:8126/container/tautulli
+  name: Tautulli
+  body_on: '{"state": "start"}'
+  body_off: '{"state": "stop"}'
+  is_on_template: '{{ value_json is not none and value_json.state == "running" }}'
+
+- platform: rest
+  resource: http://127.0.0.1:8126/container/transmission
+  name: Transmission
+  body_on: '{"state": "start"}'
+  body_off: '{"state": "stop"}'
+  is_on_template: '{{ value_json is not none and value_json.state == "running" }}'
+
+- platform: rest
+  resource: http://127.0.0.1:8126/container/unifi
+  name: Unifi
+  body_on: '{"state": "start"}'
+  body_off: '{"state": "stop"}'
+  is_on_template: '{{ value_json is not none and value_json.state == "running" }}'
+
+- platform: rest
+  resource: http://127.0.0.1:8126/container/z2m
+  name: Z2M
+  body_on: '{"state": "start"}'
+  body_off: '{"state": "stop"}'
+  is_on_template: '{{ value_json is not none and value_json.state == "running" }}'

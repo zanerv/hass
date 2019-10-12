@@ -1,11 +1,4 @@
 - platform: group
-  name: Hallway
-  entities:
-    - light.hallway1
-    - light.hallway2
-    - light.hallway3
-
-- platform: group
   name: Kitchen Day
   entities:
     - light.kitchen
@@ -16,44 +9,14 @@
     - light.bar
     - light.kitchen_strip
 
-- platform: yeelight
-  devices:
-    !secret Kitchen:
-      name: Kitchen
-      transition: 1000
-      save_on_change: False
-    !secret Kitchen_strip:
-      name: Kitchen Strip
-      transition: 1000
-      save_on_change: False
-    !secret WC:
-      name: WC
-      transition: 1000
-      save_on_change: False
-    !secret Bob:
-      name: Bob
-      transition: 1000
-      save_on_change: False
-      use_music_mode: True
-    !secret Bathroom:
-      name: Bathroom
-      transition: 1000
-      save_on_change: False
-      use_music_mode: True
-    !secret DarkRoom:
-      name: DarkRoom
-      transition: 1000
-      save_on_change: False
-      use_music_mode: True
-    !secret LightRoom:
-      name: LightRoom
-      transition: 1000
-      save_on_change: False
-      use_music_mode: True
-    !secret Bedroom:
-      name: Bedroom
-      transition: 1000
-      save_on_change: False
+- platform: mqtt
+  name: "Hallway"
+  state_topic: "zigbee2mqtt/Hallway"
+  command_topic: "zigbee2mqtt/Hallway/set"
+  availability_topic: "zigbee2mqtt/bridge/state"
+  brightness: true
+  color_temp: true
+  schema: "json"
 
 - platform: mqtt
   name: "Hallway1"
@@ -87,7 +50,7 @@
 #  state_topic: "stat/table/POWER"
 #  state_topic: "home/table/tele/STATE"
 #  state_value_template: "{{ value_json.POWER }}"
-  state_topic: "table/cmnd/POWER"
+  state_topic: "table/stat/POWER"
   command_topic: "table/cmnd/POWER"
   availability_topic: "table/tele/LWT"
   qos: 1
@@ -107,7 +70,6 @@
   payload_off: "OFF"
   payload_available: "Online"
   payload_not_available: "Offline"
-  retain: false
 
 - platform: mqtt
   name: "spot"

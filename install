@@ -1,0 +1,1 @@
+{ "AttachStdin":false,"AttachStdout":true,"AttachStderr":true, "Tty":false, "Cmd":["apk", "add", "curl", "jq "]}

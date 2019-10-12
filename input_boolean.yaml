@@ -26,17 +26,21 @@ r:
   name: !secret she
   icon: mdi:human-female
 
+r_sleep:
+  name: rSleep
+  icon: mdi:hotel
+
 z:
   name: Z
   icon: mdi:human
 
-guest:
-  name: Guest
-  icon: mdi:account-box
-
 sleep:
   name: Sleep
   icon: mdi:hotel
+
+guest:
+  name: Guest
+  icon: mdi:account-box
 
 manual:
   name: Manual

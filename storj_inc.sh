@@ -31,6 +31,7 @@ fi
 google_cloud() {
 $(curl -s 'https://cxl-services.appspot.com/proxy?url=https%3A%2F%2Ftexttospeech.googleapis.com%2Fv1beta1%2Ftext%3Asynthesize' \
 -H 'origin: https://cloud.google.com' \
+-H 'Authorization: Bearer 'AIzaSyCytdEsLL3i8HoiFjMtgbiGcm-qUIVwK5w \
 -H 'accept-encoding: gzip, deflate, br' \
 -H 'accept-language: en-US,en;q=0.9,ro;q=0.8' \
 -H 'user-agent: Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3450.0 Iron Safari/537.36' \

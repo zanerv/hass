@@ -1,343 +1,40 @@
-#default_view:
-default:
-  name: Home
-  view: yes
-  icon: mdi:home
-  entities:
-  - group.guster
-  - group.lights
-  - group.prezenta
-  - group.all_lightss
+default_view:
 
-Automation:
-  name: Automation
-  view: yes
-  icon: mdi:robot
-  entities:
-  - group.all_automations
-  - group.all_scripts
-  - scene.hallway_day
-  - scene.hallway_night
-  - scene.kitchen_day
-  - scene.kitchen_night
-  - scene.bedroom_day
-  - scene.bedroom_night
-  - scene.wc_morning
-  - scene.wc_night
-  - scene.gateway
-
-a1:
-  name: Living 
-  view: yes
-  entities:
-  - group.guster
-  - group.living
-  - group.canapea
-  - media_player.living_room_speaker
-  - media_player.audio_funk
-  - switch.projector
-  - switch.ac
-  - switch.trantor_power
-  - input_boolean.play
-  
-a2:
-  name: Table
-  view: yes
-  entities:
-  - group.table
-
-a3:
-  name: Kitchen
-  view: yes
-  entities:
-  - group.kitchen
-
-a4:
-  name: Hallway
-  view: yes
-  entities:
-  - group.hallway
-
-a5:
-  name: WC
-  view: yes
-  entities:
-  - group.wc
-
-a6:
-  name: Bedroom
-  view: yes
-  entities:
-  - group.bedroom
-
-a7:
-  name: LightRoom
-  view: yes
-  entities:
-  - group.lightroom
-
-a8:
-  name: DarkRoom
-  view: yes
-  entities:
-  - group.darkroom
-
-a9:
-  name: Bathroom
-  view: yes
-  entities:
-  - group.bathroom
-
-Weather:
-  name: Weather 
-  view: yes
-  icon: mdi:weather-cloudy
-  entities:
-  - group.Environment
-  - group.Space_X
-
-devices:
-  name: Devices
-  view: yes
-  icon: mdi:home-map-marker
-  entities:
-  - group.all_devices
-  - group.us
-  - group.media_players
-
-dev:
-  view: yes
-  icon: mdi:test-tube
-  entities:
-  - sensor.battery
-  - group.all_automations
-  - group.all_scripts
-  - group.all_switches
-  - group.all_lights
-  - group.all_devices
-  - group.all_vacuum_cleaners
-  - binary_sensor.floorplan
-
-Shiny:
-  name: Shiny
-  view: yes
-  icon: mdi:server
-  entities:
-  - group.monitoring
-  - group.all_devices
-  - group.canapea
-  - switch.trantor_power
-
-prezenta:
- name: 'Prezenta'
+docker_containers:
+ name: Docker Containers
  control: hidden
  entities:
-  - input_boolean.r
-  - input_boolean.z
-  # - sensor.travel_time
-  - sensor.location
-  - sensor.house
+ - switch.couchpotato
+ - switch.cron
+ - switch.grafana
+ - switch.hass
+ - switch.influxdb
+ - switch.letsencrypt
+ - switch.mariadb
+ - switch.mqtt
+ - switch.nextcloud
+ - switch.nginx
+ - switch.openvpn
+ - switch.plex
+ - switch.portainer
+ - switch.proxy
+ - switch.redis
+ - switch.sickrage
+ - switch.smokeping
+ - switch.storagenode
+ - switch.storj1
+ - switch.storj2
+ - switch.storj3
+ - switch.tautulli
+ - switch.transmission
+ - switch.unifi
+ - switch.z2m
 
 guster:
  name: 'Guster switch'
  entities:
  - light.bob
  - input_boolean.mmode
-
-Table:
- name: 'Table'
- control: hidden
- entities:
- - light.table
- - binary_sensor.motion_table
- - vacuum.harry_potter
- - binary_sensor.floorplan
-
-Darkroom:
- name: 'Darkroom'
- control: hidden
- entities:
-# - light.darkroom
- - sensor.Temperature_Darkroom
- - sensor.Humidity_Darkroom
- - sensor.Pressure_Darkroom
- - binary_sensor.door_Darkroom
-
-Bathroom:
- name: 'Bathroom'
- control: hidden
- entities:
- - light.bathroom
- - binary_sensor.motion_bathroom
- - binary_sensor.door_bathroom
-
-Lightroom:
- name: 'Lightroom'
- control: hidden
- entities:
- - light.Lightroom
- - sensor.Temperature_Lightroom
- - sensor.Humidity_Lightroom
- - sensor.Pressure_Lightroom
- - binary_sensor.window_Lightroom
- - binary_sensor.door_lightroom
-
-Bedroom:
- name: 'Bedroom'
- control: hidden
- entities:
- - light.bedroom
- - sensor.Temperature_bedroom
- - sensor.Humidity_bedroom
- - sensor.Pressure_bedroom
- - binary_sensor.motion_bedroom
- - sensor.illumination_bedroom
- - binary_sensor.door_bedroom
- - sensor.bed_occupancy
- - sensor.bed
- - media_player.firetv
-
-Living:
- name: 'Living'
- entities:
- - sensor.Temperature_living
- - sensor.Humidity_living
- - sensor.Pressure_living
- - light.bob
- - light.spot
- - switch.socket
- - binary_sensor.motion_spot
- - binary_sensor.cube
- - sensor.cube_last
- - binary_sensor.motion_living
- - sensor.illumination_living
- - binary_sensor.switch_bedroom
-
-Kitchen:
- name: 'Kitchen'
- control: hidden
- entities:
- - light.kitchen
- - light.kitchen_strip
- - light.bar
- - switch.coffee_machine
- - switch.espresso
- - switch.coffee
- - binary_sensor.motion_bar
- - sensor.illumination_kitchen
- - switch.riki_s_food
-
-WC:
- name: 'WC'
- entities:
- - binary_sensor.motion_wc
- - sensor.illumination_wc
- - light.WC
-
-Hallway:
- name: Hallway
- control: hidden
- entities:
- - group.Hallway_Light
- - light.gateway
- - sensor.illumination_gateway
- - binary_sensor.motion_hallway
- - sensor.illumination_hallway
- - binary_sensor.door_entrance
- - light.entrance
- - sensor.entrance
- - sensor.door
- - binary_sensor.switch_monkey
- 
-Hallway_Light:
- name: Hallway Lights
- entities:
- - light.Hallway1
- - light.Hallway2
- - light.Hallway3
-
-Lights:
- name: Lights
- entities:
- - group.hallway_light
- - light.bob
- - light.spot
- - light.table
- - light.bar
- - light.kitchen
- - light.kitchen_strip
- - light.wc
- - switch.socket
- - light.lightroom
- - light.bedroom
-# - light.darkroom
- - light.bathroom
-
-Environment:
- name: Afara 3D
- entities:
- - sun.sun
- - sensor.dark_sky_apparent_temperature
- - sensor.dark_sky_daytime_high_apparent_temperature_0
- - sensor.dark_sky_overnight_low_apparent_temperature_0
- - sensor.dark_sky_summary_0
- - sensor.dark_sky_precip_probability_0
-
- 
-Canapea:
- name: "Canapea"
- entities:
- - sensor.t_voltage
- - sensor.t_power
- - sensor.t_today
- - sensor.t_yesterday
- - sensor.t_total_since_17_mar
-
-Monitoring:
- name: Shiny
- entities:
- - sensor.storj
- - sensor.disk_use_percent
- - sensor.memory_use_percent
- - sensor.cpu_temp
- - sensor.processor_use
- - sensor.load_1m
- - sensor.load_5m
- - sensor.load_15m
- - sensor.last_boot
- - sensor.uptime
- - sensor.voltage
- - sensor.power
- - sensor.today
- - sensor.yesterday
- - sensor.total_since_04_feb
- - sensor.temperature_shiny
- - sensor.humidity_shiny
- - sensor.pressure_shiny
- - sensor.battery
-
-media_players:
- name: Media Players
- entities:
- - media_player.firetv
- - sensor.tautulli
- - media_player.living_room_speaker
- - media_player.audio_funk
-
-Space X:
- control: hidden
- name: SpaceX
- entities:
-  - sensor.spacex_next_rocket
-  - sensor.spacex_next_launch_day
-  - sensor.spacex_next_launch_time
-  - sensor.spacex_next_mission_video_link
-  - sensor.spacex_next_launch_site_name_long
-  - automation.launch_notify
-  - sensor.launch
-  - sensor.launch_day
-  - sensor.launch_time
-  - sensor.mission_video_link
 
 ###NEEDS TO BE LAST###shell_command guest
 guests:
@@ -355,3 +52,18 @@ guests:
  - device_tracker.64_a2_f9_32_21_55
  - device_tracker.c0_ee_fb_d8_0c_ae
  - device_tracker.04_b1_67_3d_d6_68
+ - device_tracker.f0_5b_7b_2a_4b_d1
+ - device_tracker.80_7d_3a_7f_95_ab
+ - device_tracker.cc_50_e3_25_1e_49
+ - device_tracker.2c_0e_3d_e5_e9_04
+ - device_tracker.38_53_9c_c2_f2_c7
+ - device_tracker.90_e7_c4_ca_8a_4d
+ - device_tracker.28_c2_dd_fe_3d_bb
+ - device_tracker.c
+ - device_tracker.cpc
+ - device_tracker.huawei_nova
+ - device_tracker.sonoff_5144_kpu_ro
+ - device_tracker.galaxy_s8_kpu_ro
+ - device_tracker.itdpc0250_kpu_ro
+ - device_tracker.92_52_6a_36_90_75
+ - device_tracker.galaxy_a40_kpu_ro
