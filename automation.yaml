@@ -80,20 +80,8 @@
         title: "Gucci Gang"
         message: "Finger bang"
 
-- alias: 'connected'
-  initial_state: true
-  trigger:
-    - platform: state
-      entity_id: sensor.rosu_ap
-      from: 'Away'
-  action:
-    - service: notify.hass
-      data_template:
-        title: "{{states.device_tracker.z.state}}"
-        message: "Connected to {{states.sensor.rosu_ap.state}}:{{states.sensor.rosu_rssi.state}}dbm"
-
 - alias: 'near shop'
-  initial_state: true
+  initial_state: false
   trigger:
     - platform: state
       entity_id: device_tracker.z_phone

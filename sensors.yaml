@@ -79,15 +79,6 @@
 
 - platform: template
   sensors:
-    rosu_rssi:
-      device_class: signal_strength
-      unit_of_measurement: "dBm"
-      value_template: >-
-        {% if is_state("device_tracker.z", "home") %}
-          {{ states.device_tracker.z.attributes.rssi }}
-        {% else %}
-          -99
-        {% endif %}
     rosu_ap:
       value_template: >-  
         {% if is_state("device_tracker.z", "home") and 'ef' in state_attr("device_tracker.z", "ap_mac") %}
@@ -96,16 +87,6 @@
           Hallway
         {% else %}
           Away
-        {% endif %}
-        
-    pink_rssi:
-      device_class: signal_strength
-      unit_of_measurement: "dBm"
-      value_template: >-
-        {% if is_state("device_tracker.r", "home") %}              
-          {{ states.device_tracker.r.attributes.rssi }}              
-        {% else %}
-          -99
         {% endif %}
     pink_ap:
       value_template: >-
