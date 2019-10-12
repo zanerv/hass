@@ -1127,7 +1127,7 @@
       entity_id: group.guests
       to: 'not_home'
       for:
-        seconds: 10
+        seconds: 30
     - platform: state
       entity_id: group.guests
       to: 'home'

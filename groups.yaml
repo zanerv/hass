@@ -41,29 +41,10 @@ guests:
  name: Guests
  entities:
  - device_tracker.puiul
- - device_tracker.a028ed81d9bf
- - device_tracker.dc0b34cc373b
- - device_tracker.f832e4f172b4
- - device_tracker.9822ef1c911c
- - device_tracker.40a3ccefea7f
- - device_tracker.2c598a57e84a
- - device_tracker.64899a0bbf63
- - device_tracker.00_0a_f5_3e_59_5c
- - device_tracker.64_a2_f9_32_21_55
- - device_tracker.c0_ee_fb_d8_0c_ae
- - device_tracker.04_b1_67_3d_d6_68
- - device_tracker.f0_5b_7b_2a_4b_d1
- - device_tracker.80_7d_3a_7f_95_ab
- - device_tracker.cc_50_e3_25_1e_49
- - device_tracker.2c_0e_3d_e5_e9_04
- - device_tracker.38_53_9c_c2_f2_c7
- - device_tracker.90_e7_c4_ca_8a_4d
- - device_tracker.28_c2_dd_fe_3d_bb
- - device_tracker.c
- - device_tracker.cpc
- - device_tracker.huawei_nova
- - device_tracker.sonoff_5144_kpu_ro
- - device_tracker.galaxy_s8_kpu_ro
- - device_tracker.itdpc0250_kpu_ro
- - device_tracker.92_52_6a_36_90_75
- - device_tracker.galaxy_a40_kpu_ro
+ - device_tracker.desktop_dcpoif1
+ - device_tracker.galaxy_a40
+ - device_tracker.galaxy_s8
+ - device_tracker.huawei_nova_3_325946ab577
+ - device_tracker.huawei_p10_lite_8a241608a
+ - device_tracker.itdpc0250
+

@@ -14,6 +14,7 @@ entity_registry.yaml
 cloud.yaml
 .shopping_list.json
 .uuid
+.spotify-token-cache
 plex.conf
 device.py
 configurator.py

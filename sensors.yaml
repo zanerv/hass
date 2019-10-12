@@ -90,9 +90,9 @@
         {% endif %}
     rosu_ap:
       value_template: >-  
-        {% if is_state("device_tracker.z", "home") and state_attr("device_tracker.z", "ap_mac") == "fc:ec:da:96:62:ef" %}  
+        {% if is_state("device_tracker.z", "home") and 'ef' in state_attr("device_tracker.z", "ap_mac") %}
           Living
-        {% elif is_state("device_tracker.z", "home") and state_attr("device_tracker.z", "ap_mac") == "fc:ec:da:89:65:05" %}
+        {% elif is_state("device_tracker.z", "home") and '05' in state_attr("device_tracker.z", "ap_mac") %}
           Hallway
         {% else %}
           Away
@@ -109,9 +109,9 @@
         {% endif %}
     pink_ap:
       value_template: >-
-        {% if is_state("device_tracker.r", "home") and state_attr("device_tracker.r", "ap_mac") == "fc:ec:da:96:62:ef" %}
+        {% if is_state("device_tracker.r", "home") and 'ef' in state_attr("device_tracker.z", "ap_mac") %}
           Living
-        {% elif is_state("device_tracker.r", "home") and state_attr("device_tracker.r", "ap_mac") == "fc:ec:da:89:65:05" %}
+        {% elif is_state("device_tracker.r", "home") and '05' in state_attr("device_tracker.z", "ap_mac") %}
           Hallway
         {% else %}
           Away
