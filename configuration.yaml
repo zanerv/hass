@@ -1,6 +1,6 @@
 homeassistant:  
-  whitelist_external_dirs:
-    - /config/storj
+  #whitelist_external_dirs:
+   # - /config/custom_components
   auth_providers:
     - type: homeassistant
     - type: trusted_networks
@@ -8,33 +8,20 @@ homeassistant:
       - 192.168.0.0/24
       - 172.19.0.0/24
       allow_bypass_login: true
-  # Name of the location where Home Assistant is running
   name: Home
-  # Location required to calculate the time the sun rises and sets
   latitude: !secret latitude
   longitude: !secret longitude
-  # Impacts weather/sunrise data (altitude above sea level in meters)
   elevation: 185
-  # metric for Metric, imperial for Retarted
   unit_system: metric
-  # Pick yours from here: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
   time_zone: !secret time_zone
-  # Customization file
   customize: !include customizes.yaml
   packages: !include_dir_named packages/
   
-# panel_iframe:
-#   editor:
-#     title: IDE
-#     icon: mdi:code-braces
-#     url: !secret url
-
-# Enables the frontend
 frontend:
+  javascript_version: latest
   themes: !include themes.yaml
   extra_html_url:
     - /local/custom_ui/state-card-floorplan.html
-    # - http://cloud9.kpu.ro/ide.html
 
 panel_custom:
   - name: floorplan
@@ -59,7 +46,7 @@ mqtt:
   broker: !secret mqtt_broker
   port: !secret mqtt_port
   client_id: home-assistant-1
-#  keepalive: 60
+  keepalive: 60
   username: !secret mqtt_user
   password: !secret mqtt_password
   discovery: true
@@ -69,7 +56,7 @@ mqtt:
   will_message:
     topic: 'hass/status'
     payload: 'offline'
-# Enables configuration UI
+
 config:
 
 http:
@@ -79,32 +66,20 @@ http:
   # api_password: !secret http_password
   # Uncomment this if you are using SSL/TLS, running in Docker container, etc.
   base_url: !secret base_url
-
-# Checks for available updates
-# Note: This component will send some information about your system to
-# the developers to assist with development of Home Assistant.
-# For more information, please see:
-# https://home-assistant.io/blog/2016/10/25/explaining-the-updater/
-updater:
-  # Optional, allows Home Assistant developers to focus on popular components.
-  # include_used_components: true
   
 # hassio:
+python_script:
 
-# Discover some devices automatically
 discovery:
   ignore:
     - homekit
 #    - roku 
     - yeelight
 
-# Allows you to issue voice commands from the frontend in enabled browsers
 conversation:
 
-# Enables support for tracking state changes over time
 history:
 
-# View all events in a logbook
 logbook:
   exclude:
     entities:
@@ -126,7 +101,13 @@ logger:
   logs:
     sensor.laptop: warning
     pychromecast.socket_client: fatal
-
+    plexapi: fatal
+    #influxdb: debug
+    # aiounifi: debug
+    # homeassistant.components.unifi: debug
+    # homeassistant.components.device_tracker.unifi: debug
+    # homeassistant.components.switch.unifi: debug
+    
 influxdb:
   exclude:
     entities:
@@ -137,7 +118,7 @@ recorder:
   db_url: !secret db_url
   purge_keep_days: 2
 
-#system_health:
+system_health:
 
 default_config:
 
@@ -148,6 +129,12 @@ alert:
     repeat: 10
     notifiers:
       - hass
+      
+remote:
+  - platform: broadlink
+    name: Broadlink Family
+    host: !secret broadlink_host
+    mac: !secret broadlink_mac
 
 person:
   - name: Z
@@ -160,16 +147,12 @@ person:
     device_trackers:
       - device_tracker.r
       - device_tracker.rdell
-      - device_tracker.rpc
       - device_tracker.r_phone
 
-# Enables a map showing the location of tracked devices
 map:
 
-# Track the sun
 sun:
 
-# Text to speech
 tts:
   - platform: google_translate
     service_name: google_say
@@ -177,47 +160,18 @@ tts:
 shopping_list:
 roku:
   - host: !secret roku_host
-# Plex
-media_player:
-  - platform: spotify
+
+spotify:
     client_id: !secret client_id
     client_secret: !secret client_secret
-  - platform: plex
-    # entity_namespace: 'plex'
-    # include_non_clients: true
-    scan_interval: 5
-    # use_custom_entity_ids: true
-    # use_episode_art: true
 
-  - platform: androidtv
-    name: FireTV
-    host: !secret firetv_host
-    adbkey: "/config/adb/adbkey"
-    apps:
-      com.amazon.tv.launcher: "Fire TV"
-      com.plexapp.android: "Plex"
+ombi:
+  api_key: !secret ombi_api_key
+  host: !secret ombi_host
+  username: zanerv
+  port: 3579
 
 device_tracker:
-  # - platform: nmap_tracker
-  #   hosts:
-  #     - !secret nmap_hosts
-  #   home_interval: 5
-  #   interval_seconds: 20
-  - platform: unifi
-    host: unifi
-    username: !secret unifi_user
-    password: !secret unifi_pass
-    verify_ssl: false
-    interval_seconds: 30
-    monitored_conditions:
-      - rssi
-      - ap_mac
-# googlehome:
-#   devices:
-#   - host: !secret ghome
-#     rssi_threshold: -100
-#     track_devices: true
-#     device_types: 2
 
 telegram_bot:
   - platform: polling
@@ -225,47 +179,6 @@ telegram_bot:
     parse_mode: html
     allowed_chat_ids:
       - !secret chat_id
-
-yeelight:
-  devices:
-    !secret Kitchen:
-      name: Kitchen
-      transition: 1000
-      save_on_change: False
-    !secret Kitchen_strip:
-      name: Kitchen Strip
-      transition: 1000
-      save_on_change: False
-    !secret WC:
-      name: WC
-      transition: 1000
-      save_on_change: False
-    !secret Bob:
-      name: Bob
-      transition: 1000
-      save_on_change: False
-    !secret Bathroom:
-      name: Bathroom
-      transition: 1000
-      save_on_change: False
-    !secret DarkRoom:
-      name: DarkRoom
-      transition: 1000
-      save_on_change: False
-    !secret LightRoom:
-      name: LightRoom
-      transition: 1000
-      save_on_change: False
-    !secret Bedroom:
-      name: Bedroom
-      transition: 1000
-      save_on_change: False
-
-notify: !include notify.yaml
-
-media_extractor:
-
-input_datetime: !include input_datetime.yaml
 
 input_text:
   url:
@@ -290,13 +203,21 @@ climate:
     initial_hvac_mode: "off"
     precision: 0.5
 
+media_extractor:
+
+yeelight: !include yeelight.yaml
+
+notify: !include notify.yaml
+
+input_datetime: !include input_datetime.yaml
+
 input_boolean: !include input_boolean.yaml
 
 cloud: !include cloud.yaml
 
 scene: !include scenes.yaml
 
-automation: !include automation.yaml
+automation: !include automations.yaml
 
 light: !include lights.yaml
 

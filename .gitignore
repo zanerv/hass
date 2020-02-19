@@ -1,5 +1,6 @@
 rssi*
 home-assistant.log
+trash/
 .cloud/
 .storage/
 deps/
@@ -24,3 +25,6 @@ jq
 upc.sh
 zone.yaml
 cookies.txt
+.vscode/settings.json
+.code-workspace.code-workspace
+groups.yaml

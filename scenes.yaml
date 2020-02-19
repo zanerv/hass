@@ -1,13 +1,13 @@
 - name: Hallway Night
   entities:
-    light.Hallway:
+    light.hallway:
       state: on
       brightness: 10
       color_temp: 228
   
 - name: Hallway Day
   entities:
-    light.Hallway:
+    light.hallway:
       state: on
       brightness: 255
       color_temp: 228
@@ -15,12 +15,14 @@
 
 - name: Kitchen Night
   entities:
-    light.kitchen_night:
+    light.kitchen_strip: 
+      state: on
+    light.bar: 
       state: on
 
 - name: Kitchen Day
   entities:
-    light.kitchen_day:
+    light.kitchen:
       state: on
       brightness: 255
 
@@ -34,13 +36,13 @@
   entities:
     light.bedroom:
       state: on
-      brightness_pct: 100
+      brightness: 255
 
 - name: WC Night
   entities:
     light.wc:
       state: on
-      brightness_pct: 17
+      brightness: 60
       # rgb_color: [255,126,000]
 
 - name: WC Day
@@ -54,4 +56,4 @@
     light.gateway:
       state: on
       brightness_pct: 10
-      color_name: darkred
+      # color_name: darkred

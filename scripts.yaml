@@ -45,10 +45,10 @@ night_mode:
         entity_id: remote.roku
         command:
           - down
-    - wait_template: "{{ states.binary_sensor.motion_bar.state == 'on' }}"
-      timeout: '00:02:00'
+    - wait_template: "{{ states.sensor.entrance.state == 'Motion' }}"
+      timeout: '00:05:00'
     - service: homeassistant.turn_on
-      entity_id: input_boolean.mmode
+      entity_id: automation.bob_on
     - service: light.turn_off
       entity_id: light.spot, light.kitchen_night
     - service: media_player.turn_off
@@ -71,7 +71,8 @@ coffee_machine_on:
   sequence:
     - service: switch.turn_on
       entity_id: switch.coffee_machine
-    - wait_template: "{{ states.binary_sensor.motion_bar.state == 'on' }}"
+    #- wait_template: "{{ states.binary_sensor.motion_bar.state == 'on' }}"
+    - wait_template: "{{ states.binary_sensor.motion_living.state == 'on' }}"
       timeout: '00:04:00'
       continue_on_timeout: false
     - service: switch.turn_on
@@ -80,21 +81,10 @@ coffee_machine_on:
 movie_time:
   alias: movie time
   sequence:
-    #- service: shell_command.wake_on_wifi
-    # - service: switch.turn_on
-    #   data_template:
-    #     entity_id: >
-    #       {% if states('device_tracker.htpc') == 'not_home' %} switch.htpc, switch.projector
-    #       {% else %} switch.projector
-    #       {% endif %}
-    # - service: switch.turn_on
-    #   entity_id: switch.projector
-    # - delay: '00:00:02'
     - service: switch.turn_on
       entity_id: switch.projector
     - service: light.turn_on
       entity_id: light.spot
-    # - delay: '00:00:40'
     - service: homeassistant.turn_off
       entity_id: group.guster
     - service: light.turn_off
@@ -107,24 +97,6 @@ movie_time:
           x.entity_id != 'light.spot' and (as_timestamp(now()) - as_timestamp(x.last_changed) | int < 120)  -%} 
           {{- "," if not loop.first-}}{{ x.entity_id }}{{-endif-}}
           {%- endfor -%}
-    # - delay: '00:00:20'
-    # - service: media_player.turn_off
-    #   data:
-    #     entity_id: media_player.audio
-
-storj_information:
-  alias: storj information
-  sequence:
-    # - service: shell_command.storj
-    # - service: shell_command.tts_storj
-    #   data_template:
-    #     arg: "{{states.sensor.storj.state}}"
-    # - delay: '00:00:01'
-    - service: media_player.play_media
-      data:
-        entity_id: media_player.living_room_speaker
-        media_content_id: !secret storj_wav
-        media_content_type: music
 
 restart:
   alias: abracadabra
@@ -144,7 +116,7 @@ house_mode_away:
       data_template:
         entity_id: >
           {%- for x in states.media_player if
-          x.entity_id != 'media_player.spotify' -%}
+          x.entity_id != 'media_player.spotify' and (x.entity_id != 'media_player.roku' or states.binary_sensor.tv.state == 'on')-%}
           {{- "," if not loop.first-}}{{ x.entity_id }}{{-endif-}}
           {%- endfor -%}
     - service: switch.turn_off
@@ -152,7 +124,7 @@ house_mode_away:
 
 nothing:
   alias: nothing
-  sequence:
+  sequence: []
 
 door_lock:
   alias: Door Lock
@@ -292,7 +264,7 @@ spacex:
             ├─ Start Time: {{ states('sensor.spacex_next_launch_time') }}
             ├─ Rocket:     {{ states('sensor.spacex_next_rocket') }}
             └─ Link:   {{ states.sensor.spacex.attributes.links.video_link }}
-            
+
 launch:
   alias: Launch
   sequence:

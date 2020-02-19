@@ -2,7 +2,6 @@ default_view:
 
 docker_containers:
  name: Docker Containers
- control: hidden
  entities:
  - switch.couchpotato
  - switch.cron
@@ -22,9 +21,6 @@ docker_containers:
  - switch.sickrage
  - switch.smokeping
  - switch.storagenode
- - switch.storj1
- - switch.storj2
- - switch.storj3
  - switch.tautulli
  - switch.transmission
  - switch.unifi
@@ -34,17 +30,29 @@ guster:
  name: 'Guster switch'
  entities:
  - light.bob
- - input_boolean.mmode
+ - automation.bob_on
 
 ###NEEDS TO BE LAST###shell_command guest
 guests:
  name: Guests
  entities:
- - device_tracker.puiul
  - device_tracker.desktop_dcpoif1
  - device_tracker.galaxy_a40
  - device_tracker.galaxy_s8
- - device_tracker.huawei_nova_3_325946ab577
+ - device_tracker.christina
  - device_tracker.huawei_p10_lite_8a241608a
  - device_tracker.itdpc0250
-
+ - device_tracker.oneplus6
+ - device_tracker.oneplus3
+ - device_tracker.android_42908e2949a81b38
+ - device_tracker.galaxy_s10
+ - device_tracker.redminote5_alex
+ - device_tracker.huawei_p10_lite_12d178ee1
+ - device_tracker.alex
+ - device_tracker.huawei_p9_lite
+ - device_tracker.andrejhcsiphone
+ - device_tracker.a0021
+ - device_tracker.n1683
+ - device_tracker.iphone
+ - device_tracker.samsung_galaxy_s7
+ - device_tracker.personnefictive
