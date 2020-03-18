@@ -37,22 +37,6 @@ guests:
  name: Guests
  entities:
  - device_tracker.desktop_dcpoif1
- - device_tracker.galaxy_a40
- - device_tracker.galaxy_s8
  - device_tracker.christina
- - device_tracker.huawei_p10_lite_8a241608a
- - device_tracker.itdpc0250
- - device_tracker.oneplus6
- - device_tracker.oneplus3
- - device_tracker.android_42908e2949a81b38
- - device_tracker.galaxy_s10
- - device_tracker.redminote5_alex
- - device_tracker.huawei_p10_lite_12d178ee1
- - device_tracker.alex
- - device_tracker.huawei_p9_lite
- - device_tracker.andrejhcsiphone
- - device_tracker.a0021
- - device_tracker.n1683
- - device_tracker.iphone
- - device_tracker.samsung_galaxy_s7
- - device_tracker.personnefictive
+ - device_tracker.unifi_dc_54_d7_2e_6f_81_default
+ - device_tracker.pf17ydkn_2

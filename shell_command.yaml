@@ -5,3 +5,4 @@ mop: mirobo fanspeed 105
 friendly: ssh -i /config/.storage/obama -o StrictHostKeyChecking=no obama 'sed -i "" "s/1\.1\.1\.2/1.1.1.2 {{ arg }}/g" /cf/conf/config.xml && rm /tmp/config.cache && /etc/rc.reload_all'
 wake_on_wifi: !secret wake_on_wifi
 shop: cat /config/.shopping_list.json |jq -r .[].name
+zcal: !secret zcal

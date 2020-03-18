@@ -42,20 +42,20 @@ xiaomi_aqara:
     key: !secret xg_key
     host: !secret xg_host
 
-mqtt:
-  broker: !secret mqtt_broker
-  port: !secret mqtt_port
-  client_id: home-assistant-1
-  keepalive: 60
-  username: !secret mqtt_user
-  password: !secret mqtt_password
-  discovery: true
-  birth_message:
-    topic: 'hass/status'
-    payload: 'online'
-  will_message:
-    topic: 'hass/status'
-    payload: 'offline'
+# mqtt:
+#   broker: !secret mqtt_broker
+#   port: !secret mqtt_port
+#   client_id: home-assistant-1
+#   keepalive: 60
+#   username: !secret mqtt_user
+#   password: !secret mqtt_password
+#   discovery: true
+#   birth_message:
+#     topic: 'hass/status'
+#     payload: 'online'
+#   will_message:
+#     topic: 'hass/status'
+#     payload: 'offline'
 
 config:
 
@@ -83,6 +83,8 @@ history:
 logbook:
   exclude:
     entities:
+      - sensor.geocoded_location
+      - sensor.geocoded_location_2
       - automation.location
       - input_select.location
       - binary_sensor.motion_spot
@@ -204,6 +206,8 @@ climate:
     precision: 0.5
 
 media_extractor:
+
+gdacs:
 
 yeelight: !include yeelight.yaml
 

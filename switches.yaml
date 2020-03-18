@@ -1,7 +1,7 @@
 - platform: template
   switches:
     projector:
-      value_template: "{{ states.sensor.t_power.state|int > 200 }}"
+      value_template: "{{ states.sensor.t_power.state|int > 100 }}"
       turn_on:
         service: switch.turn_on
         data:
@@ -129,6 +129,20 @@
 
 # docker containers
 - platform: rest
+  resource: http://127.0.0.1:8126/container/bitwarden
+  name: Bitwarden
+  body_on: '{"state": "start"}'
+  body_off: '{"state": "stop"}'
+  is_on_template: '{{ value_json is not none and value_json.state == "running" }}'
+
+- platform: rest
+  resource: http://127.0.0.1:8126/container/code-server
+  name: code-server
+  body_on: '{"state": "start"}'
+  body_off: '{"state": "stop"}'
+  is_on_template: '{{ value_json is not none and value_json.state == "running" }}'
+
+- platform: rest
   resource: http://127.0.0.1:8126/container/couchpotato
   name: Couchpotato
   body_on: '{"state": "start"}'
@@ -145,6 +159,13 @@
 - platform: rest
   resource: http://127.0.0.1:8126/container/dockermon
   name: DockerMon
+  body_on: '{"state": "start"}'
+  body_off: '{"state": "stop"}'
+  is_on_template: '{{ value_json is not none and value_json.state == "running" }}'
+
+- platform: rest
+  resource: http://127.0.0.1:8126/container/firefly
+  name: Firefly
   body_on: '{"state": "start"}'
   body_off: '{"state": "stop"}'
   is_on_template: '{{ value_json is not none and value_json.state == "running" }}'
@@ -292,6 +313,13 @@
 - platform: rest
   resource: http://127.0.0.1:8126/container/unifi
   name: Unifi
+  body_on: '{"state": "start"}'
+  body_off: '{"state": "stop"}'
+  is_on_template: '{{ value_json is not none and value_json.state == "running" }}'
+
+- platform: rest
+  resource: http://127.0.0.1:8126/container/watchtower
+  name: Watchtower
   body_on: '{"state": "start"}'
   body_off: '{"state": "stop"}'
   is_on_template: '{{ value_json is not none and value_json.state == "running" }}'

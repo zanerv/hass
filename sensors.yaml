@@ -9,13 +9,13 @@
   state_topic: "Fufa/tele/STATE"
   value_template: "{{ value_json.Uptime }}"
   
-- platform: mqtt
-  name: 'vibration'
-  state_topic: 'zigbee2mqtt/vibration'
-  json_attributes_topic: 'zigbee2mqtt/vibration'
-  availability_topic: 'zigbee2mqtt/bridge/state'
-  icon: mdi:gesture-double-tap
-  value_template: '{{ value_json.action }}'
+# - platform: mqtt
+#   name: 'vibration'
+#   state_topic: 'zigbee2mqtt/vibration'
+#   json_attributes_topic: 'zigbee2mqtt/vibration'
+#   availability_topic: 'zigbee2mqtt/bridge/state'
+#   icon: mdi:gesture-double-tap
+#   value_template: '{{ value_json.action }}'
 
 - platform: history_stats
   name: Sleep

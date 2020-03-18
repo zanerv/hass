@@ -28,3 +28,4 @@ cookies.txt
 .vscode/settings.json
 .code-workspace.code-workspace
 groups.yaml
+.HA_VERSION
