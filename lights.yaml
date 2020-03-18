@@ -1,9 +1,4 @@
 - platform: group
-  name: Kitchen Day
-  entities:
-    - light.kitchen
-
-- platform: group
   name: Kitchen Night
   entities:
     - light.bar

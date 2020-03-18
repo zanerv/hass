@@ -1,20 +1,21 @@
 - platform: mqtt
-  name: 'vibration'
-  state_topic: 'zigbee2mqtt/vibration'
-  json_attributes_topic: 'zigbee2mqtt/vibration'
-  availability_topic: 'zigbee2mqtt/bridge/state'
-  icon: mdi:gesture-double-tap
-  value_template: '{{ value_json.action }}'
-    
-# - platform: sql
-#   scan_interval: 86400
-#   queries:
-#     - name: storj yesterday
-#       query: "SELECT MAX(state)-MIN(state) AS value FROM states WHERE entity_id='sensor.storj_today' AND state!='unknown' AND datetime(last_changed) BETWEEN datetime(date('now', '-1 days')) AND datetime(date('now'));"
-#       column: 'value'
-#       unit_of_measurement: 'Gb'
-- platform: statistics
-  entity_id: sensor.storj
+  name: "Mk Uptime"
+  state_topic: "tele/marakana/STATE"
+  value_template: "{{ value_json.Uptime }}"
+  unit_of_measurement: "Hours"
+
+- platform: mqtt
+  name: "Fufa Uptime"
+  state_topic: "Fufa/tele/STATE"
+  value_template: "{{ value_json.Uptime }}"
+  
+# - platform: mqtt
+#   name: 'vibration'
+#   state_topic: 'zigbee2mqtt/vibration'
+#   json_attributes_topic: 'zigbee2mqtt/vibration'
+#   availability_topic: 'zigbee2mqtt/bridge/state'
+#   icon: mdi:gesture-double-tap
+#   value_template: '{{ value_json.action }}'
 
 - platform: history_stats
   name: Sleep
@@ -49,25 +50,58 @@
   name: Door Lock
   command: /bin/bash -c "adb shell cat /storage/sdcard0/Android/data/com.xiaomi.smarthome/files/SherlockLog/$(date +%Y%m%d.log)|grep mOperateCommandType|tail -1| awk -F ':' '{print $5}'||echo unknown"
   scan_interval: 900
- 
+     
+- platform: influxdb
+  queries:
+    - name: Storj (last day)
+      database: home_assistant
+      where: '"entity_id" = ''storj'' AND time >= now() - 26h'
+      measurement: '"Gb"'
+      value_template: '{{ value | round }}'
+      unit_of_measurement: Gb
+      group_function: first
+    - name: MK Storj (last day)
+      database: home_assistant
+      where: '"entity_id" = ''mk_storj'' AND time >= now() - 26h'
+      measurement: '"Gb"'
+      value_template: '{{ value | round }}'
+      group_function: first
+      unit_of_measurement: Gb
+
+- platform: statistics
+  entity_id: sensor.storj
+
 - platform: command_line
   name: storj
   unit_of_measurement: 'Gb'
   value_template: '{{ (value | int / 1000000000) | round }}'
   # command: du -sm /config/storj|awk '{print $1}'
   command: /config/storjV3.sh diskSpace
-  scan_interval: 900 
+  scan_interval: 1200 
+ 
+- platform: command_line
+  name: storj egress
+  unit_of_measurement: 'Gb'
+  value_template: '{{ (value | int / 1000000000) | round }}'
+  command: /config/storjV3.sh egressDaily
+  scan_interval: 1200
  
 - platform: command_line
   name: storj bandwidth
   unit_of_measurement: 'Gb'
   value_template: '{{ (value | int / 1000000000) | round }}'
-  command: /config/storjV3.sh bandwidth
-  scan_interval: 900
+  command: /config/storjV3.sh egressSummary
+  scan_interval: 1200
 
 - platform: mqtt
   name: "mk storj bandwidth"
   state_topic: "storj/storj_bandwidth"
+  value_template: '{{ value | int }}'
+  unit_of_measurement: 'Gb'
+
+- platform: mqtt
+  name: "mk storj egress"
+  state_topic: "storj/storj_egress"
   value_template: '{{ value | int }}'
   unit_of_measurement: 'Gb'
 
@@ -79,6 +113,12 @@
 
 - platform: template
   sensors:
+    storj_increase:
+      unit_of_measurement: 'Gb'
+      value_template: "{{ states('sensor.storj')|int - states('sensor.storj_last_day')|int}}"
+    mk_storj_increase:
+      unit_of_measurement: 'Gb'
+      value_template: "{{ states('sensor.mk_storj')|int - states('sensor.mk_storj_last_day')|int}}"
     rosu_ap:
       value_template: >-  
         {% if is_state("device_tracker.z", "home") and 'ef' in state_attr("device_tracker.z", "ap_mac") %}
@@ -177,10 +217,20 @@
   port: 80
   api_key: !secret tau_api
   monitored_users: zanerv
-
+  
 - platform: mqtt
-  name: "Socket Table"
-  state_topic: "tele/socket_table/SENSOR"
+  name: "Gas Spot"
+  icon: mdi:air-purifier
+  device_class: power
+  state_topic: "tele/spot/SENSOR"
+  value_template: "{{ value_json.BME680.Gas }}"
+  unit_of_measurement: "kOhm"
+  
+- platform: mqtt
+  name: "W Machine"
+  icon: mdi:washing-machine
+  device_class: power
+  state_topic: "tele/socket_wmachine/SENSOR"
   value_template: "{{ value_json.ENERGY.Power }}"
   unit_of_measurement: "W"
   
@@ -325,14 +375,21 @@
   scan_interval: 1800
 
 - platform: command_line
-  name: Ralendar
-  command: cat /config/R.cal
-  scan_interval: 9000
-
-- platform: command_line
   name: quote_of_the_day
   command: curl -s 'http://api.forismatic.com/api/1.0/?method=getQuote&format=json&lang=en'|awk -F '"' '{printf $4}'|tr -d '\\'
   scan_interval: 43200
+
+- platform: rest
+  name: Wallet
+  value_template: "{{ (value_json.tokens[0]['balance']/100000000) | round }}"
+  resource: !secret wallet_api
+  scan_interval: 9000
+
+- platform: rest
+  name: mk_wallet
+  value_template: "{{ (value_json.tokens[0]['balance']/100000000) | round }}"
+  resource: !secret mk_wallet_api
+  scan_interval: 9000
 
 - platform: rest
   name: SpaceX
@@ -346,6 +403,23 @@
   
 - platform: template
   sensors:
+    geta:
+      entity_id: sensor.w_machine
+      friendly_name: 'Geta'
+      value_template: >-  
+        {% if states.sensor.w_machine.state |int > 10 %}
+          On
+        {% elif states.sensor.w_machine.state |int > 1 %}
+          Idle
+        {% else %}
+          Off
+        {% endif %}
+      icon_template: >
+        {% if states.sensor.w_machine.state |int > 10 %}mdi:washing-machine
+        {% elif states.sensor.w_machine.state |int > 1 %}mdi:washing-machine-alert
+        {% else %}mdi:washing-machine-off
+        {% endif %}
+
     spacex_next_rocket:
       friendly_name: 'Rocket'
       value_template: '{{ states.sensor.spacex.attributes["rocket"]["rocket_name"] }}'

@@ -1,10 +1,8 @@
 song: /bin/bash -c "/config/song.sh"
-#storj: /bin/bash -c "/config/storj_sensor.sh"
-#tts_storj: /bin/bash -c "/config/storj_inc.sh '{{ arg }}'"
 echo_groups: /bin/bash -c "echo ' - {{ arg }}' >> /config/groups.yaml"
 door: /bin/bash -c "/config/lock.sh '{{ arg }}'"
 mop: mirobo fanspeed 105
-friendly: ssh -i /config/.storage/id_rsa -o StrictHostKeyChecking=no obama 'sed -i "" "s/1\.1\.1\.2/1.1.1.2 {{ arg }}/g" /cf/conf/config.xml && rm /tmp/config.cache && /etc/rc.reload_all'
+friendly: ssh -i /config/.storage/obama -o StrictHostKeyChecking=no obama 'sed -i "" "s/1\.1\.1\.2/1.1.1.2 {{ arg }}/g" /cf/conf/config.xml && rm /tmp/config.cache && /etc/rc.reload_all'
 wake_on_wifi: !secret wake_on_wifi
 shop: cat /config/.shopping_list.json |jq -r .[].name
-apk_add_storj: /config/storjV3.sh install
+zcal: !secret zcal

@@ -1,19 +1,15 @@
-  
+- platform: mqtt
+  name: "mk"
+  state_topic: "$SYS/broker/connection/mqtt.mk/state"
+  payload_on: '1'
+  payload_off: '0'
+     
 - platform: template
   sensors:
     tv:
       friendly_name: 'TV'
       value_template: '{{ states.sensor.tv.state|int > 10 }}'
   
-- platform: mqtt
-  name: "motion_living"
-  state_topic: "zigbee2mqtt/motion_living"
-  availability_topic: "zigbee2mqtt/bridge/state"
-  device_class: motion
-  value_template: "{{ value_json.occupancy }}"
-  json_attributes_topic: "zigbee2mqtt/motion_living"
-  payload_on: true
-  payload_off: false
 
 - platform: mqtt
   state_topic: dummy/floorplan/sensor
@@ -36,106 +32,3 @@
   
 - platform: workday
   country: !secret uk
-
-# - platform: bayesian
-#   prior: 0.05
-#   name: 'workaholic'
-#   probability_threshold: 0.95
-#   observations:
-#     - entity_id: 'device_tracker.zpc'
-#       prob_given_true: 0.06
-#       platform: 'state'
-#       to_state: 'home'
-#     - entity_id: 'binary_sensor.couch'
-#       prob_given_true: 0.5
-#       platform: 'state'
-#       to_state: 'off'
-      
-# - platform: bayesian
-#   prior: 0.05
-#   name: 'Sleep'
-#   probability_threshold: 0.95
-#   observations:
-#     - entity_id: 'device_tracker.rdell'
-#       prob_given_true: 0.02
-#       platform: 'state'
-#       to_state: 'home'
-#     - entity_id: 'input_boolean.r'
-#       prob_given_true: 0.3
-#       platform: 'state'
-#       to_state: 'on'
-#     - entity_id: 'sensor.bed_occupancy'
-#       prob_given_true: 0.5
-#       platform: 'state'
-#       to_state: 'on'
-#     - entity_id: 'binary_sensor.motion_bedroom'
-#       prob_given_true: 0.2
-#       platform: 'state'
-#       to_state: 'on'
-#     - entity_id: 'media_player.firetv'
-#       prob_given_true: 0.7
-#       platform: 'state'
-#       to_state: 'playing'
-
-# - platform: bayesian
-#   prior: 0.5
-#   name: 'Bayesian Sleeping'
-#   probability_threshold: 0.90
-#   observations:
-#       - entity_id: 'input_boolean.r'
-#         prob_given_true: 0.99
-#         prob_given_false: 0.5
-#         platform: 'state'
-#         to_state: 'on'
-#       - entity_id: 'device_tracker.rdell'
-#         prob_given_true: 0.99
-#         prob_given_false: 0.5
-#         platform: 'state'
-#         to_state: 'not_home'
-#       - entity_id: 'sensor.sun'
-#         prob_given_true: 0.9
-#         prob_given_false: 0.2
-#         platform: 'state'
-#         to_state: 'below_horizon'
-#       - entity_id: 'group.all_lights'
-#         prob_given_true: 0.9
-#         prob_given_false: 0.4
-#         platform: 'state'
-#         to_state: 'off'
-#       - entity_id: 'switch.coffee_machine'
-#         prob_given_true: 0.9
-#         prob_given_false: 0.4
-#         platform: 'state'
-#         to_state: 'off'
-#       - entity_id: 'input_select.location'
-#         prob_given_true: 0.9
-#         prob_given_false: 0.3
-#         platform: 'state'
-#         to_state: 'Bedroom'
-#       - entity_id: 'media_player.firetv'
-#         prob_given_true: 0.95
-#         prob_given_false: 0.5
-#         platform: 'state'
-#         to_state: 'playing'
-
-# - platform: bayesian
-#   prior: 0.2
-#   name: 'Z Presence'
-#   probability_threshold: 0.9
-#   observations:
-#     - entity_id: 'media_player.audio'
-#       prob_given_true: 0.8
-#       # prob_given_false: 0.3
-#       platform: 'state'
-#       to_state: 'playing'
-#     - entity_id: 'device_tracker.z_phone'
-#       prob_given_true: 0.9
-#       # prob_given_false: 0.3
-#       platform: 'state'
-#       to_state: 'home'
-#     # - entity_id: 'device_tracker.zpc'
-#       # prob_given_true: 0.5
-#       # # prob_given_false: 0.4
-#       # platform: 'state'
-#       # to_state: 'home'
-

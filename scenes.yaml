@@ -1,57 +1,56 @@
 - name: Hallway Night
+  id: Hallway_night
   entities:
-    light.Hallway:
-      state: on
+    light.hallway:
+      state: true
       brightness: 10
       color_temp: 228
-  
 - name: Hallway Day
+  id: hallway_day
   entities:
-    light.Hallway:
-      state: on
+    light.hallway:
+      state: true
       brightness: 255
       color_temp: 228
-      transition: 1
-
 - name: Kitchen Night
+  id: kitchen_night
   entities:
-    light.kitchen_night:
-      state: on
-
-- name: Kitchen Day
+    light.kitchen_strip: true
+    light.bar: true
+- id: kitchen_day
+  name: Kitchen Day
   entities:
-    light.kitchen_day:
-      state: on
+    light.kitchen:
       brightness: 255
-
+      color_temp: 229
+      state: 'on'
 - name: Bedroom Night
+  id: bedroom_night
   entities:
     light.bedroom:
-      state: on
+      state: true
       brightness: 15
-
 - name: Bedroom Day
+  id: bedroom_day
   entities:
     light.bedroom:
-      state: on
-      brightness_pct: 100
-
-- name: WC Night
-  entities:
-    light.wc:
-      state: on
-      brightness_pct: 17
-      # rgb_color: [255,126,000]
-
-- name: WC Day
-  entities:
-    light.wc:
-      state: on
+      state: true
       brightness: 255
-
+- name: WC Night
+  id: wc_night
+  entities:
+    light.wc:
+      state: true
+      brightness: 60
+- name: WC Day
+  id: wc_day
+  entities:
+    light.wc:
+      state: true
+      brightness: 255
 - name: Gateway
+  id: gateway
   entities:
     light.gateway:
-      state: on
-      brightness_pct: 10
-      color_name: darkred
+      state: true
+      brightness: 25

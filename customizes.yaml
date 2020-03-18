@@ -13,13 +13,45 @@ sensor.door_lock:
   friendly_name: "Door Lock"
   icon: mdi:lock-smart
 
-sensor.storj:
+sensor.wallet:
+  friendly_name: "Wallet"
+  icon: mdi:wallet
+
+sensor.mk_wallet:
+  friendly_name: "Wallet"
+  icon: mdi:wallet
+
+binary_sensor.storj_status:
   friendly_name: "Storj increase"
+  icon: mdi:gauge-full
+
+binary_sensor.mk_storj_status:
+  friendly_name: "Storj increase"
+  icon: mdi:gauge-full
+
+sensor.storj_increase:
+  friendly_name: "Storj last 24h"
+  icon: mdi:gauge
+
+sensor.mk_storj_increase:
+  friendly_name: "Storj last 24h"
+  icon: mdi:gauge
+
+sensor.storj:
+  friendly_name: "Storj disk"
   icon: mdi:nas
 
-sensor.storjmk:
-  friendly_name: "Storj mk increase"
+sensor.mk_storj:
+  friendly_name: "Storj disk"
   icon: mdi:nas
+
+sensor.storj_bandwidth:
+  friendly_name: "Storj bandwidth"
+  icon: mdi:check-network-outline
+
+sensor.mk_storj_bandwidth:
+  friendly_name: "Storj bandwidth"
+  icon: mdi:check-network-outline
 
 light.table:
   icon: mdi:ceiling-light
@@ -106,9 +138,9 @@ binary_sensor.motion_spot:
   friendly_name: "Spot"
   icon: mdi:walk
 
-switch.socket:
-  friendly_name: "Socket"
-  icon: mdi:power-socket-eu
+switch.fail_over:
+  friendly_name: "Fail Over"
+  icon: mdi:network-router
 
 sensor.uptime:
   icon: mdi:calendar-today

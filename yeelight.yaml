@@ -1,0 +1,25 @@
+devices:
+  !secret Kitchen:
+    name: Kitchen
+    transition: 700
+  !secret Kitchen_strip:
+    name: Kitchen Strip
+    transition: 700
+  !secret WC:
+    name: WC
+    transition: 700
+  !secret Bob:
+    name: Bob
+    transition: 700
+  !secret Bathroom:
+    name: Bathroom
+    transition: 700
+  !secret DarkRoom:
+    name: DarkRoom
+    transition: 700
+  !secret LightRoom:
+    name: LightRoom
+    transition: 700
+  !secret Bedroom:
+    name: Bedroom
+    transition: 700

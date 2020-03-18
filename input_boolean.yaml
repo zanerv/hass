@@ -1,3 +1,7 @@
+dustbin:
+  name: "Empty dustbin"
+  icon: mdi:delete-empty
+ 
 night:
   name: Night
   icon: mdi:theme-light-dark
@@ -9,10 +13,6 @@ song:
 play:
   initial: off
   icon: mdi:play
-
-mmode:
-  name: Bob Auto
-  icon: mdi:brightness-auto
 
 vacation:
   name: Vacation
